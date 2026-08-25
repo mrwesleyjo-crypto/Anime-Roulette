@@ -8,11 +8,20 @@
 </head>
 <body>
   <div class="page">
-    <h1>Multiverse Anime Tournament</h1>
+    <div class="player-bar">
+      <h1>Multiverse Anime Tournament</h1>
+      <div class="player-id">
+        Playing as <b id="player-name-display">—</b>
+        <button class="link-btn" id="change-name-btn">Change name</button>
+      </div>
+    </div>
+
     <p class="subtitle">
       <b>Goal:</b> draft a roster of anime fighters, then spin your way through 6 tournament leagues.
       Beat every opponent in a league's bracket to win that league's Trophy and unlock the next one.
       Clear the Multiverse Final to become the undisputed Champion.
+      <br><br>
+      <b>Warning:</b> this is single elimination. Lose a match and your run ends — unless a Phoenix Ember saves you.
     </p>
 
     <div class="how-to">
@@ -22,7 +31,29 @@
         <li><b>Train</b> — spin to pick a roster member and permanently boost their power.</li>
         <li><b>Trade</b> — spin to swap a random roster member for a freshly scouted one.</li>
         <li><b>Match</b> — fight the next opponent in your current league's bracket, shown on the map below.</li>
+        <li><b>Treasure</b> — spin to find a one-time support item, kept separate from your roster.</li>
+        <li><b>Awakening</b> — from the Gold League onward, certain fighters (Naruto, Goku, Ichigo, and more) can unlock legendary power-ups.</li>
+        <li>🔥 You start with a <b>Phoenix Ember</b> — it revives you once if you'd be eliminated. Lose without one and your run is over.</li>
       </ul>
+    </div>
+
+    <div class="progress-panel">
+      <div class="progress-stat">
+        <span class="progress-stat-label">Personal Best</span>
+        <span class="progress-stat-value" id="stat-best">0 / 24 wins</span>
+      </div>
+      <div class="progress-stat">
+        <span class="progress-stat-label">Runs Played</span>
+        <span class="progress-stat-value" id="stat-runs">0</span>
+      </div>
+      <div class="progress-stat">
+        <span class="progress-stat-label">Champion Streak</span>
+        <span class="progress-stat-value" id="stat-streak">0 🔥</span>
+      </div>
+      <div class="progress-stat live-stat">
+        <span class="progress-stat-label">This Run</span>
+        <span class="progress-stat-value" id="stat-live">0 / 24 wins</span>
+      </div>
     </div>
 
     <div class="trophy-case" id="trophy-case"></div>
@@ -52,11 +83,19 @@
           <span class="log-label">Tournament Log</span>
           <div id="log-list" class="log-list"></div>
         </div>
+
+        <div class="leaderboard-panel">
+          <span class="log-label">Local Leaderboard</span>
+          <div id="leaderboard-list" class="leaderboard-list"></div>
+        </div>
       </div>
 
       <aside class="sidebar">
         <span class="roster-label">Your Roster</span>
         <div class="roster-list" id="roster-list"></div>
+
+        <span class="roster-label items-label">Items</span>
+        <div class="items-list" id="items-list"></div>
       </aside>
     </div>
   </div>
@@ -67,7 +106,29 @@
       <div class="celebration-trophy" id="celebration-trophy">🏆</div>
       <h2 id="celebration-title">Trophy Won!</h2>
       <p id="celebration-subtitle">You conquered the Bronze League!</p>
+      <p class="celebration-extra" id="celebration-extra"></p>
       <button id="celebration-close">Continue</button>
+    </div>
+  </div>
+
+  <div id="gameover-overlay" class="celebration-overlay gameover-overlay hidden">
+    <div class="celebration-modal gameover-modal">
+      <div class="celebration-trophy">💀</div>
+      <h2>Eliminated</h2>
+      <p id="gameover-subtitle">You fell in the Bronze League.</p>
+      <p class="celebration-extra" id="gameover-extra"></p>
+      <button id="gameover-close">Try Again</button>
+    </div>
+  </div>
+
+  <div id="name-overlay" class="celebration-overlay name-overlay hidden">
+    <div class="celebration-modal name-modal">
+      <div class="celebration-trophy">🎮</div>
+      <h2>Enter your name</h2>
+      <p>Your name goes on the local leaderboard on this device. Two players on the same device can't share a name.</p>
+      <input type="text" id="name-input" maxlength="20" placeholder="Your tournament name" autocomplete="off">
+      <p class="name-error hidden" id="name-error">That name is already taken on this device — try another.</p>
+      <button id="name-submit">Start Tournament</button>
     </div>
   </div>
 
