@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="game-container">
+  <div class="page">
     <h1>Multiverse Anime Tournament</h1>
     <p class="subtitle">
       <b>Goal:</b> draft a roster of anime fighters, then spin your way through 6 tournament leagues.
@@ -25,35 +25,49 @@
       </ul>
     </div>
 
-    <div class="tier-ladder" id="tier-ladder"></div>
+    <div class="trophy-case" id="trophy-case"></div>
 
-    <div class="bracket-panel">
-      <span class="bracket-title" id="bracket-title">Bronze League — Bracket</span>
-      <div class="bracket-path" id="bracket-path"></div>
+    <div class="layout">
+      <div class="main-col">
+        <div class="bracket-panel">
+          <span class="bracket-title" id="bracket-title">Bronze League — Bracket</span>
+          <div class="bracket-path" id="bracket-path"></div>
+        </div>
+
+        <h3 class="roulette-title" id="roulette-title">Ready to begin?</h3>
+
+        <div class="roulette-viewport">
+          <div class="pointer-top"></div>
+          <div class="center-line"></div>
+          <div class="fade fade-left"></div>
+          <div class="fade fade-right"></div>
+          <div class="strip-track" id="strip-track"></div>
+        </div>
+
+        <button id="main-btn">Draft your first fighter!</button>
+
+        <div id="event-panel" class="event-panel hidden"></div>
+
+        <div class="log-panel">
+          <span class="log-label">Tournament Log</span>
+          <div id="log-list" class="log-list"></div>
+        </div>
+      </div>
+
+      <aside class="sidebar">
+        <span class="roster-label">Your Roster</span>
+        <div class="roster-list" id="roster-list"></div>
+      </aside>
     </div>
+  </div>
 
-    <div class="roster-panel">
-      <span class="roster-label">Your Roster</span>
-      <div class="roster-list" id="roster-list"></div>
-    </div>
-
-    <h3 class="roulette-title" id="roulette-title">Ready to begin?</h3>
-
-    <div class="roulette-viewport">
-      <div class="pointer-top"></div>
-      <div class="center-line"></div>
-      <div class="fade fade-left"></div>
-      <div class="fade fade-right"></div>
-      <div class="strip-track" id="strip-track"></div>
-    </div>
-
-    <button id="main-btn">Draft your first fighter!</button>
-
-    <div id="event-panel" class="event-panel hidden"></div>
-
-    <div class="log-panel">
-      <span class="log-label">Tournament Log</span>
-      <div id="log-list" class="log-list"></div>
+  <div id="celebration-overlay" class="celebration-overlay hidden">
+    <div class="celebration-modal">
+      <div class="confetti-layer" id="confetti-layer"></div>
+      <div class="celebration-trophy" id="celebration-trophy">🏆</div>
+      <h2 id="celebration-title">Trophy Won!</h2>
+      <p id="celebration-subtitle">You conquered the Bronze League!</p>
+      <button id="celebration-close">Continue</button>
     </div>
   </div>
 
