@@ -3,13 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Anime Roulette</title>
+  <title>Multiverse Anime Toernooi</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="game-container">
-    <h1>Anime Roulette</h1>
-    <p class="subtitle">Draai en ontdek welk personage je krijgt</p>
+    <h1>Multiverse Anime Toernooi</h1>
+    <p class="subtitle">Scout vechters uit tientallen anime-universes, train ze, versla rivalen en klim door de liga's tot de Multiversum Finale — allemaal gestuurd door het lot van de roulette.</p>
+
+    <div class="tier-ladder" id="tier-ladder"></div>
+
+    <div class="points-bar-wrap">
+      <div class="points-bar"><div class="points-fill" id="points-fill"></div></div>
+      <span class="points-label" id="points-label">Bronzen Liga: 0 / 150 rangpunten</span>
+    </div>
+
+    <div class="roster-panel">
+      <span class="roster-label">Jouw roster</span>
+      <div class="roster-list" id="roster-list"></div>
+    </div>
+
+    <h3 class="roulette-title" id="roulette-title">Klaar om te beginnen?</h3>
 
     <div class="roulette-viewport">
       <div class="pointer-top"></div>
@@ -19,25 +33,13 @@
       <div class="strip-track" id="strip-track"></div>
     </div>
 
-    <div class="controls">
-      <button id="spin-btn">DRAAIEN!</button>
-      <div class="stats">
-        <span>Spins: <b id="stat-spins">0</b></span>
-        <span>Beste pull: <b id="stat-best">-</b></span>
-      </div>
-    </div>
+    <button id="main-btn">Scout je eerste vechter!</button>
 
-    <div id="result" class="hidden">
-      <h2 id="character-name">-</h2>
-      <p id="character-rarity">-</p>
-      <div id="character-stats">
-        <p>Power: <span id="stat-power">0</span></p>
-      </div>
-    </div>
+    <div id="event-panel" class="event-panel hidden"></div>
 
-    <div class="history">
-      <span class="history-label">Laatste pulls:</span>
-      <div id="history-list" class="history-list"></div>
+    <div class="log-panel">
+      <span class="log-label">Toernooi Logboek</span>
+      <div id="log-list" class="log-list"></div>
     </div>
   </div>
 
