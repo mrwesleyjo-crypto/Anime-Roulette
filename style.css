@@ -1,5 +1,9 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
-  background-color: #121214;
+  background: radial-gradient(circle at 50% -10%, #23232b 0%, #121214 55%);
   color: #ffffff;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   display: flex;
@@ -7,6 +11,7 @@ body {
   align-items: center;
   min-height: 100vh;
   margin: 0;
+  padding: 20px;
 }
 
 .game-container {
@@ -15,26 +20,147 @@ body {
   padding: 30px;
   border-radius: 16px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  width: 100%;
+  max-width: 900px;
 }
 
-.roulette-wrapper {
+h1 {
+  margin-bottom: 4px;
+  letter-spacing: 1px;
+}
+
+.subtitle {
+  margin: 0 0 24px;
+  color: #9a9aa5;
+  font-size: 0.95rem;
+}
+
+/* ---------- Roulette strip ---------- */
+
+.roulette-viewport {
   position: relative;
-  margin: 20px auto;
-  width: 500px;
-  height: 500px;
+  width: 100%;
+  height: 190px;
+  margin: 0 auto 24px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #16161b;
+  border: 1px solid #2c2c35;
 }
 
-.pointer {
+.pointer-top {
   position: absolute;
-  top: -10px;
+  top: 0;
   left: 50%;
   transform: translateX(-50%);
   width: 0;
   height: 0;
-  border-left: 15px solid transparent;
-  border-right: 15px solid transparent;
-  border-top: 30px solid #ff4757;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-top: 18px solid #ff4757;
   z-index: 10;
+  filter: drop-shadow(0 0 6px rgba(255,71,87,0.7));
+}
+
+.center-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  transform: translateX(-1px);
+  background: linear-gradient(to bottom, #ff4757, rgba(255,71,87,0.1));
+  z-index: 9;
+}
+
+.fade {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 60px;
+  z-index: 8;
+  pointer-events: none;
+}
+
+.fade-left {
+  left: 0;
+  background: linear-gradient(to right, #16161b, transparent);
+}
+
+.fade-right {
+  right: 0;
+  background: linear-gradient(to left, #16161b, transparent);
+}
+
+.strip-track {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  will-change: transform;
+  transform: translateX(0);
+}
+
+.strip-item {
+  flex: 0 0 auto;
+  width: 150px;
+  height: 160px;
+  margin-right: 12px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  background: #202028;
+  border: 2px solid var(--rarity-color, #555);
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.4);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.strip-item .avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.1rem;
+  background: var(--rarity-color, #555);
+  color: #121214;
+}
+
+.strip-item .name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.strip-item .rarity-tag {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--rarity-color, #aaa);
+  font-weight: 700;
+}
+
+.strip-item.winner {
+  transform: scale(1.06);
+  box-shadow: 0 0 25px var(--rarity-color, #555), inset 0 0 20px rgba(0,0,0,0.3);
+}
+
+/* ---------- Controls ---------- */
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
 }
 
 button {
@@ -62,6 +188,19 @@ button:disabled {
   cursor: not-allowed;
 }
 
+.stats {
+  display: flex;
+  gap: 20px;
+  color: #9a9aa5;
+  font-size: 0.85rem;
+}
+
+.stats b {
+  color: #ffffff;
+}
+
+/* ---------- Result ---------- */
+
 #result {
   margin-top: 20px;
   padding: 15px;
@@ -72,4 +211,40 @@ button:disabled {
 
 .hidden {
   opacity: 0;
+}
+
+#character-rarity {
+  font-weight: 700;
+}
+
+/* ---------- History ---------- */
+
+.history {
+  margin-top: 22px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.history-label {
+  color: #9a9aa5;
+  font-size: 0.8rem;
+}
+
+.history-list {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.history-chip {
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--rarity-color, #555);
+  color: var(--rarity-color, #aaa);
+  background: rgba(255,255,255,0.03);
 }
