@@ -97,6 +97,7 @@ const ROUND_LABELS = ['Round 1', 'Round 2', 'Semifinal', 'Final'];
 const TIERS = [
   {
     name: 'Bronze League',
+    icon: '🥉',
     bracket: [
       { name: 'Kael the Reckless', power: 40 },
       { name: 'Yumi Stormfist', power: 48 },
@@ -106,47 +107,52 @@ const TIERS = [
   },
   {
     name: 'Silver League',
+    icon: '🥈',
     bracket: [
-      { name: 'Senna Swift', power: 52 },
-      { name: 'Roku Ember', power: 60 },
-      { name: 'Nadia Frostblade', power: 66 },
-      { name: 'Lady Vael, Silver Champion', power: 74 }
+      { name: 'Senna Swift', power: 54 },
+      { name: 'Roku Ember', power: 62 },
+      { name: 'Nadia Frostblade', power: 69 },
+      { name: 'Lady Vael, Silver Champion', power: 76 }
     ]
   },
   {
     name: 'Gold League',
+    icon: '🥇',
     bracket: [
-      { name: 'Vesper Nightshade', power: 66 },
-      { name: 'Thane Ironclad', power: 74 },
-      { name: 'Amara Stormcaller', power: 80 },
-      { name: 'General Korrath, Gold Champion', power: 86 }
+      { name: 'Vesper Nightshade', power: 68 },
+      { name: 'Thane Ironclad', power: 76 },
+      { name: 'Amara Stormcaller', power: 83 },
+      { name: 'General Korrath, Gold Champion', power: 90 }
     ]
   },
   {
     name: 'Platinum League',
+    icon: '🏆',
     bracket: [
-      { name: 'Coda Voidwalker', power: 78 },
-      { name: 'Ozel the Silent', power: 84 },
-      { name: 'Brin Hollowmane', power: 90 },
-      { name: 'Sister Ishtar, Platinum Champion', power: 96 }
+      { name: 'Coda Voidwalker', power: 82 },
+      { name: 'Ozel the Silent', power: 89 },
+      { name: 'Brin Hollowmane', power: 95 },
+      { name: 'Sister Ishtar, Platinum Champion', power: 101 }
     ]
   },
   {
     name: 'Diamond League',
+    icon: '💎',
     bracket: [
-      { name: 'Kestrel Dawnbringer', power: 90 },
-      { name: 'Marrow the Unbound', power: 96 },
-      { name: 'Solstice Vane', power: 102 },
-      { name: 'The Undying Vaun, Diamond Champion', power: 106 }
+      { name: 'Kestrel Dawnbringer', power: 95 },
+      { name: 'Marrow the Unbound', power: 101 },
+      { name: 'Solstice Vane', power: 107 },
+      { name: 'The Undying Vaun, Diamond Champion', power: 112 }
     ]
   },
   {
     name: 'Multiverse Final',
+    icon: '👑',
     bracket: [
-      { name: 'Echo Fractal', power: 100 },
-      { name: 'Nyx Convergence', power: 106 },
-      { name: 'Prime Sentinel', power: 110 },
-      { name: 'The Architect, Ruler of the Multiverse', power: 116 }
+      { name: 'Echo Fractal', power: 106 },
+      { name: 'Nyx Convergence', power: 112 },
+      { name: 'Prime Sentinel', power: 117 },
+      { name: 'The Architect, Ruler of the Multiverse', power: 124 }
     ]
   }
 ];
@@ -208,9 +214,16 @@ const rouletteTitle = document.getElementById('roulette-title');
 const eventPanel = document.getElementById('event-panel');
 const logList = document.getElementById('log-list');
 const rosterList = document.getElementById('roster-list');
-const tierLadder = document.getElementById('tier-ladder');
+const trophyCase = document.getElementById('trophy-case');
 const bracketTitle = document.getElementById('bracket-title');
 const bracketPath = document.getElementById('bracket-path');
+
+const celebrationOverlay = document.getElementById('celebration-overlay');
+const celebrationTrophy = document.getElementById('celebration-trophy');
+const celebrationTitle = document.getElementById('celebration-title');
+const celebrationSubtitle = document.getElementById('celebration-subtitle');
+const celebrationClose = document.getElementById('celebration-close');
+const confettiLayer = document.getElementById('confetti-layer');
 
 // ---------------------------------------------------------------------------
 // Generic helpers
@@ -250,6 +263,24 @@ function currentTier() {
 function currentOpponent() {
   if (game.finaleWon) return null;
   return currentTier().bracket[game.roundIndex];
+}
+
+// ---------------------------------------------------------------------------
+// Win chance: total team power (with a team-size synergy bonus) vs opponent,
+// mapped through a sigmoid so the odds swing smoothly instead of linearly,
+// and never feel "stuck" near a fixed value.
+// ---------------------------------------------------------------------------
+
+function computeWinChance(opponentPower) {
+  const rosterSize = game.roster.length;
+  if (rosterSize === 0) return 0.05;
+  const avgPower = game.roster.reduce((s, c) => s + c.power, 0) / rosterSize;
+  const synergyBonus = (rosterSize - 1) * 4; // a fuller roster fights better as a team
+  const effectivePower = avgPower + synergyBonus;
+  const diff = effectivePower - opponentPower;
+  const steepness = 18;
+  const raw = 1 / (1 + Math.exp(-diff / steepness));
+  return clamp(raw, 0.05, 0.95);
 }
 
 // ---------------------------------------------------------------------------
@@ -357,43 +388,70 @@ function showEventPanel(kind, html) {
   eventPanel.innerHTML = html;
 }
 
-function refreshUI() {
-  // Roster chips
+function renderRosterSidebar() {
   rosterList.innerHTML = '';
   if (game.roster.length === 0) {
     const empty = document.createElement('span');
     empty.className = 'roster-empty';
     empty.textContent = 'No fighters yet — spin to draft your first one!';
     rosterList.appendChild(empty);
-  } else {
-    game.roster.forEach(c => {
-      const chip = document.createElement('div');
-      chip.className = 'roster-chip';
-      chip.style.setProperty('--rarity-color', c.color);
-      const avatar = document.createElement('div');
-      avatar.className = 'chip-avatar';
-      avatar.textContent = initials(c.name);
-      const text = document.createElement('span');
-      text.className = 'chip-text';
-      text.textContent = `${c.name} (${c.power})`;
-      chip.append(avatar, text);
-      rosterList.appendChild(chip);
-    });
+    return;
   }
+  game.roster.forEach(c => {
+    const card = document.createElement('div');
+    card.className = 'roster-card';
+    card.style.setProperty('--rarity-color', c.color);
 
-  // League ladder (overview of all 6 leagues)
-  tierLadder.innerHTML = '';
-  TIERS.forEach((tier, i) => {
-    const chip = document.createElement('span');
-    let cls = 'tier-chip';
-    if (i < game.tierIndex || game.finaleWon) cls += ' done';
-    else if (i === game.tierIndex) cls += ' current';
-    chip.className = cls;
-    chip.textContent = tier.name;
-    tierLadder.appendChild(chip);
+    // Placeholder for a future character image — swap this div for an
+    // <img src="..."> once artwork is added, the rarity-colored frame stays.
+    const image = document.createElement('div');
+    image.className = 'roster-card-image';
+    image.textContent = initials(c.name);
+
+    const body = document.createElement('div');
+    body.className = 'roster-card-body';
+
+    const name = document.createElement('div');
+    name.className = 'roster-card-name';
+    name.textContent = c.name;
+
+    const power = document.createElement('div');
+    power.className = 'roster-card-power';
+    power.textContent = `Power ${c.power} · ${c.universe}`;
+
+    const rarity = document.createElement('span');
+    rarity.className = 'roster-card-rarity';
+    rarity.textContent = c.rarity;
+
+    body.append(name, power, rarity);
+    card.append(image, body);
+    rosterList.appendChild(card);
   });
+}
 
-  // Bracket map for the current league
+function renderTrophyCase() {
+  trophyCase.innerHTML = '';
+  TIERS.forEach((tier, i) => {
+    const slot = document.createElement('div');
+    let cls = 'trophy-slot';
+    if (i < game.tierIndex || game.finaleWon) cls += ' earned';
+    else if (i === game.tierIndex) cls += ' current';
+    slot.className = cls;
+
+    const icon = document.createElement('span');
+    icon.className = 'trophy-icon';
+    icon.textContent = tier.icon;
+
+    const label = document.createElement('span');
+    label.className = 'trophy-league';
+    label.textContent = tier.name;
+
+    slot.append(icon, label);
+    trophyCase.appendChild(slot);
+  });
+}
+
+function renderBracket() {
   const tier = currentTier();
   bracketTitle.textContent = game.finaleWon
     ? 'Tournament Complete — Multiverse Champion!'
@@ -422,15 +480,61 @@ function refreshUI() {
     oppName.className = 'opponent-name';
     oppName.textContent = opponent.name;
 
-    node.append(roundLabel, oppName);
+    const oppPower = document.createElement('span');
+    oppPower.className = 'opponent-power';
+    oppPower.textContent = `Power ${opponent.power}`;
+
+    node.append(roundLabel, oppName, oppPower);
     bracketPath.appendChild(node);
   });
+}
 
-  // Button + idle title
+function refreshUI() {
+  renderRosterSidebar();
+  renderTrophyCase();
+  renderBracket();
+
   mainBtn.textContent = PHASE_LABELS[game.phase];
   mainBtn.disabled = isSpinning;
   rouletteTitle.textContent = PHASE_TITLES[game.phase] || PHASE_TITLES.action;
 }
+
+// ---------------------------------------------------------------------------
+// Celebration modal
+// ---------------------------------------------------------------------------
+
+const CONFETTI_COLORS = ['#ffd24d', '#ff4757', '#2ecc71', '#3498db', '#a855f7', '#ff9f43'];
+
+function spawnConfetti(count) {
+  confettiLayer.innerHTML = '';
+  for (let i = 0; i < count; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = `${Math.random() * 100}%`;
+    piece.style.background = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)];
+    piece.style.animationDuration = `${1.4 + Math.random() * 1.4}s`;
+    piece.style.animationDelay = `${Math.random() * 0.5}s`;
+    piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+    confettiLayer.appendChild(piece);
+  }
+}
+
+function showCelebration(title, subtitle, isFinal) {
+  celebrationTrophy.textContent = isFinal ? '👑' : '🏆';
+  celebrationTitle.textContent = title;
+  celebrationSubtitle.textContent = subtitle;
+  spawnConfetti(isFinal ? 70 : 40);
+  celebrationOverlay.classList.remove('hidden');
+  mainBtn.disabled = true;
+}
+
+function hideCelebration() {
+  celebrationOverlay.classList.add('hidden');
+  confettiLayer.innerHTML = '';
+  refreshUI();
+}
+
+celebrationClose.addEventListener('click', hideCelebration);
 
 // ---------------------------------------------------------------------------
 // Roster management
@@ -536,8 +640,7 @@ function startTrainingSpin() {
 }
 
 function resolveMatch(opponent) {
-  const avgPower = game.roster.length ? game.roster.reduce((s, c) => s + c.power, 0) / game.roster.length : 50;
-  const winChance = clamp(0.55 + (avgPower - opponent.power) / 45, 0.15, 0.92);
+  const winChance = computeWinChance(opponent.power);
   const pool = [
     { name: 'Victory', icon: '🏆', color: '#2ecc71', win: true, weight: winChance * 100, sub: 'Result' },
     { name: 'Defeat', icon: '💀', color: '#e74c3c', win: false, weight: (1 - winChance) * 100, sub: 'Result' }
@@ -557,21 +660,28 @@ function handleMatchResult(opponent, outcome) {
       logEvent(`🏆 Won the ${tier.name} Trophy! Whole roster +5 power.`);
       game.tierIndex++;
       game.roundIndex = 0;
+
       if (game.tierIndex >= TIERS.length) {
         game.finaleWon = true;
         logEvent('🏆 THE ARCHITECT DEFEATED! You are the Multiverse Champion!');
         showEventPanel('victory', `You defeated <b>${opponent.name}</b> and became the <b>Multiverse Champion</b>! 🎉`);
-      } else {
-        showEventPanel('success', `You won the <b>${tier.name} Trophy</b>! Your whole roster grew stronger, and the <b>${currentTier().name}</b> is now open.`);
+        refreshUI();
+        showCelebration('MULTIVERSE CHAMPION!', `You conquered every league and defeated ${opponent.name}. Legends will speak of this run.`, true);
+        return;
       }
-    } else {
-      showEventPanel('success', `You defeated <b>${opponent.name}</b>! Next up: <b>${tier.bracket[game.roundIndex].name}</b>.`);
+
+      showEventPanel('success', `You won the <b>${tier.name} Trophy</b>! Your whole roster grew stronger, and the <b>${currentTier().name}</b> is now open.`);
+      refreshUI();
+      showCelebration(`${tier.name} Champion!`, `You swept the bracket and earned the ${tier.name} Trophy! Onward to the ${currentTier().name}.`, false);
+      return;
     }
+
+    showEventPanel('success', `You defeated <b>${opponent.name}</b>! Next up: <b>${tier.bracket[game.roundIndex].name}</b>.`);
   } else {
     logEvent(`❌ Lost to ${opponent.name}`);
     showEventPanel('fail', `You lost to <b>${opponent.name}</b>. Train up your roster and try that match again.`);
   }
-  game.phase = game.finaleWon ? 'victory' : 'action';
+  game.phase = 'action';
   refreshUI();
 }
 
