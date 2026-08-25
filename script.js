@@ -87,49 +87,98 @@ const CHARACTER_POOL = buildCharacterPool();
 const STARTER_POOL = CHARACTER_POOL.filter(c => c.isStarter).map(c => ({ ...c, weight: 1 }));
 
 // ---------------------------------------------------------------------------
-// Tournament ladder: leagues, each with a rank-point threshold and a Gatekeeper boss
+// Tournament map: each league is its own bracket of 4 named opponents.
+// Win Round 1 -> Round 2 -> Semifinal -> Final to claim the league's Trophy
+// and unlock the next league.
 // ---------------------------------------------------------------------------
 
+const ROUND_LABELS = ['Round 1', 'Round 2', 'Semifinal', 'Final'];
+
 const TIERS = [
-  { name: 'Bronzen Liga', threshold: 150, rankedPower: 45, gatekeeper: { name: 'Ridder Orlan, Bronzen Kampioen', power: 60 } },
-  { name: 'Zilveren Liga', threshold: 350, rankedPower: 58, gatekeeper: { name: 'Meesteres Vael, Zilveren Kampioen', power: 72 } },
-  { name: 'Gouden Liga', threshold: 600, rankedPower: 70, gatekeeper: { name: 'Generaal Korrath, Gouden Kampioen', power: 84 } },
-  { name: 'Platina Liga', threshold: 900, rankedPower: 80, gatekeeper: { name: 'Zuster Ishtar, Platina Kampioen', power: 94 } },
-  { name: 'Diamanten Liga', threshold: 1250, rankedPower: 90, gatekeeper: { name: 'De Onsterfelijke Vaun, Diamanten Kampioen', power: 104 } },
-  { name: 'Multiversum Finale', threshold: 1600, rankedPower: 100, gatekeeper: { name: 'De Architect, Heerser van het Multiversum', power: 114 } }
+  {
+    name: 'Bronze League',
+    bracket: [
+      { name: 'Kael the Reckless', power: 40 },
+      { name: 'Yumi Stormfist', power: 48 },
+      { name: 'Draxo the Wall', power: 54 },
+      { name: 'Sir Orlan, Bronze Champion', power: 62 }
+    ]
+  },
+  {
+    name: 'Silver League',
+    bracket: [
+      { name: 'Senna Swift', power: 52 },
+      { name: 'Roku Ember', power: 60 },
+      { name: 'Nadia Frostblade', power: 66 },
+      { name: 'Lady Vael, Silver Champion', power: 74 }
+    ]
+  },
+  {
+    name: 'Gold League',
+    bracket: [
+      { name: 'Vesper Nightshade', power: 66 },
+      { name: 'Thane Ironclad', power: 74 },
+      { name: 'Amara Stormcaller', power: 80 },
+      { name: 'General Korrath, Gold Champion', power: 86 }
+    ]
+  },
+  {
+    name: 'Platinum League',
+    bracket: [
+      { name: 'Coda Voidwalker', power: 78 },
+      { name: 'Ozel the Silent', power: 84 },
+      { name: 'Brin Hollowmane', power: 90 },
+      { name: 'Sister Ishtar, Platinum Champion', power: 96 }
+    ]
+  },
+  {
+    name: 'Diamond League',
+    bracket: [
+      { name: 'Kestrel Dawnbringer', power: 90 },
+      { name: 'Marrow the Unbound', power: 96 },
+      { name: 'Solstice Vane', power: 102 },
+      { name: 'The Undying Vaun, Diamond Champion', power: 106 }
+    ]
+  },
+  {
+    name: 'Multiverse Final',
+    bracket: [
+      { name: 'Echo Fractal', power: 100 },
+      { name: 'Nyx Convergence', power: 106 },
+      { name: 'Prime Sentinel', power: 110 },
+      { name: 'The Architect, Ruler of the Multiverse', power: 116 }
+    ]
+  }
 ];
 
-const RIVAL_NAMES = ['Kael', 'Yumi', 'Draxo', 'Senna', 'Roku', 'Nadia', 'Vesper', 'Thane', 'Amara', 'Coda', 'Ozel', 'Brin'];
-
 const ACTION_META = {
-  scout: { name: 'Scouten', icon: '🧭', color: '#2ecc71' },
-  ranked: { name: 'Rangduel', icon: '⚔️', color: '#e67e22' },
-  training: { name: 'Trainingskamp', icon: '🏋️', color: '#f1c40f' },
-  trade: { name: 'Ruilen', icon: '🔄', color: '#3498db' },
-  gatekeeper: { name: 'Gatekeeper Duel', icon: '👑', color: '#e84393' }
+  scout: { name: 'Scout', icon: '🧭', color: '#2ecc71' },
+  train: { name: 'Train', icon: '🏋️', color: '#f1c40f' },
+  trade: { name: 'Trade', icon: '🔄', color: '#3498db' },
+  match: { name: 'Match', icon: '⚔️', color: '#e67e22' }
 };
 
 const PHASE_LABELS = {
-  starter: 'Scout je eerste vechter!',
-  action: 'Draai gebeurtenis!',
-  scout: 'Scout een vechter!',
-  ranked: 'Start rangduel!',
-  training: 'Start trainingskamp!',
-  trade: 'Start ruil!',
-  gatekeeper: 'Daag de Gatekeeper uit!',
-  victory: 'Nieuw toernooi starten'
+  starter: 'Draft your first fighter!',
+  action: 'Spin for the next event!',
+  scout: 'Scout a fighter!',
+  train: 'Start training!',
+  trade: 'Start a trade!',
+  match: 'Fight the next match!',
+  victory: 'Start a new tournament'
 };
 
 const PHASE_TITLES = {
-  starter: 'Draai om je eerste vechter te scouten!',
-  action: 'Wat gebeurt er nu?',
-  scout: 'Draai om een nieuwe vechter te scouten!',
-  training: 'Wie gaat er trainen?',
-  trade: 'Draai om te ruilen!',
-  victory: 'Je bent Multiversum Kampioen! 🏆'
+  starter: 'Spin to draft your first fighter!',
+  action: 'What happens next?',
+  scout: 'Spin to scout a new fighter!',
+  train: 'Who goes to training camp?',
+  trade: 'Spin to make a trade!',
+  victory: 'You are the Multiverse Champion! 🏆'
 };
 
 const MAX_ROSTER = 6;
+const POWER_CAP = 130;
 
 // ---------------------------------------------------------------------------
 // Game state
@@ -139,8 +188,8 @@ function createInitialState() {
   return {
     phase: 'starter',
     roster: [],
-    rankPoints: 0,
     tierIndex: 0,
+    roundIndex: 0,
     finaleWon: false
   };
 }
@@ -160,8 +209,8 @@ const eventPanel = document.getElementById('event-panel');
 const logList = document.getElementById('log-list');
 const rosterList = document.getElementById('roster-list');
 const tierLadder = document.getElementById('tier-ladder');
-const pointsFill = document.getElementById('points-fill');
-const pointsLabel = document.getElementById('points-label');
+const bracketTitle = document.getElementById('bracket-title');
+const bracketPath = document.getElementById('bracket-path');
 
 // ---------------------------------------------------------------------------
 // Generic helpers
@@ -194,12 +243,13 @@ function initials(text) {
     .toUpperCase();
 }
 
-function randomRivalName() {
-  return RIVAL_NAMES[Math.floor(Math.random() * RIVAL_NAMES.length)];
-}
-
 function currentTier() {
   return TIERS[Math.min(game.tierIndex, TIERS.length - 1)];
+}
+
+function currentOpponent() {
+  if (game.finaleWon) return null;
+  return currentTier().bracket[game.roundIndex];
 }
 
 // ---------------------------------------------------------------------------
@@ -313,7 +363,7 @@ function refreshUI() {
   if (game.roster.length === 0) {
     const empty = document.createElement('span');
     empty.className = 'roster-empty';
-    empty.textContent = 'Nog geen vechters — draai om je eerste te scouten!';
+    empty.textContent = 'No fighters yet — spin to draft your first one!';
     rosterList.appendChild(empty);
   } else {
     game.roster.forEach(c => {
@@ -331,25 +381,50 @@ function refreshUI() {
     });
   }
 
-  // Tier ladder
+  // League ladder (overview of all 6 leagues)
   tierLadder.innerHTML = '';
   TIERS.forEach((tier, i) => {
     const chip = document.createElement('span');
     let cls = 'tier-chip';
-    if (i < game.tierIndex) cls += ' done';
-    else if (i === game.tierIndex && !game.finaleWon) cls += ' current';
+    if (i < game.tierIndex || game.finaleWon) cls += ' done';
+    else if (i === game.tierIndex) cls += ' current';
     chip.className = cls;
-    chip.textContent = tier.name.replace(' Liga', '').replace(' Finale', '');
+    chip.textContent = tier.name;
     tierLadder.appendChild(chip);
   });
 
-  // Points bar
+  // Bracket map for the current league
   const tier = currentTier();
-  const pct = game.finaleWon ? 100 : clamp((game.rankPoints / tier.threshold) * 100, 0, 100);
-  pointsFill.style.width = `${pct}%`;
-  pointsLabel.textContent = game.finaleWon
-    ? 'Multiversum Kampioen! 🏆'
-    : `${tier.name}: ${game.rankPoints} / ${tier.threshold} rangpunten`;
+  bracketTitle.textContent = game.finaleWon
+    ? 'Tournament Complete — Multiverse Champion!'
+    : `${tier.name} — Bracket`;
+
+  bracketPath.innerHTML = '';
+  tier.bracket.forEach((opponent, i) => {
+    if (i > 0) {
+      const arrow = document.createElement('span');
+      arrow.className = 'bracket-arrow';
+      arrow.textContent = '→';
+      bracketPath.appendChild(arrow);
+    }
+    const node = document.createElement('div');
+    let cls = 'bracket-node';
+    if (i < game.roundIndex || game.finaleWon) cls += ' done';
+    else if (i === game.roundIndex) cls += ' current';
+    if (i === tier.bracket.length - 1) cls += ' trophy';
+    node.className = cls;
+
+    const roundLabel = document.createElement('span');
+    roundLabel.className = 'round-label';
+    roundLabel.textContent = i === tier.bracket.length - 1 ? 'Final' : ROUND_LABELS[i];
+
+    const oppName = document.createElement('span');
+    oppName.className = 'opponent-name';
+    oppName.textContent = opponent.name;
+
+    node.append(roundLabel, oppName);
+    bracketPath.appendChild(node);
+  });
 
   // Button + idle title
   mainBtn.textContent = PHASE_LABELS[game.phase];
@@ -365,35 +440,32 @@ function addToRoster(character) {
   const c = { ...character };
   if (game.roster.length < MAX_ROSTER) {
     game.roster.push(c);
-    logEvent(`✅ Gescout: ${c.name} (${c.universe})`);
-    showEventPanel('success', `Je hebt <b>${c.name}</b> gescout! (${c.universe} · ${c.rarity})`);
+    logEvent(`✅ Scouted: ${c.name} (${c.universe})`);
+    showEventPanel('success', `You scouted <b>${c.name}</b>! (${c.universe} · ${c.rarity})`);
     return;
   }
   const weakestIdx = game.roster.reduce((minI, t, i, arr) => (t.power < arr[minI].power ? i : minI), 0);
   const weakest = game.roster[weakestIdx];
   if (c.power > weakest.power) {
     game.roster[weakestIdx] = c;
-    logEvent(`🔁 ${weakest.name} vervangen door ${c.name}`);
-    showEventPanel('success', `Je roster was vol: <b>${weakest.name}</b> moest plaats maken voor <b>${c.name}</b> (${c.universe})!`);
+    logEvent(`🔁 ${weakest.name} replaced by ${c.name}`);
+    showEventPanel('success', `Your roster was full: <b>${weakest.name}</b> made way for <b>${c.name}</b> (${c.universe})!`);
   } else {
-    logEvent(`↩️ ${c.name} bedankte voor de eer, je roster was al sterk genoeg`);
-    showEventPanel('info', `Je roster was vol en al sterker dan <b>${c.name}</b> — die ging elders zijn geluk beproeven.`);
+    logEvent(`↩️ ${c.name} walked away, your roster was already strong enough`);
+    showEventPanel('info', `Your roster was full and already stronger than <b>${c.name}</b> — they moved on.`);
   }
 }
 
 function buildEventPool() {
-  const entries = [
-    { value: 'scout', weight: 30 },
-    { value: 'ranked', weight: 30 }
-  ];
+  const entries = [{ value: 'scout', weight: 30 }];
   if (game.roster.length > 0) {
-    entries.push({ value: 'training', weight: 20 });
+    entries.push({ value: 'train', weight: 20 });
     entries.push({ value: 'trade', weight: 10 });
   }
-  if (!game.finaleWon && game.rankPoints >= currentTier().threshold) {
-    entries.push({ value: 'gatekeeper', weight: 15 });
+  if (!game.finaleWon) {
+    entries.push({ value: 'match', weight: 40 });
   }
-  return entries.map(e => ({ ...ACTION_META[e.value], value: e.value, weight: e.weight, sub: 'Gebeurtenis' }));
+  return entries.map(e => ({ ...ACTION_META[e.value], value: e.value, weight: e.weight, sub: 'Event' }));
 }
 
 // ---------------------------------------------------------------------------
@@ -403,8 +475,8 @@ function buildEventPool() {
 function startStarterSpin() {
   runRoulette(STARTER_POOL, PHASE_TITLES.starter, winner => {
     game.roster.push({ ...winner });
-    logEvent(`🎉 Je toernooi begint met ${winner.name} (${winner.universe})!`);
-    showEventPanel('success', `Je eerste vechter is <b>${winner.name}</b> uit <b>${winner.universe}</b>!`);
+    logEvent(`🎉 Your tournament begins with ${winner.name} (${winner.universe})!`);
+    showEventPanel('success', `Your first fighter is <b>${winner.name}</b> from <b>${winner.universe}</b>!`);
     game.phase = 'action';
     refreshUI();
   });
@@ -413,8 +485,8 @@ function startStarterSpin() {
 function startActionSpin() {
   const pool = buildEventPool();
   runRoulette(pool, PHASE_TITLES.action, winner => {
-    logEvent(`🎲 Gebeurtenis: ${winner.name}`);
-    showEventPanel('info', `Er staat te gebeuren: <b>${winner.name}</b>`);
+    logEvent(`🎲 Event: ${winner.name}`);
+    showEventPanel('info', `Coming up: <b>${winner.name}</b>`);
     game.phase = winner.value;
     refreshUI();
   });
@@ -436,8 +508,8 @@ function startTradeSpin() {
       const idx = Math.floor(Math.random() * game.roster.length);
       const old = game.roster[idx];
       game.roster[idx] = { ...winner };
-      logEvent(`🔄 Geruild: ${old.name} → ${winner.name}`);
-      showEventPanel('info', `Je hebt <b>${old.name}</b> geruild voor <b>${winner.name}</b> (${winner.universe})!`);
+      logEvent(`🔄 Traded: ${old.name} → ${winner.name}`);
+      showEventPanel('info', `You traded <b>${old.name}</b> for <b>${winner.name}</b> (${winner.universe})!`);
     }
     game.phase = 'action';
     refreshUI();
@@ -451,68 +523,66 @@ function startTrainingSpin() {
     return;
   }
   const pool = game.roster.map(c => ({ ...c, weight: 1 }));
-  runRoulette(pool, PHASE_TITLES.training, winner => {
+  runRoulette(pool, PHASE_TITLES.train, winner => {
     const idx = game.roster.findIndex(c => c.name === winner.name && c.power === winner.power);
     const target = idx >= 0 ? game.roster[idx] : game.roster[0];
     const boost = rand(4, 9);
-    target.power = Math.min(105, target.power + boost);
-    logEvent(`🏋️ Trainingskamp: ${target.name} is +${boost} power gegroeid (${target.power})`);
-    showEventPanel('success', `<b>${target.name}</b> heeft een intensief trainingskamp doorstaan en is nu <b>${target.power}</b> power sterk!`);
+    target.power = Math.min(POWER_CAP, target.power + boost);
+    logEvent(`🏋️ Training camp: ${target.name} gained +${boost} power (${target.power})`);
+    showEventPanel('success', `<b>${target.name}</b> completed an intense training camp and is now <b>${target.power}</b> power strong!`);
     game.phase = 'action';
     refreshUI();
   });
 }
 
-function resolveDuel(kind, opponent, titleText) {
+function resolveMatch(opponent) {
   const avgPower = game.roster.length ? game.roster.reduce((s, c) => s + c.power, 0) / game.roster.length : 50;
   const winChance = clamp(0.55 + (avgPower - opponent.power) / 45, 0.15, 0.92);
   const pool = [
-    { name: 'Overwinning', icon: '🏆', color: '#2ecc71', win: true, weight: winChance * 100, sub: 'Resultaat' },
-    { name: 'Nederlaag', icon: '💀', color: '#e74c3c', win: false, weight: (1 - winChance) * 100, sub: 'Resultaat' }
+    { name: 'Victory', icon: '🏆', color: '#2ecc71', win: true, weight: winChance * 100, sub: 'Result' },
+    { name: 'Defeat', icon: '💀', color: '#e74c3c', win: false, weight: (1 - winChance) * 100, sub: 'Result' }
   ];
-  runRoulette(pool, titleText, outcome => handleDuelResult(kind, opponent, outcome));
+  runRoulette(pool, `Match: vs ${opponent.name}!`, outcome => handleMatchResult(opponent, outcome));
 }
 
-function handleDuelResult(kind, opponent, outcome) {
+function handleMatchResult(opponent, outcome) {
+  const tier = currentTier();
+
   if (outcome.win) {
-    if (kind === 'ranked') {
-      const gained = 35 + rand(0, 10);
-      game.rankPoints += gained;
-      logEvent(`⚔️ Gewonnen van rivaal ${opponent.name}! (+${gained} rangpunten)`);
-      showEventPanel('success', `Je versloeg rivaal <b>${opponent.name}</b> en verdiende <b>${gained} rangpunten</b>!`);
-    } else if (kind === 'gatekeeper') {
+    logEvent(`⚔️ Defeated ${opponent.name}!`);
+    game.roundIndex++;
+    if (game.roundIndex >= tier.bracket.length) {
+      // Tier complete: award trophy, boost the whole roster, advance.
+      game.roster.forEach(c => { c.power = Math.min(POWER_CAP, c.power + 5); });
+      logEvent(`🏆 Won the ${tier.name} Trophy! Whole roster +5 power.`);
       game.tierIndex++;
+      game.roundIndex = 0;
       if (game.tierIndex >= TIERS.length) {
         game.finaleWon = true;
-        logEvent('🏆 DE ARCHITECT VERSLAGEN! Je bent Multiversum Kampioen!');
-        showEventPanel('victory', `Je hebt <b>${opponent.name}</b> verslagen en bent de nieuwe <b>Multiversum Kampioen</b>! 🎉`);
+        logEvent('🏆 THE ARCHITECT DEFEATED! You are the Multiverse Champion!');
+        showEventPanel('victory', `You defeated <b>${opponent.name}</b> and became the <b>Multiverse Champion</b>! 🎉`);
       } else {
-        logEvent(`👑 Gatekeeper verslagen: ${opponent.name} — welkom in de ${currentTier().name}!`);
-        showEventPanel('success', `Je hebt <b>${opponent.name}</b> verslagen! Je stroomt door naar de <b>${currentTier().name}</b>.`);
+        showEventPanel('success', `You won the <b>${tier.name} Trophy</b>! Your whole roster grew stronger, and the <b>${currentTier().name}</b> is now open.`);
       }
+    } else {
+      showEventPanel('success', `You defeated <b>${opponent.name}</b>! Next up: <b>${tier.bracket[game.roundIndex].name}</b>.`);
     }
   } else {
-    if (kind === 'ranked') {
-      logEvent(`❌ Verloren van rivaal ${opponent.name}`);
-      showEventPanel('fail', `Helaas, je verloor van rivaal <b>${opponent.name}</b>. Geen rangpunten dit keer.`);
-    } else {
-      logEvent(`❌ Verloren van Gatekeeper ${opponent.name}`);
-      showEventPanel('fail', `Helaas, <b>${opponent.name}</b> was te sterk. Train je roster verder en probeer het opnieuw.`);
-    }
+    logEvent(`❌ Lost to ${opponent.name}`);
+    showEventPanel('fail', `You lost to <b>${opponent.name}</b>. Train up your roster and try that match again.`);
   }
   game.phase = game.finaleWon ? 'victory' : 'action';
   refreshUI();
 }
 
-function startRankedSpin() {
-  const tier = currentTier();
-  const opponent = { name: `${randomRivalName()} (${tier.name})`, power: tier.rankedPower + rand(-8, 8) };
-  resolveDuel('ranked', opponent, `Rangduel tegen ${opponent.name}!`);
-}
-
-function startGatekeeperSpin() {
-  const opponent = currentTier().gatekeeper;
-  resolveDuel('gatekeeper', opponent, `Gatekeeper Duel: ${opponent.name}!`);
+function startMatchSpin() {
+  const opponent = currentOpponent();
+  if (!opponent) {
+    game.phase = 'victory';
+    refreshUI();
+    return;
+  }
+  resolveMatch(opponent);
 }
 
 function resetGame() {
@@ -534,10 +604,9 @@ function handleMainButtonClick() {
     case 'starter': startStarterSpin(); break;
     case 'action': startActionSpin(); break;
     case 'scout': startScoutSpin(); break;
-    case 'ranked': startRankedSpin(); break;
-    case 'training': startTrainingSpin(); break;
+    case 'train': startTrainingSpin(); break;
     case 'trade': startTradeSpin(); break;
-    case 'gatekeeper': startGatekeeperSpin(); break;
+    case 'match': startMatchSpin(); break;
     case 'victory': resetGame(); break;
   }
 }
