@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anime Roulette</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="game-container">
+    <h1>Anime Roulette</h1>
+    
+    <div class="roulette-wrapper">
+      <div class="pointer"></div>
+      <canvas id="wheel" width="500" height="500"></canvas>
+    </div>
+
+    <button id="spin-btn">DRAAIEN!</button>
+
+    <div id="result" class="hidden">
+      <h2 id="character-name">-</h2>
+      <p id="character-rarity">-</p>
+      <div id="character-stats">
+        <p>Power: <span id="stat-power">0</span></p>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
