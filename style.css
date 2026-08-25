@@ -8,20 +8,19 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   display: flex;
   justify-content: center;
-  align-items: center;
   min-height: 100vh;
   margin: 0;
   padding: 20px;
 }
 
-.game-container {
+.page {
   text-align: center;
   background: #1e1e24;
   padding: 30px;
   border-radius: 16px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.5);
   width: 100%;
-  max-width: 900px;
+  max-width: 1080px;
 }
 
 h1 {
@@ -65,38 +64,174 @@ h1 {
   line-height: 1.6;
 }
 
-/* ---------- Tier ladder ---------- */
+/* ---------- Trophy case ---------- */
 
-.tier-ladder {
+.trophy-case {
   display: flex;
   justify-content: center;
-  gap: 6px;
+  gap: 16px;
   flex-wrap: wrap;
-  margin-bottom: 14px;
-}
-
-.tier-chip {
-  font-size: 0.68rem;
-  padding: 5px 10px;
-  border-radius: 20px;
-  border: 1px solid #3a3a44;
-  color: #6c6c78;
+  margin-bottom: 20px;
+  padding: 14px;
   background: #191920;
-  white-space: nowrap;
+  border: 1px solid #2c2c35;
+  border-radius: 10px;
 }
 
-.tier-chip.done {
-  border-color: #2ecc71;
-  color: #2ecc71;
-  background: rgba(46,204,113,0.08);
+.trophy-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  opacity: 0.35;
+  transition: opacity 0.3s ease;
 }
 
-.tier-chip.current {
-  border-color: #ffd24d;
+.trophy-slot .trophy-icon {
+  font-size: 1.9rem;
+  filter: grayscale(1);
+}
+
+.trophy-slot .trophy-league {
+  font-size: 0.62rem;
+  color: #6c6c78;
+  max-width: 76px;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.trophy-slot.current {
+  opacity: 0.85;
+}
+
+.trophy-slot.current .trophy-icon {
+  filter: none;
+  opacity: 0.6;
+}
+
+.trophy-slot.earned {
+  opacity: 1;
+}
+
+.trophy-slot.earned .trophy-icon {
+  filter: none;
+  text-shadow: 0 0 10px #ffd24d;
+  animation: trophyGlow 2.2s ease-in-out infinite;
+}
+
+.trophy-slot.earned .trophy-league {
   color: #ffd24d;
-  background: rgba(255,210,77,0.1);
-  box-shadow: 0 0 8px rgba(255,210,77,0.4);
+}
+
+@keyframes trophyGlow {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.12); }
+}
+
+/* ---------- Two-column layout ---------- */
+
+.layout {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.main-col {
+  flex: 1;
+  min-width: 0;
+}
+
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  text-align: left;
+  background: #191920;
+  border: 1px solid #2c2c35;
+  border-radius: 10px;
+  padding: 14px;
+}
+
+@media (max-width: 760px) {
+  .layout {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+  }
+}
+
+/* ---------- Roster sidebar cards ---------- */
+
+.roster-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #9a9aa5;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.roster-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.roster-empty {
+  color: #6c6c78;
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+.roster-card {
+  display: flex;
+  flex-direction: column;
+  background: #202028;
+  border: 1px solid #2c2c35;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.roster-card-image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #121214;
+  background: linear-gradient(160deg, var(--rarity-color, #555), #16161b 130%);
+}
+
+.roster-card-body {
+  padding: 8px 10px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.roster-card-name {
+  font-size: 0.82rem;
   font-weight: 700;
+  line-height: 1.2;
+}
+
+.roster-card-power {
+  font-size: 0.7rem;
+  color: #9a9aa5;
+}
+
+.roster-card-rarity {
+  align-self: flex-start;
+  font-size: 0.64rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  border: 1.5px solid var(--rarity-color, #555);
+  color: var(--rarity-color, #aaa);
 }
 
 /* ---------- Bracket map ---------- */
@@ -106,7 +241,7 @@ h1 {
   background: #191920;
   border: 1px solid #2c2c35;
   border-radius: 10px;
-  padding: 14px;
+  padding: 16px;
 }
 
 .bracket-title {
@@ -115,7 +250,7 @@ h1 {
   letter-spacing: 0.5px;
   color: #9a9aa5;
   display: block;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .bracket-path {
@@ -130,12 +265,13 @@ h1 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 8px 10px;
-  border-radius: 8px;
+  gap: 5px;
+  padding: 10px 12px;
+  border-radius: 10px;
   border: 1px solid #3a3a44;
   background: #202028;
-  min-width: 100px;
+  min-width: 110px;
+  transition: all 0.3s ease;
 }
 
 .bracket-node .round-label {
@@ -146,10 +282,16 @@ h1 {
 }
 
 .bracket-node .opponent-name {
-  font-size: 0.74rem;
+  font-size: 0.76rem;
   font-weight: 600;
   text-align: center;
   line-height: 1.25;
+}
+
+.bracket-node .opponent-power {
+  font-size: 0.66rem;
+  color: #ff9f43;
+  font-weight: 700;
 }
 
 .bracket-node.done {
@@ -161,10 +303,15 @@ h1 {
   color: #2ecc71;
 }
 
+.bracket-node.done .opponent-power {
+  color: #2ecc71;
+}
+
 .bracket-node.current {
   border-color: #ff4757;
-  background: rgba(255,71,87,0.1);
-  box-shadow: 0 0 10px rgba(255,71,87,0.4);
+  background: rgba(255,71,87,0.12);
+  box-shadow: 0 0 14px rgba(255,71,87,0.5);
+  transform: scale(1.05);
 }
 
 .bracket-node.trophy {
@@ -179,62 +326,6 @@ h1 {
 .bracket-arrow {
   color: #4a4a55;
   font-size: 1rem;
-}
-
-/* ---------- Roster panel ---------- */
-
-.roster-panel {
-  margin-bottom: 18px;
-}
-
-.roster-label {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: #9a9aa5;
-  display: block;
-  margin-bottom: 8px;
-}
-
-.roster-list {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  justify-content: center;
-  min-height: 34px;
-}
-
-.roster-chip {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 10px 5px 5px;
-  border-radius: 20px;
-  background: #202028;
-  border: 1px solid var(--rarity-color, #555);
-}
-
-.roster-chip .chip-avatar {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--rarity-color, #555);
-  color: #121214;
-  font-size: 0.65rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.roster-chip .chip-text {
-  font-size: 0.75rem;
-}
-
-.roster-empty {
-  color: #6c6c78;
-  font-size: 0.8rem;
-  font-style: italic;
 }
 
 /* ---------- Roulette strip ---------- */
@@ -459,4 +550,96 @@ button:disabled {
   padding: 4px 8px;
   background: #1a1a20;
   border-radius: 6px;
+}
+
+/* ---------- Celebration modal ---------- */
+
+.celebration-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(8,8,10,0.82);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  animation: fadeIn 0.25s ease;
+}
+
+.celebration-overlay.hidden {
+  display: none;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.celebration-modal {
+  position: relative;
+  background: linear-gradient(160deg, #26261f, #1e1e24 60%);
+  border: 1px solid #ffd24d;
+  box-shadow: 0 0 50px rgba(255,210,77,0.35);
+  border-radius: 18px;
+  padding: 40px 36px 30px;
+  text-align: center;
+  max-width: 380px;
+  width: 90%;
+  overflow: hidden;
+  animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes popIn {
+  from { transform: scale(0.6); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.celebration-trophy {
+  font-size: 4rem;
+  animation: trophyBounce 1s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px rgba(255,210,77,0.7));
+}
+
+@keyframes trophyBounce {
+  0%, 100% { transform: translateY(0) rotate(-4deg); }
+  50% { transform: translateY(-14px) rotate(4deg); }
+}
+
+.celebration-modal h2 {
+  margin: 14px 0 6px;
+  color: #ffd24d;
+  font-size: 1.4rem;
+}
+
+.celebration-modal p {
+  margin: 0 0 22px;
+  color: #d8d8e0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.celebration-modal button {
+  padding: 12px 34px;
+}
+
+.confetti-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -10%;
+  width: 8px;
+  height: 14px;
+  opacity: 0.9;
+  animation: confettiFall linear forwards;
+}
+
+@keyframes confettiFall {
+  to {
+    transform: translateY(420px) rotate(540deg);
+    opacity: 0;
+  }
 }
