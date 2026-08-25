@@ -4,15 +4,23 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Multiverse Anime Tournament</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div class="starfield"></div>
+  <div id="toast-container" class="toast-container"></div>
+
   <div class="page">
     <div class="player-bar">
       <h1>Multiverse Anime Tournament</h1>
       <div class="player-id">
         Playing as <b id="player-name-display">—</b>
         <button class="link-btn" id="change-name-btn">Change name</button>
+        <button class="link-btn" id="open-stats-btn">📊 Stats</button>
+        <button class="link-btn" id="open-shop-btn">🛒 Shop (<span id="shard-balance-inline">0</span> 🔷)</button>
       </div>
     </div>
 
@@ -30,30 +38,12 @@
         <li><b>Scout</b> — spin to recruit a new fighter to your roster (rarer fighters are stronger, but less likely).</li>
         <li><b>Train</b> — spin to pick a roster member and permanently boost their power.</li>
         <li><b>Trade</b> — spin to swap a random roster member for a freshly scouted one.</li>
-        <li><b>Match</b> — fight the next opponent in your current league's bracket, shown on the map below.</li>
+        <li><b>Match</b> — face the next opponent in your current league's bracket, shown on the map below.</li>
         <li><b>Treasure</b> — spin to find a one-time support item, kept separate from your roster.</li>
-        <li><b>Awakening</b> — from the Gold League onward, certain fighters (Naruto, Goku, Ichigo, and more) can unlock legendary power-ups.</li>
+        <li><b>Awakening</b> — from the Gold League onward, certain fighters can unlock legendary power-ups.</li>
         <li>🔥 You start with a <b>Phoenix Ember</b> — it revives you once if you'd be eliminated. Lose without one and your run is over.</li>
+        <li>🔷 Earn <b>Shards</b> from achievements and quests — spend them in the Shop for extra items.</li>
       </ul>
-    </div>
-
-    <div class="progress-panel">
-      <div class="progress-stat">
-        <span class="progress-stat-label">Personal Best</span>
-        <span class="progress-stat-value" id="stat-best">0 / 24 wins</span>
-      </div>
-      <div class="progress-stat">
-        <span class="progress-stat-label">Runs Played</span>
-        <span class="progress-stat-value" id="stat-runs">0</span>
-      </div>
-      <div class="progress-stat">
-        <span class="progress-stat-label">Champion Streak</span>
-        <span class="progress-stat-value" id="stat-streak">0 🔥</span>
-      </div>
-      <div class="progress-stat live-stat">
-        <span class="progress-stat-label">This Run</span>
-        <span class="progress-stat-value" id="stat-live">0 / 24 wins</span>
-      </div>
     </div>
 
     <div class="trophy-case" id="trophy-case"></div>
@@ -96,7 +86,30 @@
 
         <span class="roster-label items-label">Items</span>
         <div class="items-list" id="items-list"></div>
+
+        <span class="roster-label items-label">Daily Quests</span>
+        <div class="quest-list" id="daily-quest-list"></div>
       </aside>
+    </div>
+  </div>
+
+  <div id="battle-intro-overlay" class="celebration-overlay battle-overlay hidden">
+    <div class="celebration-modal battle-modal">
+      <div class="battle-vs-row">
+        <div class="battle-side you-side">
+          <div class="battle-avatar">🛡️</div>
+          <div class="battle-side-label">YOUR TEAM</div>
+          <div class="battle-power" id="battle-your-power">Power —</div>
+        </div>
+        <div class="battle-vs-text">VS</div>
+        <div class="battle-side enemy-side">
+          <div class="battle-avatar" id="battle-enemy-avatar">👹</div>
+          <div class="battle-side-label" id="battle-enemy-name">—</div>
+          <div class="battle-power" id="battle-enemy-power">Power —</div>
+        </div>
+      </div>
+      <p class="battle-quote" id="battle-enemy-quote">"..."</p>
+      <button id="battle-engage-btn">Engage!</button>
     </div>
   </div>
 
@@ -129,6 +142,30 @@
       <input type="text" id="name-input" maxlength="20" placeholder="Your tournament name" autocomplete="off">
       <p class="name-error hidden" id="name-error">That name is already taken on this device — try another.</p>
       <button id="name-submit">Start Tournament</button>
+    </div>
+  </div>
+
+  <div id="stats-overlay" class="celebration-overlay stats-overlay hidden">
+    <div class="celebration-modal stats-modal">
+      <button class="modal-close-x" id="stats-close-x">✕</button>
+      <h2>📊 Career Stats</h2>
+      <div class="stats-grid" id="stats-grid"></div>
+
+      <h3 class="stats-subheading">🏅 Achievements <span id="achievements-progress"></span></h3>
+      <div class="achievements-list" id="achievements-list"></div>
+
+      <h3 class="stats-subheading">📜 Permanent Quests</h3>
+      <div class="quest-list" id="permanent-quest-list"></div>
+    </div>
+  </div>
+
+  <div id="shop-overlay" class="celebration-overlay shop-overlay hidden">
+    <div class="celebration-modal shop-modal">
+      <button class="modal-close-x" id="shop-close-x">✕</button>
+      <h2>🛒 Shard Shop</h2>
+      <p class="shop-balance">Balance: <b id="shard-balance">0</b> 🔷</p>
+      <p class="shop-note" id="shop-note"></p>
+      <div class="shop-list" id="shop-list"></div>
     </div>
   </div>
 
