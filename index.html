@@ -1,29 +1,43 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Multiverse Anime Toernooi</title>
+  <title>Multiverse Anime Tournament</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="game-container">
-    <h1>Multiverse Anime Toernooi</h1>
-    <p class="subtitle">Scout vechters uit tientallen anime-universes, train ze, versla rivalen en klim door de liga's tot de Multiversum Finale — allemaal gestuurd door het lot van de roulette.</p>
+    <h1>Multiverse Anime Tournament</h1>
+    <p class="subtitle">
+      <b>Goal:</b> draft a roster of anime fighters, then spin your way through 6 tournament leagues.
+      Beat every opponent in a league's bracket to win that league's Trophy and unlock the next one.
+      Clear the Multiverse Final to become the undisputed Champion.
+    </p>
+
+    <div class="how-to">
+      <span class="how-to-title">How it works</span>
+      <ul>
+        <li><b>Scout</b> — spin to recruit a new fighter to your roster (rarer fighters are stronger, but less likely).</li>
+        <li><b>Train</b> — spin to pick a roster member and permanently boost their power.</li>
+        <li><b>Trade</b> — spin to swap a random roster member for a freshly scouted one.</li>
+        <li><b>Match</b> — fight the next opponent in your current league's bracket, shown on the map below.</li>
+      </ul>
+    </div>
 
     <div class="tier-ladder" id="tier-ladder"></div>
 
-    <div class="points-bar-wrap">
-      <div class="points-bar"><div class="points-fill" id="points-fill"></div></div>
-      <span class="points-label" id="points-label">Bronzen Liga: 0 / 150 rangpunten</span>
+    <div class="bracket-panel">
+      <span class="bracket-title" id="bracket-title">Bronze League — Bracket</span>
+      <div class="bracket-path" id="bracket-path"></div>
     </div>
 
     <div class="roster-panel">
-      <span class="roster-label">Jouw roster</span>
+      <span class="roster-label">Your Roster</span>
       <div class="roster-list" id="roster-list"></div>
     </div>
 
-    <h3 class="roulette-title" id="roulette-title">Klaar om te beginnen?</h3>
+    <h3 class="roulette-title" id="roulette-title">Ready to begin?</h3>
 
     <div class="roulette-viewport">
       <div class="pointer-top"></div>
@@ -33,12 +47,12 @@
       <div class="strip-track" id="strip-track"></div>
     </div>
 
-    <button id="main-btn">Scout je eerste vechter!</button>
+    <button id="main-btn">Draft your first fighter!</button>
 
     <div id="event-panel" class="event-panel hidden"></div>
 
     <div class="log-panel">
-      <span class="log-label">Toernooi Logboek</span>
+      <span class="log-label">Tournament Log</span>
       <div id="log-list" class="log-list"></div>
     </div>
   </div>
