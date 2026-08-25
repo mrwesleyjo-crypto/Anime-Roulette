@@ -1,0 +1,75 @@
+body {
+  background-color: #121214;
+  color: #ffffff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+}
+
+.game-container {
+  text-align: center;
+  background: #1e1e24;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.roulette-wrapper {
+  position: relative;
+  margin: 20px auto;
+  width: 500px;
+  height: 500px;
+}
+
+.pointer {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  border-top: 30px solid #ff4757;
+  z-index: 10;
+}
+
+button {
+  background: #ff4757;
+  color: white;
+  border: none;
+  padding: 15px 40px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.1s, background 0.2s;
+}
+
+button:hover {
+  background: #ff6b81;
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+button:disabled {
+  background: #555;
+  cursor: not-allowed;
+}
+
+#result {
+  margin-top: 20px;
+  padding: 15px;
+  background: #2a2a35;
+  border-radius: 8px;
+  transition: opacity 0.5s ease;
+}
+
+.hidden {
+  opacity: 0;
+}
