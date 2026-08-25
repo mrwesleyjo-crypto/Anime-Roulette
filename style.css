@@ -30,18 +30,143 @@ h1 {
 }
 
 .subtitle {
-  margin: 0 0 24px;
+  margin: 0 0 20px;
   color: #9a9aa5;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+/* ---------- Tier ladder ---------- */
+
+.tier-ladder {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.tier-chip {
+  font-size: 0.68rem;
+  padding: 5px 10px;
+  border-radius: 20px;
+  border: 1px solid #3a3a44;
+  color: #6c6c78;
+  background: #191920;
+  white-space: nowrap;
+}
+
+.tier-chip.done {
+  border-color: #2ecc71;
+  color: #2ecc71;
+  background: rgba(46,204,113,0.08);
+}
+
+.tier-chip.current {
+  border-color: #ffd24d;
+  color: #ffd24d;
+  background: rgba(255,210,77,0.1);
+  box-shadow: 0 0 8px rgba(255,210,77,0.4);
+  font-weight: 700;
+}
+
+/* ---------- Points bar ---------- */
+
+.points-bar-wrap {
+  margin-bottom: 18px;
+}
+
+.points-bar {
+  height: 10px;
+  border-radius: 6px;
+  background: #191920;
+  border: 1px solid #2c2c35;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.points-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #ff4757, #ffd24d);
+  transition: width 0.4s ease;
+}
+
+.points-label {
+  font-size: 0.75rem;
+  color: #9a9aa5;
+}
+
+/* ---------- Roster panel ---------- */
+
+.roster-panel {
+  margin-bottom: 18px;
+}
+
+.roster-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #9a9aa5;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.roster-list {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  min-height: 34px;
+}
+
+.roster-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px 5px 5px;
+  border-radius: 20px;
+  background: #202028;
+  border: 1px solid var(--rarity-color, #555);
+}
+
+.roster-chip .chip-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--rarity-color, #555);
+  color: #121214;
+  font-size: 0.65rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.roster-chip .chip-text {
+  font-size: 0.75rem;
+}
+
+.roster-empty {
+  color: #6c6c78;
+  font-size: 0.8rem;
+  font-style: italic;
 }
 
 /* ---------- Roulette strip ---------- */
+
+.roulette-title {
+  margin: 0 0 12px;
+  font-size: 1rem;
+  color: #ffd24d;
+  letter-spacing: 0.3px;
+}
 
 .roulette-viewport {
   position: relative;
   width: 100%;
   height: 190px;
-  margin: 0 auto 24px;
+  margin: 0 auto 20px;
   overflow: hidden;
   border-radius: 12px;
   background: #16161b;
@@ -113,7 +238,7 @@ h1 {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   padding: 10px;
   background: #202028;
   border: 2px solid var(--rarity-color, #555);
@@ -122,31 +247,32 @@ h1 {
 }
 
 .strip-item .avatar {
-  width: 56px;
-  height: 56px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  font-size: 1.1rem;
+  font-size: 1.3rem;
   background: var(--rarity-color, #555);
   color: #121214;
 }
 
 .strip-item .name {
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 600;
   text-align: center;
   line-height: 1.2;
 }
 
-.strip-item .rarity-tag {
-  font-size: 0.68rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.strip-item .sub-tag {
+  font-size: 0.66rem;
+  text-align: center;
+  letter-spacing: 0.3px;
   color: var(--rarity-color, #aaa);
   font-weight: 700;
+  line-height: 1.3;
 }
 
 .strip-item.winner {
@@ -154,21 +280,14 @@ h1 {
   box-shadow: 0 0 25px var(--rarity-color, #555), inset 0 0 20px rgba(0,0,0,0.3);
 }
 
-/* ---------- Controls ---------- */
-
-.controls {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
+/* ---------- Main button ---------- */
 
 button {
   background: #ff4757;
   color: white;
   border: none;
   padding: 15px 40px;
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   font-weight: bold;
   border-radius: 8px;
   cursor: pointer;
@@ -188,63 +307,72 @@ button:disabled {
   cursor: not-allowed;
 }
 
-.stats {
-  display: flex;
-  gap: 20px;
-  color: #9a9aa5;
-  font-size: 0.85rem;
-}
+/* ---------- Event panel ---------- */
 
-.stats b {
-  color: #ffffff;
-}
-
-/* ---------- Result ---------- */
-
-#result {
-  margin-top: 20px;
-  padding: 15px;
-  background: #2a2a35;
+.event-panel {
+  margin-top: 18px;
+  padding: 14px 18px;
   border-radius: 8px;
-  transition: opacity 0.5s ease;
+  background: #2a2a35;
+  border-left: 4px solid #555;
+  font-size: 0.9rem;
+  text-align: left;
+  transition: opacity 0.3s ease;
 }
 
-.hidden {
-  opacity: 0;
+.event-panel.hidden {
+  display: none;
 }
 
-#character-rarity {
-  font-weight: 700;
+.event-success {
+  border-left-color: #2ecc71;
 }
 
-/* ---------- History ---------- */
-
-.history {
-  margin-top: 22px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  justify-content: center;
+.event-fail {
+  border-left-color: #e74c3c;
 }
 
-.history-label {
-  color: #9a9aa5;
-  font-size: 0.8rem;
+.event-info {
+  border-left-color: #3498db;
 }
 
-.history-list {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  justify-content: center;
+.event-victory {
+  border-left-color: #ffd24d;
+  background: linear-gradient(135deg, #2a2a1f, #2a2a35);
+  box-shadow: 0 0 20px rgba(255,210,77,0.3);
+  font-size: 1.05rem;
+  text-align: center;
 }
 
-.history-chip {
+/* ---------- Log panel ---------- */
+
+.log-panel {
+  margin-top: 20px;
+  text-align: left;
+}
+
+.log-label {
   font-size: 0.75rem;
-  padding: 4px 10px;
-  border-radius: 20px;
-  border: 1px solid var(--rarity-color, #555);
-  color: var(--rarity-color, #aaa);
-  background: rgba(255,255,255,0.03);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #9a9aa5;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.log-list {
+  max-height: 160px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: #c4c4cc;
+  padding-right: 4px;
+}
+
+.log-list div {
+  padding: 4px 8px;
+  background: #1a1a20;
+  border-radius: 6px;
 }
