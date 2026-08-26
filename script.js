@@ -1521,7 +1521,7 @@ function submitName() {
     return;
   }
   if (!raw) { nameError.textContent = 'Enter a name to continue.'; nameError.classList.remove('hidden'); return; }
-  if (raw.length > 20) { nameError.textContent = 'Keep it under 20 characters.'; nameError.classList.remove('hidden'); return; }
+  if (raw.length > 24) { nameError.textContent = 'Keep it under 24 characters.'; nameError.classList.remove('hidden'); return; }
   if (isNameTaken(raw, game.playerName)) { nameError.textContent = 'That name is already taken on this device — try another.'; nameError.classList.remove('hidden'); return; }
   reserveName(raw);
   game.playerName = raw;
