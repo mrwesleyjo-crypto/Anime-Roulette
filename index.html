@@ -17,8 +17,9 @@
     <div class="player-bar">
       <h1>Multiverse Anime Tournament</h1>
       <div class="player-id">
-        Playing as <b id="player-name-display">—</b>
+        Playing as <b id="player-name-display">—</b> <span id="title-display" class="title-badge"></span>
         <button class="link-btn" id="change-name-btn">Change name</button>
+        <button class="link-btn" id="open-collection-btn">📖 Collection</button>
         <button class="link-btn" id="open-stats-btn">📊 Stats</button>
         <button class="link-btn" id="open-shop-btn">🛒 Shop (<span id="shard-balance-inline">0</span> 🔷)</button>
       </div>
@@ -43,6 +44,8 @@
         <li><b>Awakening</b> — from the Gold League onward, certain fighters can unlock legendary power-ups.</li>
         <li>🔥 You start with a <b>Phoenix Ember</b> — it revives you once if you'd be eliminated. Lose without one and your run is over.</li>
         <li>🔷 Earn <b>Shards</b> from achievements and quests — spend them in the Shop for extra items.</li>
+        <li>📖 The <b>Collection Index</b> groups fighters by anime — complete a series for a shard bonus and a title.</li>
+        <li>★ Re-scouting a fighter you've met before grants small <b>Mastery</b> bonuses instead of being wasted.</li>
       </ul>
     </div>
 
@@ -152,11 +155,23 @@
       <h2>📊 Career Stats</h2>
       <div class="stats-grid" id="stats-grid"></div>
 
+      <h3 class="stats-subheading">🎖️ Titles</h3>
+      <div class="title-list" id="title-list"></div>
+
       <h3 class="stats-subheading">🏅 Achievements <span id="achievements-progress"></span></h3>
       <div class="achievements-list" id="achievements-list"></div>
 
       <h3 class="stats-subheading">📜 Permanent Quests</h3>
       <div class="quest-list" id="permanent-quest-list"></div>
+    </div>
+  </div>
+
+  <div id="collection-overlay" class="celebration-overlay collection-overlay hidden">
+    <div class="celebration-modal collection-modal">
+      <button class="modal-close-x" id="collection-close-x">✕</button>
+      <h2>📖 Collection Index</h2>
+      <p class="collection-note">Discover every fighter from an anime to complete its collection and earn a shard bonus.</p>
+      <div class="collection-list" id="collection-list"></div>
     </div>
   </div>
 
