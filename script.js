@@ -308,6 +308,391 @@ const TIERS = [
   }
 ];
 
+// ---------------------------------------------------------------------------
+// Special fusions — specific character pairs that, when both are in your
+// roster, guarantee the next event is a Fusion (instead of the normal
+// random-pair fusion). Matched by baseName so an awakened form still counts.
+// ---------------------------------------------------------------------------
+
+const SPECIAL_FUSIONS = [
+  { pair: ['Goku', 'Vegeta'], name: 'Gogeta', icon: '⚡', color: '#ffd24d', bonus: 60, flavor: 'The Potara earrings — or is it the fusion dance? — merge Goku and Vegeta into Gogeta, a being of terrifying power!' },
+  { pair: ['Naruto Uzumaki', 'Sasuke Uchiha'], name: 'Naruto & Sasuke: Perfect Combo', icon: '☯️', color: '#a855f7', bonus: 45, flavor: 'Yin and Yang chakra intertwine — rivals turned partners unleash the ultimate combination attack!' },
+  { pair: ['Monkey D. Luffy', 'Roronoa Zoro'], name: 'Straw Hat Vanguard', icon: '🏴‍☠️', color: '#3498db', bonus: 40, flavor: 'Captain and first mate charge in together — nothing stands between them and victory!' },
+  { pair: ['Ichigo Kurosaki', 'Rukia Kuchiki'], name: 'Shinigami Duo', icon: '❄️', color: '#00e5ff', bonus: 40, flavor: 'Substitute Soul Reaper and Squad 13 officer strike as one, blade and blade!' },
+  { pair: ['Gon Freecss', 'Killua Zoldyck'], name: 'Best Friends Combo', icon: '⚡', color: '#f1c40f', bonus: 38, flavor: 'Gon and Killua — a friendship stronger than any Nen ability, syncing perfectly in battle!' },
+  { pair: ['Saitama', 'Genos'], name: 'Master & Disciple', icon: '👊', color: '#e67e22', bonus: 45, flavor: 'Teacher and student unleash a coordinated assault — one serious punch, one cyborg barrage!' }
+];
+
+function getAvailableSpecialFusion() {
+  const owned = new Set(game.roster.map(c => c.baseName || c.name));
+  return SPECIAL_FUSIONS.find(f => owned.has(f.pair[0]) && owned.has(f.pair[1])) || null;
+}
+
+// ---------------------------------------------------------------------------
+// Team synergies — evaluated live against your current roster. Only the
+// single best-matching synergy applies at a time (no stacking) and grants a
+// power bonus baked into your win chance. Built from small factory helpers
+// so 100+ combinations stay readable instead of 100 hand-written objects.
+// ---------------------------------------------------------------------------
+
+// "Slots" for characters who exist as multiple named versions in the roster —
+// any of these names fills the slot (e.g. either Gohan counts as "Gohan").
+const GOHAN_ANY = ['Gohan (Kid Gohan)', 'Gohan (Beast Gohan)'];
+const ERZA_ANY = ['Erza Scarlet (Heart Kreuz Armor)', 'Erza Scarlet (Nakagami Armor)'];
+const GUTS_ANY = ['Guts (Band of the Hawk)', 'Guts (Berserker Armor)'];
+const KANEKI_ANY = ['Kaneki Ken (Half-Ghoul)', 'Kaneki Ken (One-Eyed King)'];
+const SUNGJINWOO_ANY = ['Sung Jin-Woo (E-Rank Hunter)', 'Sung Jin-Woo (Shadow Monarch)'];
+const ALUCARD_ANY = ['Alucard', 'Alucard (No Life King)'];
+const MELIODAS_ANY = ["Meliodas (Fairy King's Forest)", 'Meliodas (Demon King)'];
+
+// A "slot" is either an exact name (string) or a list of acceptable
+// alternative names (array) — the slot counts as filled if any match is owned.
+function slotFilled(names, slot) {
+  return Array.isArray(slot) ? slot.some(v => names.has(v)) : names.has(slot);
+}
+
+function groupSynergy(id, name, icon, bonus, desc, slots, minCount) {
+  return {
+    id, name, icon, bonus, desc,
+    check: names => slots.filter(slot => slotFilled(names, slot)).length >= (minCount || slots.length)
+  };
+}
+
+function pairSynergy(id, name, icon, bonus, desc, slots) {
+  return groupSynergy(id, name, icon, bonus, desc, slots, slots.length);
+}
+
+function bothFormsSynergy(id, name, icon, bonus, desc, variants) {
+  return pairSynergy(id, name, icon, bonus, desc, variants);
+}
+
+function sizeSynergy(id, name, icon, bonus, desc, exactSize) {
+  return { id, name, icon, bonus, desc, check: (names, roster) => roster.length === exactSize };
+}
+
+function rarityCompositionSynergy(id, name, icon, bonus, desc, rarity, minSize) {
+  return {
+    id, name, icon, bonus, desc,
+    check: (names, roster) => roster.length >= (minSize || 2) && roster.every(c => c.rarity === rarity)
+  };
+}
+
+function stateSynergy(id, name, icon, bonus, desc, substring) {
+  return { id, name, icon, bonus, desc, check: (names, roster) => roster.some(c => c.name.includes(substring)) };
+}
+
+const SYNERGY_DEFS = [
+  // --- Iconic teams, duos & trios -------------------------------------------------
+  groupSynergy('team-7', 'Team 7', '🍥', 26, 'Naruto, Sasuke, and Kakashi — the legendary genin squad reunites.', ['Naruto Uzumaki', 'Sasuke Uchiha', 'Kakashi Hatake'], 2),
+  pairSynergy('sannin', 'Legendary Sannin', '🐌', 24, 'Jiraiya and Tsunade — two of the three legendary Sannin.', ['Jiraiya', 'Tsunade']),
+  groupSynergy('leaf-legends', 'Leaf Village Legends', '🍃', 18, 'A gathering of Konoha\'s finest.', ['Naruto Uzumaki', 'Kakashi Hatake', 'Jiraiya', 'Tsunade', 'Might Guy'], 2),
+  groupSynergy('uchiha-bloodline', 'Uchiha Bloodline', '👁️', 24, 'Sasuke, Itachi, and Madara — the Sharingan runs deep in this roster.', ['Sasuke Uchiha', 'Itachi Uchiha', 'Madara Uchiha'], 2),
+  pairSynergy('ninja-academy', 'Ninja Academy', '📜', 12, 'Naruto looks out for the next generation.', ['Naruto Uzumaki', 'Konohamaru Sarutobi']),
+  pairSynergy('akatsuki-ties', 'Akatsuki Ties', '☁️', 16, 'Itachi and Madara, bound by a dangerous organization\'s history.', ['Itachi Uchiha', 'Madara Uchiha']),
+  pairSynergy('family-ties-uchiha', 'Brothers in Blood', '🩸', 14, 'Itachi and Sasuke — brothers, rivals, family.', ['Itachi Uchiha', 'Sasuke Uchiha']),
+  pairSynergy('mentor-jiraiya', 'The Toad Sage\'s Student', '🐸', 12, 'Jiraiya trained him well.', ['Jiraiya', 'Naruto Uzumaki']),
+  pairSynergy('mentor-kakashi', 'Copy Ninja\'s Pupil', '🐺', 12, 'Kakashi never truly stops watching over his students.', ['Kakashi Hatake', 'Sasuke Uchiha']),
+
+  groupSynergy('straw-hats', 'Straw Hat Alliance', '🏴‍☠️', 20, 'Multiple Straw Hat crew members, sailing and fighting as one.', ['Monkey D. Luffy', 'Roronoa Zoro', 'Portgas D. Ace', 'Shanks'], 2),
+  groupSynergy('east-blue-trio', 'East Blue Trio', '⛵', 20, 'Luffy, Zoro, and Usopp — where the legend began.', ['Monkey D. Luffy', 'Roronoa Zoro', 'Usopp'], 2),
+  pairSynergy('yonko-alliance', 'Yonko\'s Shadow', '👑', 22, 'Whitebeard and Shanks — two of the Four Emperors.', ['Whitebeard', 'Shanks']),
+  pairSynergy('legendary-blades', 'Legendary Blades', '⚔️', 16, 'Zoro and Levi — masters of the sword, from different worlds.', ['Roronoa Zoro', 'Levi Ackerman']),
+
+  groupSynergy('z-fighters', 'Z Fighters', '🐉', 26, 'Goku, Vegeta, Gohan, and Piccolo assemble to defend the universe.', ['Goku', 'Vegeta', GOHAN_ANY, 'Piccolo'], 2),
+  pairSynergy('saiyan-pride', 'Saiyan Pride', '⚡', 22, 'Goku and Vegeta together — rival Saiyans pushing each other past their limits.', ['Goku', 'Vegeta']),
+  groupSynergy('bulma-crew', 'Bulma\'s Support Squad', '🔧', 14, 'Bulma, Chichi, and Yamcha — the ones who keep the Z Fighters grounded.', ['Bulma', 'Chichi', 'Yamcha'], 2),
+  groupSynergy('angels-and-gods', 'Angels & Gods', '😇', 30, 'Whis, the Grand Priest, and Zeno — beings above mortal power scales entirely.', ['Whis', 'Grand Priest', 'Zeno'], 2),
+
+  groupSynergy('soul-society', 'Soul Society', '⚔️', 22, 'Ichigo, Rukia, Toshiro, and Yoruichi represent the Soul Reapers.', ['Ichigo Kurosaki', 'Rukia Kuchiki', 'Toshiro Hitsugaya', 'Yoruichi Shihoin'], 2),
+  pairSynergy('substitute-and-officer', 'Substitute Shinigami Duo', '❄️', 20, 'Ichigo and Rukia — the pair that started it all.', ['Ichigo Kurosaki', 'Rukia Kuchiki']),
+
+  groupSynergy('class-1a', 'Class 1-A', '🎓', 22, 'Izuku, Bakugo, and Todoroki — UA\'s brightest (and loudest) students.', ['Izuku Midoriya', 'Bakugo Katsuki', 'Todoroki Shoto'], 2),
+  pairSynergy('symbol-of-peace-legacy', 'Symbol of Peace\'s Legacy', '💪', 18, 'All Might passed the torch — and still fights beside his successor.', ['All Might', 'Izuku Midoriya']),
+
+  groupSynergy('demon-slayer-corps', 'Demon Slayer Corps', '🗡️', 24, 'Tanjiro, Zenitsu, and Inosuke reunite — the training-arc trio rides again.', ['Tanjiro Kamado', 'Zenitsu Agatsuma', 'Inosuke Hashibira'], 2),
+  pairSynergy('hashira-council', 'Hashira Council', '🌸', 18, 'Giyu and Shinobu — Pillars of the Demon Slayer Corps.', ['Giyu Tomioka', 'Shinobu Kocho']),
+
+  groupSynergy('jujutsu-high', 'Jujutsu High', '🔮', 22, 'Yuji, Megumi, and Nobara — first-years with unlimited potential.', ['Yuji Itadori', 'Megumi Fushiguro', 'Nobara Kugisaki'], 2),
+  pairSynergy('six-eyes-sensei', 'Six Eyes Sensei', '👓', 20, 'Gojo keeps a close eye on his most promising student.', ['Gojo Satoru', 'Megumi Fushiguro']),
+
+  pairSynergy('hxh-duo', 'Gon & Killua', '🤝', 18, 'Best friends since the Hunter Exam — they always fight better together.', ['Gon Freecss', 'Killua Zoldyck']),
+  pairSynergy('freecss-family', 'Freecss Family', '🎣', 16, 'Gon finally fights alongside the father he searched the world for.', ['Gon Freecss', 'Ging Freecss']),
+
+  groupSynergy('fairy-tail-guild', 'Fairy Tail Guild', '🧚', 22, 'Natsu, Gray, and Erza — the guild\'s strongest mages, united.', ['Natsu Dragneel', 'Gray Fullbuster', ERZA_ANY], 2),
+  pairSynergy('fire-and-ice', 'Fire and Ice', '🔥', 16, 'Natsu and Gray — eternal rivals, unstoppable together.', ['Natsu Dragneel', 'Gray Fullbuster']),
+
+  groupSynergy('survey-corps', 'Survey Corps', '🦅', 24, 'Eren, Mikasa, Armin, and Levi — humanity\'s strongest soldiers.', ['Eren Yeager', 'Mikasa Ackerman', 'Armin Arlert', 'Levi Ackerman'], 2),
+  groupSynergy('childhood-trio', 'Childhood Trio', '🏠', 18, 'Eren, Mikasa, and Armin — friends since before the walls fell.', ['Eren Yeager', 'Mikasa Ackerman', 'Armin Arlert'], 2),
+
+  groupSynergy('devil-hunters', 'Devil Hunters', '🩸', 20, 'Denji, Power, and Aki — Public Safety\'s most chaotic division.', ['Denji', 'Power', 'Aki Hayakawa'], 2),
+
+  pairSynergy('cat-and-mouse', 'Cat and Mouse', '🔍', 22, 'Light and L — the greatest rivalry ever written, now on the same team.', ['Light Yagami', 'L']),
+  pairSynergy('genius-strategists-2', 'Battle of Wits', '🧠', 20, 'Two of the sharpest minds across the multiverse, for once cooperating.', ['L', 'Lelouch Lamperouge']),
+
+  pairSynergy('stand-users', 'Stand Users', '⭐', 22, 'Jotaro and Dio — bitter enemies, undeniable power.', ['Jotaro Kujo', 'Dio Brando']),
+
+  pairSynergy('spirits-and-guys', 'Spirits and Guys', '👻', 14, 'Mob and Reigen — psychic power meets pure confidence.', ['Mob (Shigeo Kageyama)', 'Reigen Arataka']),
+
+  pairSynergy('hero-duo', 'Master & Disciple', '👊', 20, 'Saitama and Genos — one serious punch, one cyborg barrage.', ['Saitama', 'Genos']),
+  pairSynergy('number-one-heroes', 'Number One Heroes', '🥇', 24, 'Saitama and All Might — two answers to "who is the strongest hero?"', ['Saitama', 'All Might']),
+
+  groupSynergy('sin-brothers', 'Sin Brothers', '7️⃣', 26, 'Escanor, Ban, and Meliodas — three of the Seven Deadly Sins.', ['Escanor', 'Ban', MELIODAS_ANY], 2),
+
+  pairSynergy('magic-knights', 'Magic Knights', '🍀', 16, 'Asta and Yami — the Black Bulls\' most explosive duo.', ['Asta', 'Yami Sukehiro']),
+  pairSynergy('elric-and-mustang', 'State Alchemists', '🔥', 16, 'Edward and Roy — equivalent exchange meets the Flame Alchemist.', ['Edward Elric', 'Roy Mustang']),
+
+  // --- "Twin Selves" — owning both versions of a split character at once ---------
+  bothFormsSynergy('twin-selves-gohan', 'Two Gohans, One Timeline', '♊', 20, 'Kid Gohan and Beast Gohan, somehow standing side by side.', GOHAN_ANY),
+  bothFormsSynergy('twin-selves-erza', 'Two Ezras, Two Armors', '♊', 20, 'Both of Erza\'s iconic armors, worn at once.', ERZA_ANY),
+  bothFormsSynergy('twin-selves-guts', 'The Black Swordsman, Twice Over', '♊', 20, 'Both eras of Guts fighting in the same roster.', GUTS_ANY),
+  bothFormsSynergy('twin-selves-kaneki', 'One Man, Two Forms', '♊', 20, 'Half-Ghoul and One-Eyed King, together at last.', KANEKI_ANY),
+  bothFormsSynergy('twin-selves-sungjinwoo', 'From E-Rank to Monarch', '♊', 22, 'The full journey of the Shadow Monarch, represented at once.', SUNGJINWOO_ANY),
+  bothFormsSynergy('twin-selves-alucard', 'No Life King, Twice', '♊', 20, 'Alucard in both of his terrifying forms.', ALUCARD_ANY),
+  bothFormsSynergy('twin-selves-meliodas', 'Captain and Demon King', '♊', 20, 'Meliodas before and after his true nature awakens.', MELIODAS_ANY),
+
+  // --- Trope & joke synergies -----------------------------------------------------
+  groupSynergy('overpowered-protagonists', 'Strongest There Is', '💥', 26, 'Saitama, Escanor, and All Might — each the undisputed strongest of their world.', ['Saitama', 'Escanor', 'All Might'], 2),
+  groupSynergy('isekai-legends', 'Isekai Legends', '🌀', 24, 'Rimuru, Anos, and Ainz — reincarnated (or transported) into unstoppable power.', ['Rimuru Tempest', 'Anos Voldigoad', 'Ainz Ooal Gown'], 2),
+  pairSynergy('reincarnated-heroes', 'Reincarnated Heroes', '🔁', 16, 'Rimuru and Anos, both given a second life and a first-class power set.', ['Rimuru Tempest', 'Anos Voldigoad']),
+  groupSynergy('shadow-and-demon-kings', 'Shadow & Demon Kings', '😈', 28, 'Sung Jin-Woo, Meliodas, and Anos — rulers of darkness in their own right.', [SUNGJINWOO_ANY, MELIODAS_ANY, 'Anos Voldigoad'], 2),
+  groupSynergy('the-kings', 'The Kings', '👑', 26, 'Ainz, Anos, and Meliodas — each a king of their own domain.', ['Ainz Ooal Gown', 'Anos Voldigoad', MELIODAS_ANY], 2),
+
+  groupSynergy('silver-haired-squad', 'Silver-Haired Squad', '🩶', 14, 'Toshiro, Killua, and Kakashi — a coincidence of hair color, or a sign of power?', ['Toshiro Hitsugaya', 'Killua Zoldyck', 'Kakashi Hatake'], 2),
+  groupSynergy('golden-hair-alliance', 'Golden Hair Alliance', '💛', 12, 'Naruto, Armin, Edward, and Zenitsu — a blonde battalion.', ['Naruto Uzumaki', 'Armin Arlert', 'Edward Elric', 'Zenitsu Agatsuma'], 2),
+  pairSynergy('redhead-rally', 'Redhead Rally', '🔴', 14, 'Erza and Shanks — fire-haired and fiercely powerful.', [ERZA_ANY, 'Shanks']),
+
+  groupSynergy('swordsmen-union', 'Swordsmen Union', '🗡️', 22, 'Zoro, Levi, Guts, and Erza — masters of the blade from every corner of the multiverse.', ['Roronoa Zoro', 'Levi Ackerman', GUTS_ANY, ERZA_ANY], 2),
+  groupSynergy('fists-of-fury', 'Fists of Fury', '👊', 20, 'Saitama, All Might, Bakugo, and Might Guy — pure martial power, no weapons needed.', ['Saitama', 'All Might', 'Bakugo Katsuki', 'Might Guy'], 2),
+  groupSynergy('genius-strategists', 'Genius Strategists', '🧩', 22, 'L, Lelouch, and Light — masterminds who see ten moves ahead.', ['L', 'Lelouch Lamperouge', 'Light Yagami'], 2),
+  groupSynergy('prodigies', 'Prodigies', '✨', 20, 'Itachi, Gojo, Killua, and Todoroki — child geniuses who never stopped growing.', ['Itachi Uchiha', 'Gojo Satoru', 'Killua Zoldyck', 'Todoroki Shoto'], 2),
+  groupSynergy('immortals-club', 'Immortals Club', '♾️', 24, 'Ban, Alucard, and Yhwach — death is more of a suggestion to this crowd.', ['Ban', ALUCARD_ANY, 'Yhwach'], 2),
+  groupSynergy('big-brother-energy', 'Big Brother Energy', '🫂', 16, 'Whitebeard, All Might, and Kakashi — mentors who protect everyone around them.', ['Whitebeard', 'All Might', 'Kakashi Hatake'], 2),
+  groupSynergy('comic-relief-crew', 'Comic Relief Crew', '🤡', 12, 'Yamcha, Mr. Satan, and Usopp — legendary cowards, occasional heroes.', ['Yamcha', 'Mr. Satan', 'Usopp'], 2),
+  pairSynergy('reapers-and-ghouls', 'Reapers & Ghouls', '💀', 14, 'Ichigo and Kaneki — death and hunger, crossing paths.', ['Ichigo Kurosaki', KANEKI_ANY]),
+  groupSynergy('multiverse-core-four', 'The Core Four', '🔱', 34, 'Naruto, Luffy, Goku, and Ichigo — four of the most iconic protagonists in anime, together.', ['Naruto Uzumaki', 'Monkey D. Luffy', 'Goku', 'Ichigo Kurosaki'], 3),
+  groupSynergy('big-three', 'The Big Three', '🔱', 30, 'Naruto, Luffy, and Goku all on one roster — the three shonen legends fight side by side.', ['Naruto Uzumaki', 'Monkey D. Luffy', 'Goku'], 3),
+
+  // --- Awakened-state synergies (name reflects the current transformation) -------
+  stateSynergy('six-paths-active', 'Six Paths Awakened', '☯️', 20, 'Naruto has reached Six Paths Sage Mode — a power beyond mortal limits.', 'Six Paths'),
+  stateSynergy('ultra-instinct-active', 'Ultra Instinct Engaged', '⬜', 26, 'Goku moves on pure instinct, body ahead of mind.', 'Ultra Instinct'),
+  stateSynergy('super-saiyan-active', 'Super Saiyan Ascended', '⚡', 18, 'A golden aura burns — Super Saiyan has been unlocked.', 'Super Saiyan'),
+  stateSynergy('bankai-released', 'Bankai Released', '🌑', 18, '"Bankai!" — a Zanpakuto\'s true form has been revealed.', 'Bankai'),
+  stateSynergy('getsuga-active', 'Final Getsuga Tensho', '🌌', 24, 'A power that costs everything has been unleashed.', 'Getsuga'),
+  stateSynergy('gear-fifth-active', 'Gear Fifth Unlocked', '☀️', 24, 'The laughter of legend — Luffy has reached his ultimate form.', 'Gear Fifth'),
+  stateSynergy('susanoo-active', 'Susanoo Manifested', '👹', 18, 'Ribs of chakra tower over the arena.', 'Susanoo'),
+  stateSynergy('full-cowl-active', 'Full Cowl 100%', '💚', 16, 'One For All is surging at its absolute limit.', 'Full Cowl'),
+
+  // --- Roster size synergies -------------------------------------------------------
+  sizeSynergy('lone-wolf', 'Lone Wolf', '🐺', 6, 'Just one fighter, no backup — every match is a solo statement.', 1),
+  sizeSynergy('dynamic-duo', 'Dynamic Duo', '👥', 8, 'Two fighters, perfectly in sync.', 2),
+  sizeSynergy('terrific-trio', 'Terrific Trio', '👨‍👩‍👧', 10, 'Three fighters covering every angle.', 3),
+  sizeSynergy('fantastic-four', 'Fantastic Four', '🃏', 12, 'A well-rounded four-fighter roster.', 4),
+  sizeSynergy('famous-five', 'Famous Five', '🖐️', 14, 'Five fighters deep — very few gaps left to exploit.', 5),
+  sizeSynergy('final-six', 'Final Six', '💯', 16, 'A completely full roster — every slot earning its place.', 6),
+
+  // --- Rarity composition -----------------------------------------------------------
+  rarityCompositionSynergy('all-common', 'Grounded Squad', '⚪', 8, 'Every fighter is Common rarity — humble, but reliable.', 'Common'),
+  rarityCompositionSynergy('all-rare', 'Rare Formation', '🔵', 16, 'Every fighter on this roster is Rare or better, uniformly.', 'Rare'),
+  rarityCompositionSynergy('all-epic', 'Epic Formation', '🟣', 24, 'A roster built entirely of Epic-tier fighters.', 'Epic'),
+  {
+    id: 'elite-tier',
+    name: 'Multiversal Elite',
+    icon: '👑',
+    bonus: 32,
+    desc: 'Your whole roster is Legendary or Mythic — an assembly of true powerhouses.',
+    check: (names, roster) => roster.length >= 2 && roster.every(c => RARITY_RANK[c.rarity] >= RARITY_RANK.Legendary)
+  },
+  rarityCompositionSynergy('all-mythic', 'Beyond the Multiverse', '🌈', 45, 'Every single fighter is Mythic-tier. This should not be possible.', 'Mythic'),
+  {
+    id: 'no-weak-links',
+    name: 'No Weak Links',
+    icon: '🛡️',
+    bonus: 18,
+    desc: 'Not a single Useless or Common fighter in sight — a serious roster.',
+    check: (names, roster) => roster.length >= 2 && roster.every(c => RARITY_RANK[c.rarity] >= RARITY_RANK.Rare)
+  },
+  {
+    id: 'elite-six',
+    name: 'The Chosen Few',
+    icon: '💎',
+    bonus: 28,
+    desc: 'A full six-fighter roster with nobody below Rare rarity.',
+    check: (names, roster) => roster.length === 6 && roster.every(c => RARITY_RANK[c.rarity] >= RARITY_RANK.Rare)
+  },
+  {
+    id: 'rainbow-roster',
+    name: 'Rainbow Roster',
+    icon: '🌈',
+    bonus: 50,
+    desc: 'One fighter of every single rarity, from Useless to Mythic — the full spectrum, assembled.',
+    check: (names, roster) => roster.length === 6 && RARITY_ORDER.every(r => roster.filter(c => c.rarity === r).length === 1)
+  },
+  {
+    id: 'underdog-story',
+    name: 'David and Goliath',
+    icon: '🪨',
+    bonus: 12,
+    desc: 'A Useless fighter and a Legendary-or-better fighter, side by side — the ultimate power gap.',
+    check: (names, roster) => roster.some(c => c.rarity === 'Useless') && roster.some(c => RARITY_RANK[c.rarity] >= RARITY_RANK.Legendary)
+  },
+
+  // --- Power-level thresholds --------------------------------------------------------
+  {
+    id: 'overwhelming-force',
+    name: 'Overwhelming Force',
+    icon: '💢',
+    bonus: 18,
+    desc: 'Your average power exceeds 150 — this team hits hard.',
+    check: (names, roster) => roster.length >= 2 && (roster.reduce((s, c) => s + c.power, 0) / roster.length) > 150
+  },
+  {
+    id: 'absolute-power',
+    name: 'Absolute Power',
+    icon: '🌟',
+    bonus: 32,
+    desc: 'Your average power exceeds 250 — a roster that defies the power scale.',
+    check: (names, roster) => roster.length >= 2 && (roster.reduce((s, c) => s + c.power, 0) / roster.length) > 250
+  },
+  {
+    id: 'glass-cannon-cinema',
+    name: 'Power Overwhelming',
+    icon: '💣',
+    bonus: 20,
+    desc: 'Total combined power exceeds 600.',
+    check: (names, roster) => roster.reduce((s, c) => s + c.power, 0) > 600
+  },
+  {
+    id: 'balanced-squad',
+    name: 'Perfectly Matched',
+    icon: '⚖️',
+    bonus: 14,
+    desc: 'Every fighter is within a tight power range of each other — no weak link to exploit.',
+    check: (names, roster) => {
+      if (roster.length < 3) return false;
+      const powers = roster.map(c => c.power);
+      return (Math.max(...powers) - Math.min(...powers)) < 15;
+    }
+  },
+
+  // --- Mastery & awakening progress ---------------------------------------------------
+  {
+    id: 'veteran-squad',
+    name: 'Battle-Tested',
+    icon: '🎖️',
+    bonus: 14,
+    desc: 'At least two fighters carry Mastery from being scouted before — experience shows.',
+    check: (names, roster) => roster.filter(c => masteryLevelFor(c.baseName || c.name) > 0).length >= 2
+  },
+  {
+    id: 'awakened-ensemble',
+    name: 'Ascended Forms',
+    icon: '✨',
+    bonus: 20,
+    desc: 'At least two fighters have undergone an Awakening.',
+    check: (names, roster) => roster.filter(c => c.awakenPhase > 0).length >= 2
+  },
+  {
+    id: 'raw-potential',
+    name: 'Raw Potential',
+    icon: '🌱',
+    bonus: 10,
+    desc: 'Not a single fighter has awakened yet — untapped power, still waiting.',
+    check: (names, roster) => roster.length >= 3 && roster.every(c => c.awakenPhase === 0)
+  },
+  {
+    id: 'rookie-roster',
+    name: 'Rookie Roster',
+    icon: '🆕',
+    bonus: 8,
+    desc: 'A team of fresh faces — nobody here has Mastery yet.',
+    check: (names, roster) => roster.length >= 3 && roster.every(c => masteryLevelFor(c.baseName || c.name) === 0)
+  },
+
+  // --- Universe diversity discrete tiers ------------------------------------------------
+  {
+    id: 'crossover-special',
+    name: 'Crossover Special',
+    icon: '🎬',
+    bonus: 16,
+    desc: 'Fighters from at least 4 different anime, working together.',
+    check: (names, roster) => new Set(roster.map(c => c.universe)).size >= 4
+  },
+  {
+    id: 'multiverse-roadshow',
+    name: 'Multiverse Roadshow',
+    icon: '🚀',
+    bonus: 22,
+    desc: 'Fighters from at least 5 different anime — a true crossover event.',
+    check: (names, roster) => new Set(roster.map(c => c.universe)).size >= 5
+  },
+  {
+    id: 'infinite-diversity',
+    name: 'Infinite Diversity',
+    icon: '🌌',
+    bonus: 30,
+    desc: 'Six fighters, six completely different anime — total crossover chemistry.',
+    check: (names, roster) => roster.length === 6 && new Set(roster.map(c => c.universe)).size === 6
+  },
+  {
+    id: 'grand-finale-assembly',
+    name: 'Grand Finale Assembly',
+    icon: '🏆',
+    bonus: 38,
+    desc: 'A full six-fighter roster spanning at least four different anime — your ultimate team.',
+    check: (names, roster) => roster.length === 6 && new Set(roster.map(c => c.universe)).size >= 4
+  },
+  {
+    id: 'same-anime',
+    name: 'One Universe, United',
+    icon: '📖',
+    bonus: 20,
+    desc: 'Every fighter on your roster hails from the same anime.',
+    check: (names, roster) => roster.length >= 2 && new Set(roster.map(c => c.universe)).size === 1
+  },
+
+  {
+    id: 'useless-squad',
+    name: 'Useless Squad',
+    icon: '🤡',
+    bonus: 10,
+    desc: 'Every fighter on this team is, on paper, completely useless. There is a strange power in having absolutely nothing to lose.',
+    check: (names, roster) => roster.length >= 2 && roster.every(c => c.rarity === 'Useless')
+  },
+
+  {
+    id: 'multiverse-ensemble',
+    name: 'Multiverse Ensemble',
+    icon: '🌌',
+    bonus: 0, // computed dynamically below
+    desc: 'A team drawn from many different anime — raw crossover chemistry.',
+    check: (names, roster) => roster.length >= 3
+  }
+];
+
+function computeActiveSynergy() {
+  const roster = game.roster;
+  if (roster.length < 1) return null;
+  const names = new Set(roster.map(c => c.baseName || c.name));
+
+  let best = null;
+  for (const def of SYNERGY_DEFS) {
+    if (def.id === 'multiverse-ensemble') continue; // fallback, evaluated last
+    if (def.check(names, roster)) {
+      if (!best || def.bonus > best.bonus) best = { ...def };
+    }
+  }
+  if (best) return best;
+
+  // Fallback: reward genuine anime diversity across a near-full roster.
+  const ensembleDef = SYNERGY_DEFS.find(d => d.id === 'multiverse-ensemble');
+  if (ensembleDef.check(names, roster)) {
+    const uniqueUniverses = new Set(roster.map(c => c.universe)).size;
+    const bonus = Math.min(24, uniqueUniverses * 4);
+    return { ...ensembleDef, bonus };
+  }
+  return null;
+}
+
 // Secret bonus opponent — only fightable after the "Two Absurd Powers" secret
 // achievement unlocks it. Not part of the normal bracket progression.
 const SECRET_OPPONENT = {
@@ -334,6 +719,7 @@ const PHASE_LABELS = {
   scout: 'Scout a fighter!',
   train: 'Start training!',
   trade: 'Start a trade!',
+  'trade-select': 'Spin to see who leaves!',
   match: 'Fight the next match!',
   item: 'Open the treasure!',
   awaken: 'Trigger an awakening!',
@@ -347,6 +733,7 @@ const PHASE_TITLES = {
   scout: 'Spin to scout a new fighter!',
   train: 'Who goes to training camp?',
   trade: 'Spin to make a trade!',
+  'trade-select': 'Spin to see who leaves your roster!',
   item: 'Spin to find a support item!',
   awaken: 'Which fighter awakens?!',
   fusion: 'Which two fighters fuse?!',
@@ -854,6 +1241,7 @@ function buildCharacterPool(rosterBySource) {
       const power = Math.floor(cfg.minPower + Math.random() * (cfg.maxPower - cfg.minPower));
       pool.push({
         name: entry.name,
+        baseName: entry.name,
         universe: entry.universe,
         rarity,
         color: cfg.color,
@@ -909,7 +1297,9 @@ function createInitialState() {
     tempFusionBonus: 0,
     actionsSinceMatch: 0,
     riftActive: false,
-    godMode: false
+    godMode: false,
+    pendingTradeIncoming: null,
+    justWonTrophy: false
   };
 }
 
@@ -928,6 +1318,7 @@ const eventPanel = document.getElementById('event-panel');
 const logList = document.getElementById('log-list');
 const rosterList = document.getElementById('roster-list');
 const rosterPowerSummary = document.getElementById('roster-power-summary');
+const synergyBanner = document.getElementById('synergy-banner');
 const itemsList = document.getElementById('items-list');
 const dailyQuestList = document.getElementById('daily-quest-list');
 const trophyCase = document.getElementById('trophy-case');
@@ -945,12 +1336,14 @@ const celebrationTitle = document.getElementById('celebration-title');
 const celebrationSubtitle = document.getElementById('celebration-subtitle');
 const celebrationExtra = document.getElementById('celebration-extra');
 const celebrationClose = document.getElementById('celebration-close');
+const celebrationShareBtn = document.getElementById('celebration-share-btn');
 const confettiLayer = document.getElementById('confetti-layer');
 
 const gameoverOverlay = document.getElementById('gameover-overlay');
 const gameoverSubtitle = document.getElementById('gameover-subtitle');
 const gameoverExtra = document.getElementById('gameover-extra');
 const gameoverClose = document.getElementById('gameover-close');
+const gameoverShareBtn = document.getElementById('gameover-share-btn');
 
 const nameOverlay = document.getElementById('name-overlay');
 const nameInput = document.getElementById('name-input');
@@ -963,6 +1356,7 @@ const battleEnemyAvatar = document.getElementById('battle-enemy-avatar');
 const battleEnemyName = document.getElementById('battle-enemy-name');
 const battleEnemyPower = document.getElementById('battle-enemy-power');
 const battleEnemyQuote = document.getElementById('battle-enemy-quote');
+const battleWinChance = document.getElementById('battle-win-chance');
 const battleEngageBtn = document.getElementById('battle-engage-btn');
 
 const statsOverlay = document.getElementById('stats-overlay');
@@ -1072,7 +1466,7 @@ function currentOpponent() {
 
 function awakenableRoster() {
   return game.roster.filter(c => {
-    const chain = AWAKENING_CHAINS[c.name];
+    const chain = AWAKENING_CHAINS[c.baseName || c.name];
     return chain && c.awakenPhase < chain.length;
   });
 }
@@ -1104,8 +1498,10 @@ function computeWinChance(opponentPower, bonus) {
   const rosterSize = game.roster.length;
   if (rosterSize === 0) return 0.05;
   const avgPower = game.roster.reduce((s, c) => s + c.power, 0) / rosterSize;
-  const synergyBonus = (rosterSize - 1) * 4;
-  const effectivePower = avgPower + synergyBonus + (bonus || 0);
+  const teamSizeBonus = (rosterSize - 1) * 4;
+  const activeSynergy = computeActiveSynergy();
+  const teamSynergyBonus = activeSynergy ? activeSynergy.bonus : 0;
+  const effectivePower = avgPower + teamSizeBonus + teamSynergyBonus + (bonus || 0);
   const diff = effectivePower - opponentPower;
   const steepness = 18;
   const raw = 1 / (1 + Math.exp(-diff / steepness));
@@ -1272,6 +1668,15 @@ function renderRosterSidebar() {
   const avgPower = game.roster.length > 0 ? Math.round(totalPower / game.roster.length) : 0;
   rosterPowerSummary.textContent = `Team Power: ${totalPower} total · ${avgPower} avg`;
 
+  const synergy = computeActiveSynergy();
+  if (synergy) {
+    synergyBanner.classList.remove('hidden');
+    synergyBanner.innerHTML = `<span class="synergy-icon">${synergy.icon}</span><div><b>${synergy.name}</b> <span class="synergy-bonus">+${synergy.bonus} power</span><div class="synergy-desc">${synergy.desc}</div></div>`;
+  } else {
+    synergyBanner.classList.add('hidden');
+    synergyBanner.innerHTML = '';
+  }
+
   rosterList.innerHTML = '';
   if (game.roster.length === 0) {
     const empty = document.createElement('span');
@@ -1306,7 +1711,7 @@ function renderRosterSidebar() {
 
     body.append(name, power, rarity);
 
-    const masteryLvl = masteryLevelFor(c.name);
+    const masteryLvl = masteryLevelFor(c.baseName || c.name);
     if (masteryLvl > 0) {
       const mastery = document.createElement('span');
       mastery.className = 'roster-card-mastery';
@@ -1314,7 +1719,7 @@ function renderRosterSidebar() {
       body.appendChild(mastery);
     }
 
-    const chain = AWAKENING_CHAINS[c.name];
+    const chain = AWAKENING_CHAINS[c.baseName || c.name];
     if (chain) {
       const awaken = document.createElement('span');
       awaken.className = 'roster-card-awaken';
@@ -1465,6 +1870,7 @@ function refreshUI() {
   mainBtn.textContent = PHASE_LABELS[game.phase];
   mainBtn.disabled = isSpinning;
   rouletteTitle.textContent = PHASE_TITLES[game.phase] || PHASE_TITLES.action;
+  viewport.classList.toggle('rift-active', !!game.riftActive);
 }
 
 // ---------------------------------------------------------------------------
@@ -1540,6 +1946,14 @@ changeNameBtn.addEventListener('click', () => openNameOverlay(game.playerName));
 
 let pendingOpponent = null;
 
+function previewWinChance(opponent) {
+  if (game.godMode) return 0.99;
+  if (game.items.twinMoon > 0) return 0.99;
+  let bonus = game.tempFusionBonus || 0;
+  if (game.items.chakraDraft > 0) bonus += 20;
+  return computeWinChance(opponent.power, bonus);
+}
+
 function showBattleIntro(opponent) {
   pendingOpponent = opponent;
   battleYourPower.textContent = `Power ${averageRosterPower()} (avg)`;
@@ -1550,6 +1964,11 @@ function showBattleIntro(opponent) {
   battleEnemyName.textContent = opponent.name;
   battleEnemyPower.textContent = `Power ${opponent.power}`;
   battleEnemyQuote.textContent = `"${opponent.quote}"`;
+
+  const chance = Math.round(previewWinChance(opponent) * 100);
+  battleWinChance.textContent = `Estimated win chance: ${chance}%`;
+  battleWinChance.className = 'battle-win-chance ' + (chance >= 60 ? 'good' : chance >= 35 ? 'ok' : 'bad');
+
   battleOverlay.classList.remove('hidden');
   mainBtn.disabled = true;
 }
@@ -1565,6 +1984,82 @@ battleEngageBtn.addEventListener('click', () => {
     pendingOpponent = null;
   }
 });
+
+// ---------------------------------------------------------------------------
+// Shareable run-summary badge (canvas-generated PNG download)
+// ---------------------------------------------------------------------------
+
+function drawShareBadge(ctx, isChampion, opponentName) {
+  const w = 800, h = 1000;
+  const accent = isChampion ? '#ffd24d' : '#e74c3c';
+
+  const bg = ctx.createLinearGradient(0, 0, 0, h);
+  bg.addColorStop(0, '#241238');
+  bg.addColorStop(1, '#07040e');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, w, h);
+
+  ctx.strokeStyle = accent;
+  ctx.lineWidth = 6;
+  ctx.strokeRect(20, 20, w - 40, h - 40);
+
+  ctx.textAlign = 'center';
+  ctx.fillStyle = accent;
+  ctx.font = 'bold 40px "Segoe UI", sans-serif';
+  ctx.fillText(isChampion ? '👑 MULTIVERSE CHAMPION' : '💀 ELIMINATED', w / 2, 100);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 32px "Segoe UI", sans-serif';
+  ctx.fillText(game.playerName || 'Anonymous', w / 2, 150);
+
+  ctx.fillStyle = '#c7c2df';
+  ctx.font = '20px "Segoe UI", sans-serif';
+  ctx.fillText(
+    isChampion ? `Defeated ${opponentName}` : `Fell to ${opponentName} in the ${currentTier().name}`,
+    w / 2, 185
+  );
+
+  const score = liveScore();
+  const totalPower = game.roster.reduce((s, c) => s + c.power, 0);
+  ctx.fillStyle = '#00e5ff';
+  ctx.font = 'bold 26px "Segoe UI", sans-serif';
+  ctx.fillText(`${score} / ${TOTAL_MATCHES} matches won`, w / 2, 235);
+  ctx.fillStyle = '#ffd24d';
+  ctx.fillText(`Team Power: ${totalPower}`, w / 2, 270);
+
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 22px "Segoe UI", sans-serif';
+  ctx.fillText('Final Roster:', 60, 330);
+
+  let y = 372;
+  ctx.font = '18px "Segoe UI", sans-serif';
+  game.roster.forEach(c => {
+    ctx.fillStyle = c.color;
+    ctx.fillRect(60, y - 16, 14, 14);
+    ctx.fillStyle = '#e8e4f5';
+    ctx.fillText(`${c.name}  —  Power ${c.power}  (${c.rarity})`, 84, y);
+    y += 36;
+  });
+
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#6c6c78';
+  ctx.font = '16px "Segoe UI", sans-serif';
+  ctx.fillText('Multiverse Anime Tournament', w / 2, h - 42);
+  ctx.fillText(new Date().toLocaleDateString(), w / 2, h - 20);
+}
+
+function downloadShareBadge(isChampion, opponentName) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 800;
+  canvas.height = 1000;
+  const ctx = canvas.getContext('2d');
+  drawShareBadge(ctx, isChampion, opponentName);
+  const link = document.createElement('a');
+  link.download = `multiverse-tournament-${isChampion ? 'champion' : 'run'}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
 
 // ---------------------------------------------------------------------------
 // Celebration / Game Over modals
@@ -1586,7 +2081,10 @@ function spawnConfetti(count) {
   }
 }
 
-function showCelebration(title, subtitle, icon, extraText) {
+let lastCelebrationWasChampion = false;
+let lastCelebrationOpponent = '';
+
+function showCelebration(title, subtitle, icon, extraText, opponentName) {
   celebrationTrophy.textContent = icon || '🏆';
   celebrationTitle.textContent = title;
   celebrationSubtitle.textContent = subtitle;
@@ -1595,6 +2093,10 @@ function showCelebration(title, subtitle, icon, extraText) {
   spawnConfetti(icon === '👑' ? 70 : 40);
   celebrationOverlay.classList.remove('hidden');
   mainBtn.disabled = true;
+
+  lastCelebrationWasChampion = icon === '👑';
+  lastCelebrationOpponent = opponentName || '';
+  celebrationShareBtn.classList.toggle('hidden', !lastCelebrationWasChampion);
 }
 
 function hideCelebration() {
@@ -1604,12 +2106,16 @@ function hideCelebration() {
 }
 
 celebrationClose.addEventListener('click', hideCelebration);
+celebrationShareBtn.addEventListener('click', () => downloadShareBadge(true, lastCelebrationOpponent));
+
+let lastGameOverOpponent = '';
 
 function showGameOver(opponent, extraText) {
   gameoverSubtitle.textContent = `You made it to the ${currentTier().name} before falling to ${opponent.name}. Every legend has a beginning — try again!`;
   gameoverExtra.textContent = extraText || '';
   gameoverOverlay.classList.remove('hidden');
   mainBtn.disabled = true;
+  lastGameOverOpponent = opponent.name;
 }
 
 function hideGameOverAndRestart() {
@@ -1618,6 +2124,28 @@ function hideGameOverAndRestart() {
 }
 
 gameoverClose.addEventListener('click', hideGameOverAndRestart);
+gameoverShareBtn.addEventListener('click', () => downloadShareBadge(false, lastGameOverOpponent));
+
+// ---------------------------------------------------------------------------
+// Dimensional Rift popup
+// ---------------------------------------------------------------------------
+
+const riftOverlay = document.getElementById('rift-overlay');
+const riftClose = document.getElementById('rift-close');
+
+function showRiftPopup() {
+  riftOverlay.classList.remove('hidden');
+  mainBtn.disabled = true;
+  refreshUI();
+}
+
+function hideRiftPopup() {
+  riftOverlay.classList.add('hidden');
+  refreshUI();
+}
+
+riftClose.addEventListener('click', hideRiftPopup);
+
 
 // ---------------------------------------------------------------------------
 // Stats / Achievements / Quests modal
@@ -2002,6 +2530,13 @@ function addToRoster(character) {
 }
 
 function buildEventPool() {
+  // A ready special-pair fusion (e.g. Goku + Vegeta) always takes over the
+  // very next event completely — 100% guaranteed, no other outcome possible.
+  const special = getAvailableSpecialFusion();
+  if (special) {
+    return [{ value: 'fusion', name: `${special.name} Fusion!`, icon: special.icon, color: special.color, weight: 100, sub: 'Event' }];
+  }
+
   // The longer you avoid a match (scouting/trading/opening treasure instead),
   // the more the odds tilt toward forcing a match — you can't stall forever.
   const pressure = game.actionsSinceMatch || 0;
@@ -2012,7 +2547,10 @@ function buildEventPool() {
     entries.push({ value: 'train', weight: 16 });
     entries.push({ value: 'trade', weight: 8 * decay });
   }
-  if (!game.finaleWon) entries.push({ value: 'match', weight: 34 + pressure * 8 });
+  // A short breather after winning a league — no back-to-back matches.
+  if (!game.finaleWon && !game.justWonTrophy) {
+    entries.push({ value: 'match', weight: 34 + pressure * 8 });
+  }
   entries.push({ value: 'item', weight: 10 * decay });
   if (game.tierIndex >= AWAKENING_UNLOCK_TIER && awakenableRoster().length > 0) {
     entries.push({ value: 'awaken', weight: 8 });
@@ -2050,12 +2588,13 @@ function startActionSpin() {
     showEventPanel('info', `Coming up: <b>${winner.name}</b>`);
     game.phase = winner.value;
     game.actionsSinceMatch = winner.value === 'match' ? 0 : (game.actionsSinceMatch || 0) + 1;
+    game.justWonTrophy = false;
 
     // Dimensional Rift: a small chance, only when not already active, to grant
     // a temporary boosted-luck window for your next Scout.
     if (winner.value !== 'match' && !game.riftActive && Math.random() < 0.04) {
       game.riftActive = true;
-      showToast('unlock', '⚠️ DIMENSIONAL RIFT DETECTED', 'Your next Scout pulls from a boosted pool!');
+      showRiftPopup();
     }
     refreshUI();
   });
@@ -2093,16 +2632,35 @@ function startTradeSpin() {
   const pool = poolExcludingRoster(ACTIVE_POOL);
   runRoulette(pool, PHASE_TITLES.trade, winnerRaw => {
     const winner = applyMasteryBonus(winnerRaw);
-    trackScoutedCharacter(winner);
     if (game.roster.length === 0) {
+      trackScoutedCharacter(winner);
       addToRoster(winner);
-    } else {
-      const idx = Math.floor(Math.random() * game.roster.length);
-      const old = game.roster[idx];
-      game.roster[idx] = { ...winner, awakenPhase: 0 };
-      logEvent(`🔄 Traded: ${old.name} → ${winner.name}`);
-      showEventPanel('info', `You traded <b>${old.name}</b> for <b>${winner.name}</b> (${winner.universe})!`);
+      game.phase = 'action';
+      runProgressionChecks();
+      refreshUI();
+      return;
     }
+    game.pendingTradeIncoming = winner;
+    logEvent(`🔄 Found ${winner.name} for a trade — spin again to see who leaves!`);
+    showEventPanel('info', `You found <b>${winner.name}</b> (${winner.universe}) to trade in. Spin to decide who leaves your roster!`);
+    game.phase = 'trade-select';
+    refreshUI();
+  });
+}
+
+function startTradeSelectSpin() {
+  const incoming = game.pendingTradeIncoming;
+  if (!incoming) { game.phase = 'action'; refreshUI(); return; }
+  const pool = game.roster.map(c => ({ ...c, weight: 1 }));
+  runRoulette(pool, 'Who leaves the team?', winnerRaw => {
+    const idx = game.roster.findIndex(c => c.name === winnerRaw.name && c.power === winnerRaw.power);
+    const safeIdx = idx >= 0 ? idx : 0;
+    const old = game.roster[safeIdx];
+    game.roster[safeIdx] = { ...incoming, awakenPhase: 0 };
+    trackScoutedCharacter(incoming);
+    logEvent(`🔄 Traded: ${old.name} → ${incoming.name}`);
+    showEventPanel('info', `You traded <b>${old.name}</b> for <b>${incoming.name}</b> (${incoming.universe})!`);
+    game.pendingTradeIncoming = null;
     game.phase = 'action';
     runProgressionChecks();
     refreshUI();
@@ -2149,13 +2707,15 @@ function startAwakenSpin() {
   if (eligible.length === 0) { game.phase = 'action'; refreshUI(); return; }
   const pool = eligible.map(c => ({ ...c, weight: 1 }));
   runRoulette(pool, PHASE_TITLES.awaken, winner => {
-    const target = game.roster.find(c => c.name === winner.name && c.awakenPhase < (AWAKENING_CHAINS[c.name] || []).length);
+    const winnerBase = winner.baseName || winner.name;
+    const target = game.roster.find(c => (c.baseName || c.name) === winnerBase && c.awakenPhase < (AWAKENING_CHAINS[winnerBase] || []).length);
     if (!target) { game.phase = 'action'; refreshUI(); return; }
-    const chain = AWAKENING_CHAINS[target.name];
+    const chain = AWAKENING_CHAINS[target.baseName || target.name];
     const phaseData = chain[target.awakenPhase];
     target.power = Math.min(MAX_POWER, Math.round(target.power * phaseData.multiplier));
     target.rarity = phaseData.newRarity;
     target.color = RARITIES[phaseData.newRarity].color;
+    target.name = `${target.baseName || target.name} (${phaseData.label})`;
     target.sub = `${target.universe} · ${target.rarity}`;
     target.awakenPhase++;
     if (target.power > career.highestPower) career.highestPower = target.power;
@@ -2169,6 +2729,24 @@ function startAwakenSpin() {
 
 function startFusionSpin() {
   if (game.roster.length < 2) { game.phase = 'action'; refreshUI(); return; }
+
+  const special = getAvailableSpecialFusion();
+  if (special) {
+    const owned = new Set(game.roster.map(c => c.baseName || c.name));
+    const pairMembers = game.roster.filter(c => owned.has(c.baseName || c.name) && special.pair.includes(c.baseName || c.name));
+    const pool = pairMembers.map(c => ({ ...c, weight: 1 }));
+    runRoulette(pool.length > 0 ? pool : game.roster.map(c => ({ ...c, weight: 1 })), `Fusion: ${special.name}!`, () => {
+      game.tempFusionBonus = special.bonus;
+      logEvent(`🌀 SPECIAL FUSION: ${special.name}! (+${special.bonus} power next match)`);
+      showEventPanel('success', `<b>${special.pair[0]}</b> and <b>${special.pair[1]}</b> fuse into <b>${special.name}</b>! <b>+${special.bonus} power</b> for your next match.`);
+      game.phase = 'action';
+      runProgressionChecks();
+      refreshUI();
+      showCelebration(special.name, special.flavor, special.icon);
+    });
+    return;
+  }
+
   const pool = game.roster.map(c => ({ ...c, weight: 1 }));
   runRoulette(pool, PHASE_TITLES.fusion, lead => {
     const partners = game.roster.filter(c => c.name !== lead.name);
@@ -2237,11 +2815,13 @@ function handleMatchResult(opponent, outcome) {
         showEventPanel('victory', `You defeated <b>${opponent.name}</b> and became the <b>Multiverse Champion</b>! 🎉`);
         const isNewBest = recordRunEnd(true, opponent.name);
         refreshUI();
-        showCelebration('MULTIVERSE CHAMPION!', `You conquered every league and defeated ${opponent.name}. Legends will speak of this run.`, '👑', isNewBest ? '🌟 New Personal Best!' : '');
+        showCelebration('MULTIVERSE CHAMPION!', `You conquered every league and defeated ${opponent.name}. Legends will speak of this run.`, '👑', isNewBest ? '🌟 New Personal Best!' : '', opponent.name);
         return;
       }
 
       showEventPanel('success', `You won the <b>${tier.name} Trophy</b>! Your whole roster grew stronger, and the <b>${currentTier().name}</b> is now open.`);
+      game.phase = 'action';
+      game.justWonTrophy = true;
       runProgressionChecks();
       refreshUI();
       showCelebration(`${tier.name} Champion!`, `You swept the bracket and earned the ${tier.name} Trophy! Onward to the ${currentTier().name}.`, '🏆');
@@ -2331,6 +2911,7 @@ function handleMainButtonClick() {
     case 'scout': startScoutSpin(); break;
     case 'train': startTrainingSpin(); break;
     case 'trade': startTradeSpin(); break;
+    case 'trade-select': startTradeSelectSpin(); break;
     case 'match': startMatchSpin(); break;
     case 'item': startItemSpin(); break;
     case 'awaken': startAwakenSpin(); break;
