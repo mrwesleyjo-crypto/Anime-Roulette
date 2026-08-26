@@ -86,6 +86,7 @@
       <aside class="sidebar">
         <span class="roster-label">Your Roster</span>
         <div class="roster-power-summary" id="roster-power-summary">Team Power: 0 total · 0 avg</div>
+        <div class="synergy-banner hidden" id="synergy-banner"></div>
         <div class="roster-list" id="roster-list"></div>
 
         <span class="roster-label items-label">Items</span>
@@ -113,6 +114,7 @@
         </div>
       </div>
       <p class="battle-quote" id="battle-enemy-quote">"..."</p>
+      <p class="battle-win-chance" id="battle-win-chance">Estimated win chance: —</p>
       <button id="battle-engage-btn">Engage!</button>
     </div>
   </div>
@@ -124,7 +126,10 @@
       <h2 id="celebration-title">Trophy Won!</h2>
       <p id="celebration-subtitle">You conquered the Bronze League!</p>
       <p class="celebration-extra" id="celebration-extra"></p>
-      <button id="celebration-close">Continue</button>
+      <div class="modal-btn-row">
+        <button class="secondary-btn hidden" id="celebration-share-btn">📸 Save Badge</button>
+        <button id="celebration-close">Continue</button>
+      </div>
     </div>
   </div>
 
@@ -134,9 +139,13 @@
       <h2>Eliminated</h2>
       <p id="gameover-subtitle">You fell in the Bronze League.</p>
       <p class="celebration-extra" id="gameover-extra"></p>
-      <button id="gameover-close">Try Again</button>
+      <div class="modal-btn-row">
+        <button class="secondary-btn" id="gameover-share-btn">📸 Save Badge</button>
+        <button id="gameover-close">Try Again</button>
+      </div>
     </div>
   </div>
+
 
   <div id="name-overlay" class="celebration-overlay name-overlay hidden">
     <div class="celebration-modal name-modal">
@@ -146,6 +155,16 @@
       <input type="text" id="name-input" maxlength="24" placeholder="Your tournament name" autocomplete="off">
       <p class="name-error hidden" id="name-error">That name is already taken on this device — try another.</p>
       <button id="name-submit">Start Tournament</button>
+    </div>
+  </div>
+
+  <div id="rift-overlay" class="celebration-overlay rift-overlay hidden">
+    <div class="celebration-modal rift-modal">
+      <div class="rift-vortex"></div>
+      <div class="rift-icon">🌀</div>
+      <h2>⚠️ DIMENSIONAL RIFT DETECTED</h2>
+      <p>Reality tears open at the edge of the arena... your next Scout will pull from a boosted pool of Epic-or-better fighters!</p>
+      <button id="rift-close">Step Through</button>
     </div>
   </div>
 
