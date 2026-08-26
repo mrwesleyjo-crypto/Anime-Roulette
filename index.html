@@ -13,9 +13,11 @@
   <div class="starfield"></div>
   <div id="toast-container" class="toast-container"></div>
 
+  <div class="reveal-flash" id="reveal-flash"></div>
+
   <div class="page">
     <div class="player-bar">
-      <h1>Multiverse Anime Tournament</h1>
+      <h1>Multiverse Anime Tournament <span class="kanji-badge">闘技場</span></h1>
       <div class="player-id">
         Playing as <b id="player-name-display">—</b> <span id="title-display" class="title-badge"></span>
         <button class="link-btn" id="change-name-btn">Change name</button>
@@ -86,6 +88,10 @@
       <aside class="sidebar">
         <span class="roster-label">Your Roster</span>
         <div class="roster-power-summary" id="roster-power-summary">Team Power: 0 total · 0 avg</div>
+        <div class="power-tier-row" id="power-tier-row">
+          <span class="power-tier-label" id="power-tier-label">🌱 Rookie Fighter</span>
+          <div class="power-tier-bar"><div class="power-tier-bar-fill" id="power-tier-bar-fill"></div></div>
+        </div>
         <div class="synergy-banner hidden" id="synergy-banner"></div>
         <div class="roster-list" id="roster-list"></div>
 

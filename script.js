@@ -16,6 +16,26 @@ const RARITY_ORDER = ['Useless', 'Common', 'Rare', 'Epic', 'Legendary', 'Mythic'
 const RARITY_RANK = RARITY_ORDER.reduce((acc, rarity, i) => { acc[rarity] = i; return acc; }, {});
 
 // ---------------------------------------------------------------------------
+// Power tiers — anime-flavored descriptors for your team's average power
+// ---------------------------------------------------------------------------
+
+const POWER_TIERS = [
+  { max: 30, label: 'Academy Student', icon: '💤', color: '#7a7a8a' },
+  { max: 55, label: 'Rookie Fighter', icon: '🌱', color: '#9aa5b1' },
+  { max: 75, label: 'Trained Warrior', icon: '⚔️', color: '#3498db' },
+  { max: 95, label: 'Elite Combatant', icon: '🔥', color: '#5dade2' },
+  { max: 120, label: 'S-Class Hunter', icon: '⭐', color: '#a855f7' },
+  { max: 160, label: 'Legendary Powerhouse', icon: '👑', color: '#ffd24d' },
+  { max: 250, label: 'World Breaker', icon: '🌍', color: '#ff9f43' },
+  { max: 500, label: 'Multiversal Threat', icon: '🌌', color: '#ff2d6b' },
+  { max: Infinity, label: 'Beyond Comprehension', icon: '♾️', color: '#00ffcc' }
+];
+
+function getPowerTier(avgPower) {
+  return POWER_TIERS.find(t => avgPower <= t.max) || POWER_TIERS[POWER_TIERS.length - 1];
+}
+
+// ---------------------------------------------------------------------------
 // Core roster (always available)
 // ---------------------------------------------------------------------------
 
@@ -703,13 +723,13 @@ const SECRET_OPPONENT = {
 const TOTAL_MATCHES = TIERS.length * 4; // 24 — the full-clear score
 
 const ACTION_META = {
-  scout: { name: 'Scout', icon: '🧭', color: '#2ecc71' },
-  train: { name: 'Train', icon: '🏋️', color: '#f1c40f' },
-  trade: { name: 'Dimensional Swap', icon: '🔄', color: '#3498db' },
-  match: { name: 'Match', icon: '⚔️', color: '#e67e22' },
-  item: { name: 'Treasure', icon: '🎁', color: '#ff9f43' },
-  awaken: { name: 'Awakening', icon: '✨', color: '#ff6b81' },
-  fusion: { name: 'Fusion', icon: '🌀', color: '#00e5ff' }
+  scout: { name: 'Scout', icon: '🥷', kanji: '偵察', color: '#2ecc71' },
+  train: { name: 'Train', icon: '🥋', kanji: '修行', color: '#f1c40f' },
+  trade: { name: 'Dimensional Swap', icon: '🌌', kanji: '次元', color: '#3498db' },
+  match: { name: 'Match', icon: '⚔️', kanji: '決闘', color: '#e67e22' },
+  item: { name: 'Treasure', icon: '🎁', kanji: '秘宝', color: '#ff9f43' },
+  awaken: { name: 'Awakening', icon: '💥', kanji: '覚醒', color: '#ff6b81' },
+  fusion: { name: 'Fusion', icon: '🌀', kanji: '融合', color: '#00e5ff' }
 };
 
 const PHASE_LABELS = {
@@ -1309,6 +1329,8 @@ let isSpinning = false;
 // ---------------------------------------------------------------------------
 
 const track = document.getElementById('strip-track');
+const revealFlash = document.getElementById('reveal-flash');
+const pageEl = document.querySelector('.page');
 const viewport = document.querySelector('.roulette-viewport');
 const mainBtn = document.getElementById('main-btn');
 const rouletteTitle = document.getElementById('roulette-title');
@@ -1316,6 +1338,8 @@ const eventPanel = document.getElementById('event-panel');
 const logList = document.getElementById('log-list');
 const rosterList = document.getElementById('roster-list');
 const rosterPowerSummary = document.getElementById('roster-power-summary');
+const powerTierLabel = document.getElementById('power-tier-label');
+const powerTierBarFill = document.getElementById('power-tier-bar-fill');
 const synergyBanner = document.getElementById('synergy-banner');
 const itemsList = document.getElementById('items-list');
 const dailyQuestList = document.getElementById('daily-quest-list');
@@ -1554,7 +1578,115 @@ function targetTranslateX() {
   return containerWidth / 2 - winnerCenter + jitter;
 }
 
-function runRoulette(pool, titleText, onComplete) {
+// ---------------------------------------------------------------------------
+// Pull sound effects — synthesized with Web Audio, no external files needed.
+// ---------------------------------------------------------------------------
+
+let audioCtx = null;
+function getAudioCtx() {
+  if (!audioCtx) {
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { audioCtx = null; }
+  }
+  return audioCtx;
+}
+
+function playTone(freq, startTime, duration, type, gainPeak) {
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = type || 'sine';
+  osc.frequency.setValueAtTime(freq, ctx.currentTime + startTime);
+  gain.gain.setValueAtTime(0, ctx.currentTime + startTime);
+  gain.gain.linearRampToValueAtTime(gainPeak || 0.14, ctx.currentTime + startTime + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + startTime + duration);
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.start(ctx.currentTime + startTime);
+  osc.stop(ctx.currentTime + startTime + duration + 0.05);
+}
+
+function playRaritySound(rarity) {
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  if (ctx.state === 'suspended') ctx.resume();
+  if (rarity === 'Useless') {
+    playTone(200, 0, 0.18, 'triangle', 0.07);
+  } else if (rarity === 'Common') {
+    playTone(330, 0, 0.15, 'triangle', 0.09);
+  } else if (rarity === 'Rare') {
+    playTone(440, 0, 0.12, 'sine', 0.11);
+    playTone(660, 0.08, 0.2, 'sine', 0.12);
+  } else if (rarity === 'Epic') {
+    playTone(440, 0, 0.1, 'sine', 0.12);
+    playTone(554, 0.08, 0.1, 'sine', 0.12);
+    playTone(660, 0.16, 0.28, 'sine', 0.14);
+  } else if (rarity === 'Legendary') {
+    playTone(392, 0, 0.12, 'sawtooth', 0.09);
+    playTone(494, 0.1, 0.12, 'sawtooth', 0.1);
+    playTone(587, 0.2, 0.12, 'sawtooth', 0.11);
+    playTone(784, 0.3, 0.5, 'sine', 0.16);
+  } else if (rarity === 'Mythic') {
+    playTone(392, 0, 0.1, 'sawtooth', 0.09);
+    playTone(494, 0.08, 0.1, 'sawtooth', 0.1);
+    playTone(587, 0.16, 0.1, 'sawtooth', 0.11);
+    playTone(784, 0.24, 0.1, 'sawtooth', 0.12);
+    playTone(988, 0.32, 0.65, 'sine', 0.18);
+    playTone(1174, 0.4, 0.65, 'sine', 0.13);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Reveal effects — screen flash, shake, and particle burst, scaled by rarity.
+// ---------------------------------------------------------------------------
+
+const REVEAL_SILHOUETTE_MS = { Useless: 200, Common: 300, Rare: 550, Epic: 950, Legendary: 1600, Mythic: 2400 };
+const REVEAL_SETTLE_MS = { Useless: 150, Common: 200, Rare: 350, Epic: 550, Legendary: 800, Mythic: 1100 };
+const REVEAL_DURATION_BONUS_MS = { Useless: 0, Common: 0, Rare: 250, Epic: 700, Legendary: 1500, Mythic: 2400 };
+
+function spawnRevealParticles(color, count) {
+  const layer = document.createElement('div');
+  layer.className = 'reveal-particle-layer';
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement('div');
+    p.className = 'reveal-particle';
+    const angle = (Math.PI * 2 * i) / count + Math.random() * 0.3;
+    const dist = 60 + Math.random() * 60;
+    p.style.setProperty('--dx', `${Math.cos(angle) * dist}px`);
+    p.style.setProperty('--dy', `${Math.sin(angle) * dist}px`);
+    p.style.background = color;
+    layer.appendChild(p);
+  }
+  viewport.appendChild(layer);
+  setTimeout(() => layer.remove(), 900);
+}
+
+function triggerRevealEffects(rarity, color) {
+  playRaritySound(rarity);
+
+  if (RARITY_RANK[rarity] >= RARITY_RANK.Epic) {
+    revealFlash.style.background = color;
+    revealFlash.classList.remove('flashing');
+    void revealFlash.offsetWidth;
+    revealFlash.classList.add('flashing');
+    spawnRevealParticles(color, RARITY_RANK[rarity] >= RARITY_RANK.Legendary ? 24 : 14);
+  }
+
+  if (RARITY_RANK[rarity] >= RARITY_RANK.Legendary) {
+    pageEl.classList.remove('screen-shake');
+    void pageEl.offsetWidth;
+    pageEl.classList.add('screen-shake');
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Main roulette engine. Pass { characterReveal: true } for genuine character
+// pulls (Scout/Trade/Starter/Shop) to get suspense-scaled spin duration,
+// near-miss fake-out fillers, a silhouette hold, and a rarity-scaled reveal
+// (sound + screen flash/shake + particles) before the result is confirmed.
+// ---------------------------------------------------------------------------
+
+function runRoulette(pool, titleText, onComplete, options) {
   if (isSpinning) return;
   isSpinning = true;
   mainBtn.disabled = true;
@@ -1562,10 +1694,23 @@ function runRoulette(pool, titleText, onComplete) {
 
   career.totalSpins += 1;
 
+  const characterReveal = !!(options && options.characterReveal);
   const winner = weightedPick(pool);
+
   const items = [];
   for (let i = 0; i < TOTAL_ITEMS; i++) {
-    items.push(i === WINNER_INDEX ? winner : weightedPick(pool));
+    if (i === WINNER_INDEX) {
+      items.push(winner);
+      continue;
+    }
+    // Fake-out: bias a few slots just before the pointer toward high-rarity
+    // cards, so the strip teases a big pull even when the real winner is not one.
+    if (characterReveal && i >= WINNER_INDEX - 5 && i < WINNER_INDEX && Math.random() < 0.3) {
+      const flashy = pool.filter(c => c.rarity && RARITY_RANK[c.rarity] >= RARITY_RANK.Epic);
+      items.push(flashy.length > 0 ? flashy[Math.floor(Math.random() * flashy.length)] : weightedPick(pool));
+    } else {
+      items.push(weightedPick(pool));
+    }
   }
   renderStrip(items);
 
@@ -1573,7 +1718,8 @@ function runRoulette(pool, titleText, onComplete) {
   track.style.transform = 'translateX(0px)';
   void track.offsetHeight;
 
-  const duration = MIN_DURATION + Math.random() * (MAX_DURATION - MIN_DURATION);
+  const rarityBonus = characterReveal ? (REVEAL_DURATION_BONUS_MS[winner.rarity] || 0) : 0;
+  const duration = MIN_DURATION + Math.random() * (MAX_DURATION - MIN_DURATION) + rarityBonus;
   const finalX = targetTranslateX();
 
   requestAnimationFrame(() => {
@@ -1586,9 +1732,25 @@ function runRoulette(pool, titleText, onComplete) {
     if (settled) return;
     settled = true;
     const winnerEl = track.children[WINNER_INDEX];
-    if (winnerEl) winnerEl.classList.add('winner');
-    isSpinning = false;
-    onComplete(winner);
+
+    if (characterReveal && winnerEl && winner.rarity) {
+      winnerEl.classList.add('silhouette');
+      const holdMs = REVEAL_SILHOUETTE_MS[winner.rarity] || 250;
+      setTimeout(() => {
+        winnerEl.classList.remove('silhouette');
+        winnerEl.classList.add('winner', `reveal-${winner.rarity.toLowerCase()}`);
+        triggerRevealEffects(winner.rarity, winner.color);
+        const settleMs = REVEAL_SETTLE_MS[winner.rarity] || 200;
+        setTimeout(() => {
+          isSpinning = false;
+          onComplete(winner);
+        }, settleMs);
+      }, holdMs);
+    } else {
+      if (winnerEl) winnerEl.classList.add('winner');
+      isSpinning = false;
+      onComplete(winner);
+    }
   };
 
   track.addEventListener('transitionend', finish, { once: true });
@@ -1666,6 +1828,12 @@ function renderRosterSidebar() {
   const avgPower = game.roster.length > 0 ? Math.round(totalPower / game.roster.length) : 0;
   rosterPowerSummary.textContent = `Team Power: ${totalPower} total · ${avgPower} avg`;
 
+  const powerTier = getPowerTier(avgPower);
+  powerTierLabel.textContent = `${powerTier.icon} ${powerTier.label}`;
+  powerTierLabel.style.color = powerTier.color;
+  powerTierBarFill.style.width = `${clamp((avgPower / 300) * 100, avgPower > 0 ? 3 : 0, 100)}%`;
+  powerTierBarFill.style.background = powerTier.color;
+
   const synergy = computeActiveSynergy();
   if (synergy) {
     synergyBanner.classList.remove('hidden');
@@ -1707,7 +1875,15 @@ function renderRosterSidebar() {
     rarity.className = 'roster-card-rarity';
     rarity.textContent = c.rarity;
 
-    body.append(name, power, rarity);
+    const powerBarWrap = document.createElement('div');
+    powerBarWrap.className = 'roster-card-powerbar';
+    const powerBarFill = document.createElement('div');
+    powerBarFill.className = 'roster-card-powerbar-fill';
+    powerBarFill.style.width = `${clamp((c.power / 200) * 100, 4, 100)}%`;
+    powerBarFill.style.background = c.color;
+    powerBarWrap.appendChild(powerBarFill);
+
+    body.append(name, power, rarity, powerBarWrap);
 
     const masteryLvl = masteryLevelFor(c.baseName || c.name);
     if (masteryLvl > 0) {
@@ -1853,8 +2029,28 @@ function renderLeaderboard() {
   });
 }
 
+const LEAGUE_THEMES = [
+  { text: '#e0a458', border: 'rgba(224,164,88,0.35)', borderStrong: 'rgba(224,164,88,0.5)', glow: 'rgba(224,164,88,0.15)', glowStrong: 'rgba(224,164,88,0.4)' },
+  { text: '#c7d3e0', border: 'rgba(199,211,224,0.35)', borderStrong: 'rgba(199,211,224,0.5)', glow: 'rgba(199,211,224,0.15)', glowStrong: 'rgba(199,211,224,0.4)' },
+  { text: '#ffd24d', border: 'rgba(255,210,77,0.35)', borderStrong: 'rgba(255,210,77,0.5)', glow: 'rgba(255,210,77,0.15)', glowStrong: 'rgba(255,210,77,0.4)' },
+  { text: '#8fe8ff', border: 'rgba(143,232,255,0.35)', borderStrong: 'rgba(143,232,255,0.5)', glow: 'rgba(143,232,255,0.16)', glowStrong: 'rgba(143,232,255,0.42)' },
+  { text: '#9db4ff', border: 'rgba(157,180,255,0.4)', borderStrong: 'rgba(157,180,255,0.55)', glow: 'rgba(157,180,255,0.18)', glowStrong: 'rgba(157,180,255,0.45)' },
+  { text: '#ff6b9d', border: 'rgba(255,45,107,0.45)', borderStrong: 'rgba(255,45,107,0.6)', glow: 'rgba(255,45,107,0.2)', glowStrong: 'rgba(255,45,107,0.5)' }
+];
+
+function applyLeagueTheme() {
+  const theme = LEAGUE_THEMES[Math.min(game.tierIndex, LEAGUE_THEMES.length - 1)];
+  const root = document.documentElement.style;
+  root.setProperty('--league-text', theme.text);
+  root.setProperty('--league-border', theme.border);
+  root.setProperty('--league-border-strong', theme.borderStrong);
+  root.setProperty('--league-glow', theme.glow);
+  root.setProperty('--league-glow-strong', theme.glowStrong);
+}
+
 function refreshUI() {
   flushPlaytime();
+  applyLeagueTheme();
   renderRosterSidebar();
   renderItemsSidebar();
   renderDailyQuests();
@@ -2609,7 +2805,7 @@ function buildEventPool() {
   // very next event completely — 100% guaranteed, no other outcome possible.
   const special = getAvailableSpecialFusion();
   if (special) {
-    return [{ value: 'fusion', name: `${special.name} Fusion!`, icon: special.icon, color: special.color, weight: 100, sub: 'Event' }];
+    return [{ value: 'fusion', name: `${special.name} Fusion!`, icon: special.icon, color: special.color, weight: 100, sub: `Event · ${ACTION_META.fusion.kanji}` }];
   }
 
   // The longer you avoid a match (scouting/trading/opening treasure instead),
@@ -2636,7 +2832,7 @@ function buildEventPool() {
   if (career.unlockedSecretOpponent) {
     entries.push({ value: 'secret', weight: 5 });
   }
-  return entries.map(e => ({ ...ACTION_META[e.value], value: e.value, weight: e.weight, sub: 'Event' }));
+  return entries.map(e => ({ ...ACTION_META[e.value], value: e.value, weight: e.weight, sub: `Event · ${ACTION_META[e.value].kanji}` }));
 }
 
 // ---------------------------------------------------------------------------
@@ -2653,7 +2849,7 @@ function startStarterSpin() {
     game.phase = 'action';
     runProgressionChecks();
     refreshUI();
-  });
+  }, { characterReveal: true });
 }
 
 function startActionSpin() {
@@ -2700,7 +2896,7 @@ function startScoutSpin() {
     game.phase = 'action';
     runProgressionChecks();
     refreshUI();
-  });
+  }, { characterReveal: true });
 }
 
 function startTradeSpin() {
@@ -2720,7 +2916,7 @@ function startTradeSpin() {
     showEventPanel('info', `A Dimensional Rift pulls in <b>${winner.name}</b> (${winner.universe})! Spin to decide who it trades places with.`);
     game.phase = 'trade-select';
     refreshUI();
-  });
+  }, { characterReveal: true });
 }
 
 function startTradeSelectSpin() {
