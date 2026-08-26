@@ -346,6 +346,12 @@ h1 {
   font-style: italic;
 }
 
+.roster-card-mastery {
+  font-size: 0.64rem;
+  font-weight: 700;
+  color: #00e5ff;
+}
+
 /* ---------- Items sidebar ---------- */
 
 .items-list {
@@ -1273,4 +1279,150 @@ button:disabled {
 .shop-item-row button {
   padding: 8px 16px;
   font-size: 0.75rem;
+}
+
+/* ---------- Titles ---------- */
+
+.title-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #00e5ff;
+  background: rgba(0,229,255,0.1);
+  border: 1px solid rgba(0,229,255,0.3);
+  border-radius: 20px;
+  padding: 2px 10px;
+}
+
+.title-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgba(10,6,20,0.6);
+  border: 1px solid #3a3550;
+}
+
+.title-row.equipped {
+  border-color: #00e5ff;
+  background: rgba(0,229,255,0.08);
+}
+
+.title-row .title-name {
+  flex: 1;
+  font-weight: 700;
+  font-size: 0.84rem;
+}
+
+.title-row button {
+  padding: 6px 14px;
+  font-size: 0.7rem;
+}
+
+.title-row button:disabled {
+  opacity: 0.6;
+}
+
+/* ---------- Collection Index ---------- */
+
+.collection-modal {
+  max-width: 640px;
+  max-height: 82vh;
+  overflow-y: auto;
+  text-align: left;
+}
+
+.collection-modal h2 {
+  text-align: center;
+}
+
+.collection-note {
+  text-align: center;
+  color: #a9a3c2 !important;
+  font-size: 0.82rem !important;
+  margin-bottom: 18px !important;
+}
+
+.collection-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.collection-anime {
+  background: rgba(10,6,20,0.6);
+  border: 1px solid rgba(0,229,255,0.15);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.collection-anime.complete {
+  border-color: #2ecc71;
+  background: rgba(46,204,113,0.06);
+}
+
+.collection-anime-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.collection-anime-name {
+  font-weight: 700;
+  font-size: 0.88rem;
+}
+
+.collection-anime-count {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #ffd24d;
+}
+
+.collection-anime.complete .collection-anime-count {
+  color: #2ecc71;
+}
+
+.collection-progress-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255,255,255,0.08);
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.collection-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00e5ff, #ffd24d);
+}
+
+.collection-anime.complete .collection-progress-fill {
+  background: #2ecc71;
+}
+
+.collection-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.collection-chip {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 4px 9px;
+  border-radius: 20px;
+  border: 1.5px solid var(--rarity-color, #555);
+  color: var(--rarity-color, #aaa);
+}
+
+.collection-chip.undiscovered {
+  border-color: #3a3550;
+  color: #5a5570;
 }
