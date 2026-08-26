@@ -2000,7 +2000,12 @@ function loadImageWithFallback(src, timeoutMs) {
 }
 
 function drawShareBadge(ctx, isChampion, opponentName, rosterImages) {
-  const w = 800, h = 1000;
+  const w = 800;
+  const radius = 52;
+  const rowHeight = 132;
+  const headerHeight = 330;
+  const footerHeight = 90;
+  const h = Math.max(560, headerHeight + game.roster.length * rowHeight + footerHeight);
   const accent = isChampion ? '#ffd24d' : '#e74c3c';
 
   const bg = ctx.createLinearGradient(0, 0, 0, h);
@@ -2008,6 +2013,15 @@ function drawShareBadge(ctx, isChampion, opponentName, rosterImages) {
   bg.addColorStop(1, '#07040e');
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, w, h);
+
+  // Large faint watermark so smaller rosters don't leave a bare card.
+  ctx.save();
+  ctx.globalAlpha = 0.07;
+  ctx.textAlign = 'center';
+  ctx.fillStyle = accent;
+  ctx.font = 'bold 380px sans-serif';
+  ctx.fillText(isChampion ? '👑' : '💀', w / 2, h / 2 + 130);
+  ctx.restore();
 
   ctx.strokeStyle = accent;
   ctx.lineWidth = 6;
@@ -2040,16 +2054,17 @@ function drawShareBadge(ctx, isChampion, opponentName, rosterImages) {
   ctx.textAlign = 'left';
   ctx.fillStyle = '#ffffff';
   ctx.font = 'bold 22px "Segoe UI", sans-serif';
-  ctx.fillText('Final Roster:', 60, 330);
+  ctx.fillText('Final Roster:', 60, 320);
 
-  const rowHeight = 68;
-  let y = 355;
+  let y = headerHeight;
   game.roster.forEach((c, i) => {
-    const cx = 80, cy = y + 26, radius = 26;
+    const cx = 60 + radius, cy = y + radius;
     const img = rosterImages && rosterImages[i];
 
+    ctx.save();
+    ctx.shadowColor = c.color;
+    ctx.shadowBlur = 18;
     if (img) {
-      ctx.save();
       ctx.beginPath();
       ctx.arc(cx, cy, radius, 0, Math.PI * 2);
       ctx.closePath();
@@ -2057,7 +2072,6 @@ function drawShareBadge(ctx, isChampion, opponentName, rosterImages) {
       const scale = Math.max((radius * 2) / img.width, (radius * 2) / img.height);
       const dw = img.width * scale, dh = img.height * scale;
       ctx.drawImage(img, cx - dw / 2, cy - dh / 2, dw, dh);
-      ctx.restore();
     } else {
       const grad = ctx.createLinearGradient(cx - radius, cy - radius, cx + radius, cy + radius);
       grad.addColorStop(0, c.color);
@@ -2067,25 +2081,30 @@ function drawShareBadge(ctx, isChampion, opponentName, rosterImages) {
       ctx.arc(cx, cy, radius, 0, Math.PI * 2);
       ctx.fill();
       ctx.fillStyle = '#0a0614';
-      ctx.font = 'bold 18px "Segoe UI", sans-serif';
+      ctx.font = 'bold 34px "Segoe UI", sans-serif';
       ctx.textAlign = 'center';
       const initials = c.name.split(' ').map(word => word[0]).slice(0, 2).join('').toUpperCase();
-      ctx.fillText(initials, cx, cy + 6);
+      ctx.fillText(initials, cx, cy + 12);
       ctx.textAlign = 'left';
     }
+    ctx.restore();
 
     ctx.strokeStyle = c.color;
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 4;
     ctx.beginPath();
     ctx.arc(cx, cy, radius, 0, Math.PI * 2);
     ctx.stroke();
 
+    const textX = cx + radius + 24;
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 19px "Segoe UI", sans-serif';
-    ctx.fillText(c.name, 122, cy - 4);
+    ctx.font = 'bold 24px "Segoe UI", sans-serif';
+    ctx.fillText(c.name, textX, cy - 6);
     ctx.fillStyle = c.color;
-    ctx.font = '16px "Segoe UI", sans-serif';
-    ctx.fillText(`Power ${c.power} · ${c.rarity}`, 122, cy + 18);
+    ctx.font = '19px "Segoe UI", sans-serif';
+    ctx.fillText(`Power ${c.power} · ${c.rarity}`, textX, cy + 24);
+    ctx.fillStyle = '#8a84a0';
+    ctx.font = '15px "Segoe UI", sans-serif';
+    ctx.fillText(c.universe, textX, cy + 46);
 
     y += rowHeight;
   });
@@ -2095,12 +2114,15 @@ function drawShareBadge(ctx, isChampion, opponentName, rosterImages) {
   ctx.font = '16px "Segoe UI", sans-serif';
   ctx.fillText('Multiverse Anime Tournament', w / 2, h - 42);
   ctx.fillText(new Date().toLocaleDateString(), w / 2, h - 20);
+
+  return h;
 }
 
 async function downloadShareBadge(isChampion, opponentName) {
+  const radius = 52, rowHeight = 132, headerHeight = 330, footerHeight = 90;
   const canvas = document.createElement('canvas');
   canvas.width = 800;
-  canvas.height = 1000;
+  canvas.height = Math.max(560, headerHeight + game.roster.length * rowHeight + footerHeight);
   const ctx = canvas.getContext('2d');
 
   const rosterImages = await Promise.all(
