@@ -389,6 +389,23 @@ const PERMANENT_QUEST_DEFS = [
   { id: 'p-anime-5', name: 'Collect fighters from 5 different anime', target: 5, statKey: 'universesCollected', isArrayLength: true, reward: 20 },
   { id: 'p-villains-3', name: 'Defeat 3 different villains', target: 3, statKey: 'villainsDefeated', isArrayLength: true, reward: 20 }
 ];
+
+// ---------------------------------------------------------------------------
+// Titles — mostly unlocked automatically as a side effect of achievements
+// and collection completions, checked in checkTitles().
+// ---------------------------------------------------------------------------
+
+const TITLE_DEFS = [
+  { id: 'Rookie Spinner', check: () => true },
+  { id: 'Legend Hunter', check: c => c.unlockedAchievements.includes('collect-40') },
+  { id: 'The Lucky One', check: c => c.unlockedAchievements.includes('lucky-streak') },
+  { id: 'The Unlucky One', check: c => c.unlockedAchievements.includes('unlucky-streak') },
+  { id: 'Professional Gambler', check: c => c.unlockedAchievements.includes('spins-1000') },
+  { id: 'Anime Master', check: c => c.animesCompleted.length >= 1 },
+  { id: 'Multiverse Historian', check: c => c.animesCompleted.length >= 5 },
+  { id: 'Multiverse Champion', check: c => c.championWins >= 1 }
+];
+
 // =============================================================================
 // systems.js — persistence + achievement/quest/pity/shop engines.
 // Depends on data.js. Loaded second. Exposes functions used by main.js.
@@ -472,6 +489,16 @@ function createDefaultCareer() {
     dailyCompletedToday: [],
     permanentQuestProgress: {},
     permanentQuestCompleted: [],
+
+    // mastery (repeat pulls of a character you've already discovered before)
+    masteryXP: {},
+
+    // collection index
+    animesCompleted: [],
+
+    // titles
+    unlockedTitles: ['Rookie Spinner'],
+    equippedTitle: 'Rookie Spinner',
 
     // playtime
     playtimeSeconds: 0
@@ -599,6 +626,78 @@ function checkAchievements() {
     });
   }
   return newlyUnlocked;
+}
+
+// ---------------------------------------------------------------------------
+// Collection Index — characters grouped by anime, with completion rewards
+// ---------------------------------------------------------------------------
+
+function getUniverseGroups() {
+  const merged = buildActiveRosterByRarity();
+  const byUniverse = {};
+  Object.keys(merged).forEach(rarity => {
+    merged[rarity].forEach(entry => {
+      if (!byUniverse[entry.universe]) byUniverse[entry.universe] = [];
+      byUniverse[entry.universe].push({ name: entry.name, rarity });
+    });
+  });
+  return byUniverse;
+}
+
+function checkCollectionCompletions() {
+  const groups = getUniverseGroups();
+  let changed = false;
+  Object.keys(groups).forEach(universe => {
+    if (career.animesCompleted.includes(universe)) return;
+    const chars = groups[universe];
+    const allOwned = chars.length > 0 && chars.every(c => career.uniqueCharacters.includes(c.name));
+    if (allOwned) {
+      career.animesCompleted.push(universe);
+      const reward = chars.length * 8;
+      career.shards += reward;
+      changed = true;
+      showToast('unlock', `📖 Collection Complete: ${universe}`, `+${reward} shards!`);
+    }
+  });
+  if (changed) saveCareer();
+}
+
+// ---------------------------------------------------------------------------
+// Titles — unlocked as a side effect of achievements / collection progress
+// ---------------------------------------------------------------------------
+
+function checkTitles() {
+  let changed = false;
+  TITLE_DEFS.forEach(def => {
+    if (career.unlockedTitles.includes(def.id)) return;
+    if (def.check(career)) {
+      career.unlockedTitles.push(def.id);
+      changed = true;
+      showToast('unlock', `🎖️ Title Unlocked: ${def.id}`, 'Equip it from the Stats page!');
+    }
+  });
+  if (changed) saveCareer();
+}
+
+// ---------------------------------------------------------------------------
+// Mastery — repeat pulls of an already-discovered character grant small,
+// capped bonuses instead of being "wasted". Duplicates still can't sit in
+// your live roster at once (that stays blocked) — this is a career-wide
+// reward for scouting/trading into a character you've met before.
+// ---------------------------------------------------------------------------
+
+const MASTERY_XP_PER_REPEAT = 10;
+const MASTERY_XP_PER_LEVEL = 50;
+const MASTERY_MAX_BONUS_POWER = 5;
+
+function masteryLevelFor(name) {
+  const xp = (career.masteryXP && career.masteryXP[name]) || 0;
+  return Math.min(MASTERY_MAX_BONUS_POWER, Math.floor(xp / MASTERY_XP_PER_LEVEL));
+}
+
+function grantMasteryXP(name) {
+  if (!career.masteryXP) career.masteryXP = {};
+  career.masteryXP[name] = (career.masteryXP[name] || 0) + MASTERY_XP_PER_REPEAT;
 }
 
 // ---------------------------------------------------------------------------
@@ -761,7 +860,8 @@ function createInitialState() {
     items: { phoenixEmber: 1, chakraDraft: 0, twinMoon: 0, spiritWhistle: 0, luckyDango: 0 },
     lastWinChance: null,
     tempFusionBonus: 0,
-    actionsSinceMatch: 0
+    actionsSinceMatch: 0,
+    riftActive: false
   };
 }
 
@@ -819,11 +919,13 @@ const battleEngageBtn = document.getElementById('battle-engage-btn');
 
 const statsOverlay = document.getElementById('stats-overlay');
 const statsGrid = document.getElementById('stats-grid');
+const titleList = document.getElementById('title-list');
 const achievementsList = document.getElementById('achievements-list');
 const achievementsProgress = document.getElementById('achievements-progress');
 const permanentQuestList = document.getElementById('permanent-quest-list');
 const openStatsBtn = document.getElementById('open-stats-btn');
 const statsCloseX = document.getElementById('stats-close-x');
+const titleDisplay = document.getElementById('title-display');
 
 const shopOverlay = document.getElementById('shop-overlay');
 const shopList = document.getElementById('shop-list');
@@ -831,6 +933,11 @@ const shardBalance = document.getElementById('shard-balance');
 const shopNote = document.getElementById('shop-note');
 const openShopBtn = document.getElementById('open-shop-btn');
 const shopCloseX = document.getElementById('shop-close-x');
+
+const collectionOverlay = document.getElementById('collection-overlay');
+const collectionList = document.getElementById('collection-list');
+const openCollectionBtn = document.getElementById('open-collection-btn');
+const collectionCloseX = document.getElementById('collection-close-x');
 
 // ---------------------------------------------------------------------------
 // Generic helpers
@@ -1038,6 +1145,8 @@ function runProgressionChecks() {
   checkAchievements();
   checkQuests();
   checkUnlocks();
+  checkCollectionCompletions();
+  checkTitles();
   saveCareer();
 }
 
@@ -1095,6 +1204,14 @@ function renderRosterSidebar() {
     rarity.textContent = c.rarity;
 
     body.append(name, power, rarity);
+
+    const masteryLvl = masteryLevelFor(c.name);
+    if (masteryLvl > 0) {
+      const mastery = document.createElement('span');
+      mastery.className = 'roster-card-mastery';
+      mastery.textContent = `★ Mastery +${masteryLvl} power`;
+      body.appendChild(mastery);
+    }
 
     const chain = AWAKENING_CHAINS[c.name];
     if (chain) {
@@ -1242,6 +1359,7 @@ function refreshUI() {
   renderLeaderboard();
 
   shardBalanceInline.textContent = career.shards;
+  titleDisplay.textContent = career.equippedTitle ? `· ${career.equippedTitle}` : '';
 
   mainBtn.textContent = PHASE_LABELS[game.phase];
   mainBtn.disabled = isSpinning;
@@ -1413,11 +1531,34 @@ function renderStatsModal() {
     statCell('Battles Won / Lost', `${career.battlesWon} / ${career.battlesLost} (${winRate}%)`),
     statCell('Villains Defeated', `${career.villainsDefeated.length} / ${TOTAL_VILLAIN_COUNT}`),
     statCell('Anime Collected', career.universesCollected.length),
+    statCell('Anime Collections Complete', career.animesCompleted.length),
     statCell('Champion Wins', career.championWins),
     statCell('Best Champion Streak', career.bestChampionStreak),
     statCell('Playtime', formatPlaytime(career.playtimeSeconds)),
     statCell('Shards Balance', `${career.shards} 🔷`)
   );
+
+  titleList.innerHTML = '';
+  TITLE_DEFS.forEach(def => {
+    if (!career.unlockedTitles.includes(def.id)) return;
+    const equipped = career.equippedTitle === def.id;
+    const row = document.createElement('div');
+    row.className = 'title-row' + (equipped ? ' equipped' : '');
+    const name = document.createElement('span');
+    name.className = 'title-name';
+    name.textContent = (equipped ? '✓ ' : '') + def.id;
+    const btn = document.createElement('button');
+    btn.textContent = equipped ? 'Equipped' : 'Equip';
+    btn.disabled = equipped;
+    btn.addEventListener('click', () => {
+      career.equippedTitle = def.id;
+      saveCareer();
+      renderStatsModal();
+      refreshUI();
+    });
+    row.append(name, btn);
+    titleList.appendChild(row);
+  });
 
   const unlockedCount = career.unlockedAchievements.length;
   achievementsProgress.textContent = `(${unlockedCount} / ${ACHIEVEMENT_DEFS.length})`;
@@ -1471,6 +1612,62 @@ function renderStatsModal() {
 
 openStatsBtn.addEventListener('click', () => { renderStatsModal(); statsOverlay.classList.remove('hidden'); });
 statsCloseX.addEventListener('click', () => statsOverlay.classList.add('hidden'));
+
+// ---------------------------------------------------------------------------
+// Collection Index
+// ---------------------------------------------------------------------------
+
+function renderCollectionIndex() {
+  const groups = getUniverseGroups();
+  collectionList.innerHTML = '';
+  const universeNames = Object.keys(groups).sort();
+  universeNames.forEach(universe => {
+    const chars = groups[universe];
+    const owned = chars.filter(c => career.uniqueCharacters.includes(c.name));
+    const complete = owned.length === chars.length;
+
+    const section = document.createElement('div');
+    section.className = 'collection-anime' + (complete ? ' complete' : '');
+
+    const header = document.createElement('div');
+    header.className = 'collection-anime-header';
+    const name = document.createElement('span');
+    name.className = 'collection-anime-name';
+    name.textContent = (complete ? '✅ ' : '') + universe;
+    const count = document.createElement('span');
+    count.className = 'collection-anime-count';
+    count.textContent = `${owned.length} / ${chars.length}`;
+    header.append(name, count);
+
+    const barWrap = document.createElement('div');
+    barWrap.className = 'collection-progress-bar';
+    const barFill = document.createElement('div');
+    barFill.className = 'collection-progress-fill';
+    barFill.style.width = `${Math.round((owned.length / chars.length) * 100)}%`;
+    barWrap.appendChild(barFill);
+
+    const chips = document.createElement('div');
+    chips.className = 'collection-chips';
+    chars.forEach(c => {
+      const discovered = career.uniqueCharacters.includes(c.name);
+      const chip = document.createElement('span');
+      chip.className = 'collection-chip' + (discovered ? '' : ' undiscovered');
+      if (discovered) {
+        chip.style.setProperty('--rarity-color', RARITIES[c.rarity].color);
+        chip.textContent = c.name;
+      } else {
+        chip.textContent = '???';
+      }
+      chips.appendChild(chip);
+    });
+
+    section.append(header, barWrap, chips);
+    collectionList.appendChild(section);
+  });
+}
+
+openCollectionBtn.addEventListener('click', () => { renderCollectionIndex(); collectionOverlay.classList.remove('hidden'); });
+collectionCloseX.addEventListener('click', () => collectionOverlay.classList.add('hidden'));
 
 // ---------------------------------------------------------------------------
 // Shard shop
@@ -1566,7 +1763,12 @@ function recordRunEnd(isChampion, opponentName) {
 
 function trackScoutedCharacter(c) {
   career.totalScouts += 1;
-  if (!career.uniqueCharacters.includes(c.name)) career.uniqueCharacters.push(c.name);
+  const isRepeat = career.uniqueCharacters.includes(c.name);
+  if (!isRepeat) {
+    career.uniqueCharacters.push(c.name);
+  } else {
+    grantMasteryXP(c.name);
+  }
   if (!career.universesCollected.includes(c.universe)) career.universesCollected.push(c.universe);
   career.rarityCounts[c.rarity] = (career.rarityCounts[c.rarity] || 0) + 1;
   if (career.rarestObtained === null || RARITY_RANK[c.rarity] > RARITY_RANK[career.rarestObtained]) {
@@ -1590,6 +1792,14 @@ function trackScoutedCharacter(c) {
   recordScoutPityResult(c.rarity);
   bumpDailyStat('dailyScouts', 1);
   if (RARITY_RANK[c.rarity] >= RARITY_RANK.Epic) bumpDailyStat('dailyEpicPlus', 1);
+}
+
+// Applies a small, capped power bonus (max +5) for characters you've met
+// before, career-wide. Duplicates still can't sit in your live roster —
+// this only rewards re-pulling someone you've already discovered.
+function applyMasteryBonus(character) {
+  const bonus = masteryLevelFor(character.name);
+  return bonus > 0 ? { ...character, power: character.power + bonus, masteryBonus: bonus } : character;
 }
 
 function rosterOwnedNames() {
@@ -1653,7 +1863,8 @@ function buildEventPool() {
 // ---------------------------------------------------------------------------
 
 function startStarterSpin() {
-  runRoulette(STARTER_POOL, PHASE_TITLES.starter, winner => {
+  runRoulette(STARTER_POOL, PHASE_TITLES.starter, winnerRaw => {
+    const winner = applyMasteryBonus(winnerRaw);
     game.roster.push({ ...winner, awakenPhase: 0 });
     trackScoutedCharacter(winner);
     logEvent(`🎉 Your tournament begins with ${winner.name} (${winner.universe})!`);
@@ -1671,6 +1882,13 @@ function startActionSpin() {
     showEventPanel('info', `Coming up: <b>${winner.name}</b>`);
     game.phase = winner.value;
     game.actionsSinceMatch = winner.value === 'match' ? 0 : (game.actionsSinceMatch || 0) + 1;
+
+    // Dimensional Rift: a small chance, only when not already active, to grant
+    // a temporary boosted-luck window for your next Scout.
+    if (winner.value !== 'match' && !game.riftActive && Math.random() < 0.04) {
+      game.riftActive = true;
+      showToast('unlock', '⚠️ DIMENSIONAL RIFT DETECTED', 'Your next Scout pulls from a boosted pool!');
+    }
     refreshUI();
   });
 }
@@ -1678,16 +1896,24 @@ function startActionSpin() {
 function startScoutSpin() {
   let pool = career.pityCounter >= PITY_SOFT_START ? getPityAdjustedPool(ACTIVE_POOL) : ACTIVE_POOL;
   let usedDango = false;
+  let usedRift = false;
   if (game.items.luckyDango > 0) {
     game.items.luckyDango--;
     pool = ACTIVE_POOL.filter(c => c.rarity !== 'Common');
     usedDango = true;
+  } else if (game.riftActive) {
+    game.riftActive = false;
+    const boosted = ACTIVE_POOL.filter(c => RARITY_RANK[c.rarity] >= RARITY_RANK.Epic);
+    pool = boosted.length > 0 ? boosted : ACTIVE_POOL;
+    usedRift = true;
   }
   pool = poolExcludingRoster(pool);
-  runRoulette(pool, PHASE_TITLES.scout, winner => {
+  runRoulette(pool, PHASE_TITLES.scout, winnerRaw => {
+    const winner = applyMasteryBonus(winnerRaw);
     addToRoster(winner);
     trackScoutedCharacter(winner);
     if (usedDango) logEvent('🍡 Lucky Dango Skewer guaranteed a Rare-or-better scout!');
+    if (usedRift) logEvent('⚠️ The Dimensional Rift boosted this scout to Epic-or-better!');
     game.phase = 'action';
     runProgressionChecks();
     refreshUI();
@@ -1696,7 +1922,8 @@ function startScoutSpin() {
 
 function startTradeSpin() {
   const pool = poolExcludingRoster(ACTIVE_POOL);
-  runRoulette(pool, PHASE_TITLES.trade, winner => {
+  runRoulette(pool, PHASE_TITLES.trade, winnerRaw => {
+    const winner = applyMasteryBonus(winnerRaw);
     trackScoutedCharacter(winner);
     if (game.roster.length === 0) {
       addToRoster(winner);
