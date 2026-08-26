@@ -159,7 +159,7 @@ const STARTER_RARITIES = ['Common', 'Useless'];
 // Awakenings
 // ---------------------------------------------------------------------------
 
-const AWAKENING_UNLOCK_TIER = 2; // Gold League (index 2) or later
+const AWAKENING_UNLOCK_TIER = 1; // Silver League (index 1) or later — moved earlier so the power boost lands before the mid-game difficulty spike
 
 const AWAKENING_CHAINS = {
   'Naruto Uzumaki': [
@@ -250,60 +250,60 @@ const TIERS = [
     name: 'Bronze League',
     icon: '🥉',
     bracket: [
-      { name: 'Zabuza Momochi', universe: 'Naruto', power: 40, icon: '🗡️', color: '#6b7f8c', quote: "A blade doesn't hesitate. Neither will I." },
-      { name: 'Kabuto Yakushi', universe: 'Naruto', power: 48, icon: '🐍', color: '#5d8c5a', quote: "I've already analyzed your every move. This ends before it begins." },
-      { name: 'Captain Ginyu', universe: 'Dragon Ball', power: 54, icon: '🟣', color: '#8e5ba8', quote: "Strike a pose — you're about to meet the strongest fighter in the universe!" },
-      { name: 'Orochimaru', universe: 'Naruto', power: 62, icon: '🐍', color: '#5a6b4f', quote: 'Power is the only truth worth chasing. Let me have a taste of yours.' }
+      { name: 'Zabuza Momochi', universe: 'Naruto', power: 36, icon: '🗡️', color: '#6b7f8c', quote: "A blade doesn't hesitate. Neither will I." },
+      { name: 'Kabuto Yakushi', universe: 'Naruto', power: 42, icon: '🐍', color: '#5d8c5a', quote: "I've already analyzed your every move. This ends before it begins." },
+      { name: 'Captain Ginyu', universe: 'Dragon Ball', power: 48, icon: '🟣', color: '#8e5ba8', quote: "Strike a pose — you're about to meet the strongest fighter in the universe!" },
+      { name: 'Orochimaru', universe: 'Naruto', power: 55, icon: '🐍', color: '#5a6b4f', quote: 'Power is the only truth worth chasing. Let me have a taste of yours.' }
     ]
   },
   {
     name: 'Silver League',
     icon: '🥈',
     bracket: [
-      { name: 'Grimmjow Jaegerjaquez', universe: 'Bleach', power: 54, icon: '🐆', color: '#3a7bd5', quote: 'I only fight opponents who can push me to my limit. Try not to disappoint me.' },
-      { name: 'Hidan', universe: 'Naruto', power: 62, icon: '🔺', color: '#8c1c2b', quote: "Pain is a gift! Let's see how much of it you can take." },
-      { name: 'Enel', universe: 'One Piece', power: 69, icon: '⚡', color: '#e0b93c', quote: 'Mortals like you were never meant to challenge a god of thunder.' },
-      { name: 'Donquixote Doflamingo', universe: 'One Piece', power: 76, icon: '🧷', color: '#d162a4', quote: 'Everything and everyone is a string for me to pull, fufufu.' }
+      { name: 'Grimmjow Jaegerjaquez', universe: 'Bleach', power: 48, icon: '🐆', color: '#3a7bd5', quote: 'I only fight opponents who can push me to my limit. Try not to disappoint me.' },
+      { name: 'Hidan', universe: 'Naruto', power: 55, icon: '🔺', color: '#8c1c2b', quote: "Pain is a gift! Let's see how much of it you can take." },
+      { name: 'Enel', universe: 'One Piece', power: 62, icon: '⚡', color: '#e0b93c', quote: 'Mortals like you were never meant to challenge a god of thunder.' },
+      { name: 'Donquixote Doflamingo', universe: 'One Piece', power: 70, icon: '🧷', color: '#d162a4', quote: 'Everything and everyone is a string for me to pull, fufufu.' }
     ]
   },
   {
     name: 'Gold League',
     icon: '🥇',
     bracket: [
-      { name: 'Ulquiorra Cifer', universe: 'Bleach', power: 68, icon: '🦇', color: '#4a4a52', quote: "Despair is the only truth. I'll show you yours." },
-      { name: 'Cell', universe: 'Dragon Ball', power: 76, icon: '🟢', color: '#4caf6a', quote: 'I am the perfect being. You are simply another cell for me to absorb.' },
-      { name: 'Akaza', universe: 'Demon Slayer', power: 83, icon: '👊', color: '#c94f6d', quote: 'Only the strong deserve to keep living. Prove that you belong.' },
-      { name: 'Frieza (Final Form)', universe: 'Dragon Ball', power: 90, icon: '❄️', color: '#b073d1', quote: "I do hope you're prepared. I so rarely have to use more than one finger." }
+      { name: 'Ulquiorra Cifer', universe: 'Bleach', power: 70, icon: '🦇', color: '#4a4a52', quote: "Despair is the only truth. I'll show you yours." },
+      { name: 'Cell', universe: 'Dragon Ball', power: 78, icon: '🟢', color: '#4caf6a', quote: 'I am the perfect being. You are simply another cell for me to absorb.' },
+      { name: 'Akaza', universe: 'Demon Slayer', power: 86, icon: '👊', color: '#c94f6d', quote: 'Only the strong deserve to keep living. Prove that you belong.' },
+      { name: 'Frieza (Final Form)', universe: 'Dragon Ball', power: 94, icon: '❄️', color: '#b073d1', quote: "I do hope you're prepared. I so rarely have to use more than one finger." }
     ]
   },
   {
     name: 'Platinum League',
     icon: '🏆',
     bracket: [
-      { name: 'Muzan Kibutsuji', universe: 'Demon Slayer', power: 82, icon: '🌑', color: '#5b2a86', quote: 'Perfection is my birthright. Everything beneath me is disposable.' },
-      { name: 'Kaido', universe: 'One Piece', power: 89, icon: '🐉', color: '#3d6b8c', quote: 'Call me the strongest creature alive — then try to prove me wrong.' },
-      { name: 'Big Mom', universe: 'One Piece', power: 95, icon: '🍰', color: '#d43f6a', quote: "Give me your soul, and maybe I'll let you leave in one piece." },
-      { name: 'Majin Buu', universe: 'Dragon Ball', power: 101, icon: '💗', color: '#e879b8', quote: "Buu doesn't understand strategy. Buu just doesn't stop." }
+      { name: 'Muzan Kibutsuji', universe: 'Demon Slayer', power: 88, icon: '🌑', color: '#5b2a86', quote: 'Perfection is my birthright. Everything beneath me is disposable.' },
+      { name: 'Kaido', universe: 'One Piece', power: 96, icon: '🐉', color: '#3d6b8c', quote: 'Call me the strongest creature alive — then try to prove me wrong.' },
+      { name: 'Big Mom', universe: 'One Piece', power: 103, icon: '🍰', color: '#d43f6a', quote: "Give me your soul, and maybe I'll let you leave in one piece." },
+      { name: 'Majin Buu', universe: 'Dragon Ball', power: 110, icon: '💗', color: '#e879b8', quote: "Buu doesn't understand strategy. Buu just doesn't stop." }
     ]
   },
   {
     name: 'Diamond League',
     icon: '💎',
     bracket: [
-      { name: 'All For One', universe: 'My Hero Academia', power: 95, icon: '🌫️', color: '#4a4358', quote: 'Whatever power you have, I can simply take it for myself.' },
-      { name: 'Griffith', universe: 'Berserk', power: 101, icon: '🦅', color: '#e8e4f0', quote: 'Dreams are worth any sacrifice. Even yours.' },
-      { name: 'Meruem', universe: 'Hunter x Hunter', power: 107, icon: '👑', color: '#3a3a42', quote: 'I was born to be the strongest. You are merely a data point.' },
-      { name: 'Frieza (Golden Form)', universe: 'Dragon Ball', power: 112, icon: '✨', color: '#e8c34a', quote: "This form cost me years of training I never wanted to do. You'd better be worth it." }
+      { name: 'All For One', universe: 'My Hero Academia', power: 104, icon: '🌫️', color: '#4a4358', quote: 'Whatever power you have, I can simply take it for myself.' },
+      { name: 'Griffith', universe: 'Berserk', power: 112, icon: '🦅', color: '#e8e4f0', quote: 'Dreams are worth any sacrifice. Even yours.' },
+      { name: 'Meruem', universe: 'Hunter x Hunter', power: 119, icon: '👑', color: '#3a3a42', quote: 'I was born to be the strongest. You are merely a data point.' },
+      { name: 'Frieza (Golden Form)', universe: 'Dragon Ball', power: 126, icon: '✨', color: '#e8c34a', quote: "This form cost me years of training I never wanted to do. You'd better be worth it." }
     ]
   },
   {
     name: 'Multiverse Final',
     icon: '👑',
     bracket: [
-      { name: 'Beerus', universe: 'Dragon Ball Super', power: 106, icon: '🐱', color: '#8e5ba8', quote: "Amuse me, or I'll erase this whole arena from existence." },
-      { name: 'Kaguya Otsutsuki', universe: 'Naruto', power: 112, icon: '🌙', color: '#c2a8e8', quote: 'Dimensions bend to my will. Yours is next.' },
-      { name: 'Kars', universe: "JoJo's Bizarre Adventure", power: 117, icon: '💎', color: '#7ac9d4', quote: 'I am the pinnacle of all life. Perfection does not lose.' },
-      { name: 'Fused Zamasu', universe: 'Dragon Ball Super', power: 124, icon: '♾️', color: '#4ce88a', quote: 'Mortals are a mistake I intend to erase — starting with you.' }
+      { name: 'Beerus', universe: 'Dragon Ball Super', power: 118, icon: '🐱', color: '#8e5ba8', quote: "Amuse me, or I'll erase this whole arena from existence." },
+      { name: 'Kaguya Otsutsuki', universe: 'Naruto', power: 126, icon: '🌙', color: '#c2a8e8', quote: 'Dimensions bend to my will. Yours is next.' },
+      { name: 'Kars', universe: "JoJo's Bizarre Adventure", power: 134, icon: '💎', color: '#7ac9d4', quote: 'I am the pinnacle of all life. Perfection does not lose.' },
+      { name: 'Fused Zamasu', universe: 'Dragon Ball Super', power: 142, icon: '♾️', color: '#4ce88a', quote: 'Mortals are a mistake I intend to erase — starting with you.' }
     ]
   }
 ];
@@ -483,7 +483,6 @@ const SYNERGY_DEFS = [
   stateSynergy('full-cowl-active', 'Full Cowl 100%', '💚', 16, 'One For All is surging at its absolute limit.', 'Full Cowl'),
 
   // --- Roster size synergies -------------------------------------------------------
-  sizeSynergy('lone-wolf', 'Lone Wolf', '🐺', 6, 'Just one fighter, no backup — every match is a solo statement.', 1),
   sizeSynergy('dynamic-duo', 'Dynamic Duo', '👥', 8, 'Two fighters, perfectly in sync.', 2),
   sizeSynergy('terrific-trio', 'Terrific Trio', '👨‍👩‍👧', 10, 'Three fighters covering every angle.', 3),
   sizeSynergy('fantastic-four', 'Fantastic Four', '🃏', 12, 'A well-rounded four-fighter roster.', 4),
@@ -671,7 +670,7 @@ const SYNERGY_DEFS = [
 
 function computeActiveSynergy() {
   const roster = game.roster;
-  if (roster.length < 1) return null;
+  if (roster.length < 2) return null;
   const names = new Set(roster.map(c => c.baseName || c.name));
 
   let best = null;
@@ -706,7 +705,7 @@ const TOTAL_MATCHES = TIERS.length * 4; // 24 — the full-clear score
 const ACTION_META = {
   scout: { name: 'Scout', icon: '🧭', color: '#2ecc71' },
   train: { name: 'Train', icon: '🏋️', color: '#f1c40f' },
-  trade: { name: 'Trade', icon: '🔄', color: '#3498db' },
+  trade: { name: 'Dimensional Swap', icon: '🔄', color: '#3498db' },
   match: { name: 'Match', icon: '⚔️', color: '#e67e22' },
   item: { name: 'Treasure', icon: '🎁', color: '#ff9f43' },
   awaken: { name: 'Awakening', icon: '✨', color: '#ff6b81' },
@@ -718,7 +717,7 @@ const PHASE_LABELS = {
   action: 'Spin for the next event!',
   scout: 'Scout a fighter!',
   train: 'Start training!',
-  trade: 'Start a trade!',
+  trade: 'Start a Dimensional Swap!',
   'trade-select': 'Spin to see who leaves!',
   match: 'Fight the next match!',
   item: 'Open the treasure!',
@@ -732,7 +731,7 @@ const PHASE_TITLES = {
   action: 'What happens next?',
   scout: 'Spin to scout a new fighter!',
   train: 'Who goes to training camp?',
-  trade: 'Spin to make a trade!',
+  trade: 'Spin to pull a fighter through the rift!',
   'trade-select': 'Spin to see who leaves your roster!',
   item: 'Spin to find a support item!',
   awaken: 'Which fighter awakens?!',
@@ -1294,7 +1293,6 @@ function createInitialState() {
     finaleWon: false,
     items: { phoenixEmber: 1, chakraDraft: 0, twinMoon: 0, spiritWhistle: 0, luckyDango: 0 },
     lastWinChance: null,
-    tempFusionBonus: 0,
     actionsSinceMatch: 0,
     riftActive: false,
     godMode: false,
@@ -1989,7 +1987,19 @@ battleEngageBtn.addEventListener('click', () => {
 // Shareable run-summary badge (canvas-generated PNG download)
 // ---------------------------------------------------------------------------
 
-function drawShareBadge(ctx, isChampion, opponentName) {
+function loadImageWithFallback(src, timeoutMs) {
+  return new Promise(resolve => {
+    const img = new Image();
+    let done = false;
+    const finish = result => { if (!done) { done = true; resolve(result); } };
+    img.onload = () => finish(img);
+    img.onerror = () => finish(null);
+    img.src = src;
+    setTimeout(() => finish(null), timeoutMs || 1500);
+  });
+}
+
+function drawShareBadge(ctx, isChampion, opponentName, rosterImages) {
   const w = 800, h = 1000;
   const accent = isChampion ? '#ffd24d' : '#e74c3c';
 
@@ -2032,14 +2042,52 @@ function drawShareBadge(ctx, isChampion, opponentName) {
   ctx.font = 'bold 22px "Segoe UI", sans-serif';
   ctx.fillText('Final Roster:', 60, 330);
 
-  let y = 372;
-  ctx.font = '18px "Segoe UI", sans-serif';
-  game.roster.forEach(c => {
+  const rowHeight = 68;
+  let y = 355;
+  game.roster.forEach((c, i) => {
+    const cx = 80, cy = y + 26, radius = 26;
+    const img = rosterImages && rosterImages[i];
+
+    if (img) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.closePath();
+      ctx.clip();
+      const scale = Math.max((radius * 2) / img.width, (radius * 2) / img.height);
+      const dw = img.width * scale, dh = img.height * scale;
+      ctx.drawImage(img, cx - dw / 2, cy - dh / 2, dw, dh);
+      ctx.restore();
+    } else {
+      const grad = ctx.createLinearGradient(cx - radius, cy - radius, cx + radius, cy + radius);
+      grad.addColorStop(0, c.color);
+      grad.addColorStop(1, '#0a0614');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#0a0614';
+      ctx.font = 'bold 18px "Segoe UI", sans-serif';
+      ctx.textAlign = 'center';
+      const initials = c.name.split(' ').map(word => word[0]).slice(0, 2).join('').toUpperCase();
+      ctx.fillText(initials, cx, cy + 6);
+      ctx.textAlign = 'left';
+    }
+
+    ctx.strokeStyle = c.color;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 19px "Segoe UI", sans-serif';
+    ctx.fillText(c.name, 122, cy - 4);
     ctx.fillStyle = c.color;
-    ctx.fillRect(60, y - 16, 14, 14);
-    ctx.fillStyle = '#e8e4f5';
-    ctx.fillText(`${c.name}  —  Power ${c.power}  (${c.rarity})`, 84, y);
-    y += 36;
+    ctx.font = '16px "Segoe UI", sans-serif';
+    ctx.fillText(`Power ${c.power} · ${c.rarity}`, 122, cy + 18);
+
+    y += rowHeight;
   });
 
   ctx.textAlign = 'center';
@@ -2049,12 +2097,17 @@ function drawShareBadge(ctx, isChampion, opponentName) {
   ctx.fillText(new Date().toLocaleDateString(), w / 2, h - 20);
 }
 
-function downloadShareBadge(isChampion, opponentName) {
+async function downloadShareBadge(isChampion, opponentName) {
   const canvas = document.createElement('canvas');
   canvas.width = 800;
   canvas.height = 1000;
   const ctx = canvas.getContext('2d');
-  drawShareBadge(ctx, isChampion, opponentName);
+
+  const rosterImages = await Promise.all(
+    game.roster.map(c => loadImageWithFallback(imagePathFor(c.baseName || c.name, 'character')))
+  );
+
+  drawShareBadge(ctx, isChampion, opponentName, rosterImages);
   const link = document.createElement('a');
   link.download = `multiverse-tournament-${isChampion ? 'champion' : 'run'}.png`;
   link.href = canvas.toDataURL('image/png');
@@ -2556,7 +2609,7 @@ function buildEventPool() {
     entries.push({ value: 'awaken', weight: 8 });
   }
   if (career.unlockedFusion && game.roster.length >= 2) {
-    entries.push({ value: 'fusion', weight: 6 });
+    entries.push({ value: 'fusion', weight: 3 });
   }
   if (career.unlockedSecretOpponent) {
     entries.push({ value: 'secret', weight: 5 });
@@ -2641,8 +2694,8 @@ function startTradeSpin() {
       return;
     }
     game.pendingTradeIncoming = winner;
-    logEvent(`🔄 Found ${winner.name} for a trade — spin again to see who leaves!`);
-    showEventPanel('info', `You found <b>${winner.name}</b> (${winner.universe}) to trade in. Spin to decide who leaves your roster!`);
+    logEvent(`🔄 A rift pulls in ${winner.name} — spin again to see who steps through!`);
+    showEventPanel('info', `A Dimensional Rift pulls in <b>${winner.name}</b> (${winner.universe})! Spin to decide who it trades places with.`);
     game.phase = 'trade-select';
     refreshUI();
   });
@@ -2658,8 +2711,8 @@ function startTradeSelectSpin() {
     const old = game.roster[safeIdx];
     game.roster[safeIdx] = { ...incoming, awakenPhase: 0 };
     trackScoutedCharacter(incoming);
-    logEvent(`🔄 Traded: ${old.name} → ${incoming.name}`);
-    showEventPanel('info', `You traded <b>${old.name}</b> for <b>${incoming.name}</b> (${incoming.universe})!`);
+    logEvent(`🔄 Dimensional Swap: ${old.name} → ${incoming.name}`);
+    showEventPanel('info', `A rift pulls <b>${old.name}</b> out and <b>${incoming.name}</b> (${incoming.universe}) steps through in their place!`);
     game.pendingTradeIncoming = null;
     game.phase = 'action';
     runProgressionChecks();
@@ -2727,6 +2780,58 @@ function startAwakenSpin() {
   });
 }
 
+const FUSION_FLAVOR_LINES = [
+  'A blinding flash of light — two fighters become one, if only for a moment!',
+  'Power surges as their auras intertwine into something new entirely!',
+  'For one match, they fight as a single, combined being!',
+  'The fusion holds — barely — but the power boost is very real!'
+];
+
+function generateFusionName(nameA, nameB) {
+  const firstA = nameA.split(' ')[0].replace(/[()]/g, '');
+  const firstB = nameB.split(' ')[0].replace(/[()]/g, '');
+  const a = firstA.slice(0, Math.max(2, Math.ceil(firstA.length / 2)));
+  const bTail = firstB.slice(Math.max(1, Math.floor(firstB.length * 0.35)));
+  const b = bTail.length > 0 ? bTail.charAt(0).toUpperCase() + bTail.slice(1) : firstB;
+  return a + b;
+}
+
+// Actually merges two roster members into one permanent fusion character —
+// this costs a roster slot (2 members become 1), which is the real balance
+// lever: fusing trades team size/synergy potential for raw power.
+function performFusionMerge(baseNameA, baseNameB, fusionName, icon, isSpecial) {
+  const idxA = game.roster.findIndex(c => (c.baseName || c.name) === baseNameA);
+  const idxB = game.roster.findIndex(c => (c.baseName || c.name) === baseNameB);
+  if (idxA === -1 || idxB === -1) return null;
+  const a = game.roster[idxA];
+  const b = game.roster[idxB];
+
+  // Special (canon) fusions merge more efficiently than a random pairing.
+  const efficiency = isSpecial ? 0.9 : 0.72;
+  const combinedPower = Math.min(MAX_POWER, Math.round((a.power + b.power) * efficiency));
+
+  const maxRarityRank = Math.max(RARITY_RANK[a.rarity], RARITY_RANK[b.rarity]);
+  const bumpedRank = Math.min(RARITY_ORDER.length - 1, maxRarityRank + (isSpecial ? 1 : 0));
+  const newRarity = RARITY_ORDER[bumpedRank];
+
+  const fused = {
+    name: fusionName,
+    baseName: fusionName,
+    universe: a.universe === b.universe ? a.universe : `${a.universe} × ${b.universe}`,
+    rarity: newRarity,
+    color: RARITIES[newRarity].color,
+    power: combinedPower,
+    awakenPhase: 0,
+    sub: `${a.universe} × ${b.universe} · ${newRarity}`
+  };
+
+  [idxA, idxB].sort((x, y) => y - x).forEach(i => game.roster.splice(i, 1));
+  game.roster.push(fused);
+
+  if (fused.power > career.highestPower) career.highestPower = fused.power;
+  return fused;
+}
+
 function startFusionSpin() {
   if (game.roster.length < 2) { game.phase = 'action'; refreshUI(); return; }
 
@@ -2736,9 +2841,11 @@ function startFusionSpin() {
     const pairMembers = game.roster.filter(c => owned.has(c.baseName || c.name) && special.pair.includes(c.baseName || c.name));
     const pool = pairMembers.map(c => ({ ...c, weight: 1 }));
     runRoulette(pool.length > 0 ? pool : game.roster.map(c => ({ ...c, weight: 1 })), `Fusion: ${special.name}!`, () => {
-      game.tempFusionBonus = special.bonus;
-      logEvent(`🌀 SPECIAL FUSION: ${special.name}! (+${special.bonus} power next match)`);
-      showEventPanel('success', `<b>${special.pair[0]}</b> and <b>${special.pair[1]}</b> fuse into <b>${special.name}</b>! <b>+${special.bonus} power</b> for your next match.`);
+      const fused = performFusionMerge(special.pair[0], special.pair[1], special.name, special.icon, true);
+      if (fused) {
+        logEvent(`🌀 SPECIAL FUSION: ${special.pair[0]} + ${special.pair[1]} permanently merge into ${special.name}! (Power ${fused.power})`);
+        showEventPanel('success', `<b>${special.pair[0]}</b> and <b>${special.pair[1]}</b> permanently fuse into <b>${special.name}</b>! <b>Power ${fused.power}</b> — but they now share one roster slot.`);
+      }
       game.phase = 'action';
       runProgressionChecks();
       refreshUI();
@@ -2751,18 +2858,25 @@ function startFusionSpin() {
   runRoulette(pool, PHASE_TITLES.fusion, lead => {
     const partners = game.roster.filter(c => c.name !== lead.name);
     const partner = partners.length > 0 ? partners[Math.floor(Math.random() * partners.length)] : lead;
-    const bonus = Math.round((lead.power + partner.power) / 2 * 0.3);
-    game.tempFusionBonus = bonus;
-    logEvent(`🌀 Fusion: ${lead.name} + ${partner.name} (+${bonus} power next match)`);
-    showEventPanel('success', `<b>${lead.name}</b> and <b>${partner.name}</b> fuse their power into an incredible surge! <b>+${bonus} power</b> for your next match.`);
+    if (partner === lead) { game.phase = 'action'; refreshUI(); return; }
+
+    const fusionName = generateFusionName(lead.name, partner.name);
+    const flavor = FUSION_FLAVOR_LINES[Math.floor(Math.random() * FUSION_FLAVOR_LINES.length)];
+    const fused = performFusionMerge(lead.baseName || lead.name, partner.baseName || partner.name, fusionName, '🌀', false);
+
+    if (fused) {
+      logEvent(`🌀 Fusion: ${lead.name} + ${partner.name} permanently merge into ${fusionName}! (Power ${fused.power})`);
+      showEventPanel('success', `<b>${lead.name}</b> and <b>${partner.name}</b> permanently fuse into <b>${fusionName}</b>! <b>Power ${fused.power}</b> — but they now share one roster slot.`);
+    }
     game.phase = 'action';
     runProgressionChecks();
     refreshUI();
+    showCelebration(`${fusionName}!`, flavor, '🌀');
   });
 }
 
 function resolveMatch(opponent) {
-  let bonus = game.tempFusionBonus || 0;
+  let bonus = 0;
   let forcedWin = false;
   let note = '';
   if (game.items.twinMoon > 0) {
@@ -2774,7 +2888,6 @@ function resolveMatch(opponent) {
     bonus += 20;
     note = ' Your Chakra Draft surges through your team (+20 power)!';
   }
-  game.tempFusionBonus = 0;
 
   const winChance = forcedWin ? 0.99 : computeWinChance(opponent.power, bonus);
   game.lastWinChance = winChance;
