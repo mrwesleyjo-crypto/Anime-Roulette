@@ -210,6 +210,14 @@ const SHOP_ITEMS = [
   { key: 'twinMoon', price: 60 }
 ].map(e => ({ ...ITEM_DEFS[e.key], key: e.key, price: e.price }));
 
+// Premium shop items — instantly recruit a fighter of a guaranteed rarity.
+// Deliberately expensive: these are a long-term shard sink, not a shortcut.
+const SHOP_CHARACTER_ITEMS = [
+  { key: 'buyRare', name: 'Recruit a Rare Fighter', icon: '💠', color: '#3498db', desc: 'Instantly adds a random Rare fighter to your roster.', price: 150, rarity: 'Rare' },
+  { key: 'buyEpic', name: 'Recruit an Epic Fighter', icon: '🌟', color: '#a855f7', desc: 'Instantly adds a random Epic fighter to your roster.', price: 400, rarity: 'Epic' },
+  { key: 'buyLegendary', name: 'Recruit a Legendary Fighter', icon: '👑', color: '#ffd24d', desc: 'Instantly adds a random Legendary fighter to your roster.', price: 900, rarity: 'Legendary' }
+];
+
 // ---------------------------------------------------------------------------
 // Tournament map: real anime villains, scaled from early-arc threats up to
 // universe-ending final bosses. Quotes are original flavor lines written
@@ -929,6 +937,7 @@ const titleDisplay = document.getElementById('title-display');
 
 const shopOverlay = document.getElementById('shop-overlay');
 const shopList = document.getElementById('shop-list');
+const shopCharacterList = document.getElementById('shop-character-list');
 const shardBalance = document.getElementById('shard-balance');
 const shopNote = document.getElementById('shop-note');
 const openShopBtn = document.getElementById('open-shop-btn');
@@ -963,6 +972,53 @@ function weightedPick(entries) {
 
 function initials(text) {
   return text.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+}
+
+// ---------------------------------------------------------------------------
+// Character/villain artwork
+//
+// Drop transparent PNGs into these folders next to index.html, named after
+// the character (lowercase, spaces/apostrophes/parentheses become hyphens):
+//   images/characters/naruto-uzumaki.png
+//   images/characters/meliodas-demon-kings-forest.png   (matches "Meliodas (Fairy King's Forest)")
+//   images/villains/frieza-final-form.png                (matches "Frieza (Final Form)")
+// If a file is missing, the existing colored-initials avatar is shown
+// instead — nothing breaks, art can be added gradually.
+// ---------------------------------------------------------------------------
+
+const CHARACTER_IMAGE_DIR = 'images/characters/';
+const VILLAIN_IMAGE_DIR = 'images/villains/';
+
+function slugifyName(name) {
+  return name
+    .toLowerCase()
+    .replace(/[().'"]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-+|-+$)/g, '');
+}
+
+function imagePathFor(name, kind) {
+  const dir = kind === 'villain' ? VILLAIN_IMAGE_DIR : CHARACTER_IMAGE_DIR;
+  return `${dir}${slugifyName(name)}.png`;
+}
+
+// Renders into `container`: a fallback text/icon (shown by default) plus an
+// <img> that, if it loads successfully, covers the fallback. If the image
+// 404s, it silently removes itself and the fallback stays visible.
+function attachAvatarImage(container, name, kind, fallbackText) {
+  const fallback = document.createElement('span');
+  fallback.className = 'avatar-fallback-text';
+  fallback.textContent = fallbackText;
+  container.appendChild(fallback);
+
+  const img = document.createElement('img');
+  img.className = 'char-img';
+  img.alt = name;
+  img.loading = 'lazy';
+  img.onload = () => container.classList.add('has-image');
+  img.onerror = () => img.remove();
+  img.src = imagePathFor(name, kind);
+  container.appendChild(img);
 }
 
 function currentTier() {
@@ -1034,7 +1090,11 @@ function createItemEl(entry) {
   el.style.setProperty('--rarity-color', entry.color);
   const avatar = document.createElement('div');
   avatar.className = 'avatar';
-  avatar.textContent = entry.icon || initials(entry.name);
+  if (entry.universe) {
+    attachAvatarImage(avatar, entry.name, 'character', initials(entry.name));
+  } else {
+    avatar.textContent = entry.icon || initials(entry.name);
+  }
   const name = document.createElement('div');
   name.className = 'name';
   name.textContent = entry.name;
@@ -1186,7 +1246,7 @@ function renderRosterSidebar() {
 
     const image = document.createElement('div');
     image.className = 'roster-card-image';
-    image.textContent = initials(c.name);
+    attachAvatarImage(image, c.name, 'character', initials(c.name));
 
     const body = document.createElement('div');
     body.className = 'roster-card-body';
@@ -1425,7 +1485,9 @@ let pendingOpponent = null;
 function showBattleIntro(opponent) {
   pendingOpponent = opponent;
   battleYourPower.textContent = `Power ${averageRosterPower()} (avg)`;
-  battleEnemyAvatar.textContent = opponent.icon || '👹';
+  battleEnemyAvatar.innerHTML = '';
+  battleEnemyAvatar.classList.remove('has-image');
+  attachAvatarImage(battleEnemyAvatar, opponent.name, 'villain', opponent.icon || '👹');
   battleEnemyAvatar.parentElement.style.setProperty('--rarity-color', opponent.color || '#ff2d6b');
   battleEnemyName.textContent = opponent.name;
   battleEnemyPower.textContent = `Power ${opponent.power}`;
@@ -1675,8 +1737,36 @@ collectionCloseX.addEventListener('click', () => collectionOverlay.classList.add
 
 function renderShop() {
   shardBalance.textContent = career.shards;
-  const runActive = game.roster.length > 0 && game.phase !== 'victory' && game.phase !== 'gameover';
-  shopNote.textContent = runActive ? '' : 'Start a run to spend shards — purchased items go straight into your current inventory.';
+  const runActive = game.phase !== 'victory' && game.phase !== 'gameover';
+  shopNote.textContent = runActive ? '' : 'Your run just ended — start a new tournament to spend shards again.';
+
+  shopCharacterList.innerHTML = '';
+  SHOP_CHARACTER_ITEMS.forEach(item => {
+    const row = document.createElement('div');
+    row.className = 'shop-item-row';
+    row.style.setProperty('--item-color', item.color);
+    const icon = document.createElement('span');
+    icon.className = 'shop-item-icon';
+    icon.textContent = item.icon;
+    const body = document.createElement('div');
+    body.className = 'shop-item-body';
+    const name = document.createElement('div');
+    name.className = 'shop-item-name';
+    name.textContent = item.name;
+    const desc = document.createElement('div');
+    desc.className = 'shop-item-desc';
+    desc.textContent = item.desc;
+    body.append(name, desc);
+    const buyBtn = document.createElement('button');
+    const canAfford = career.shards >= item.price;
+    buyBtn.textContent = `${item.price} 🔷`;
+    buyBtn.disabled = !runActive || !canAfford;
+    buyBtn.title = !runActive ? 'Start a run first' : (!canAfford ? 'Not enough shards yet' : '');
+    buyBtn.addEventListener('click', () => buyShopCharacter(item));
+    row.append(icon, body, buyBtn);
+    shopCharacterList.appendChild(row);
+  });
+
   shopList.innerHTML = '';
   SHOP_ITEMS.forEach(item => {
     const row = document.createElement('div');
@@ -1695,12 +1785,32 @@ function renderShop() {
     desc.textContent = item.desc;
     body.append(name, desc);
     const buyBtn = document.createElement('button');
+    const canAfford = career.shards >= item.price;
     buyBtn.textContent = `${item.price} 🔷`;
-    buyBtn.disabled = !runActive || career.shards < item.price;
+    buyBtn.disabled = !runActive || !canAfford;
+    buyBtn.title = !runActive ? 'Start a run first' : (!canAfford ? 'Not enough shards yet' : '');
     buyBtn.addEventListener('click', () => buyShopItem(item));
     row.append(icon, body, buyBtn);
     shopList.appendChild(row);
   });
+}
+
+function buyShopCharacter(item) {
+  if (career.shards < item.price) return;
+  const pool = poolExcludingRoster(ACTIVE_POOL.filter(c => c.rarity === item.rarity));
+  if (pool.length === 0) {
+    logEvent(`🛒 No available ${item.rarity} fighters left to recruit right now.`);
+    return;
+  }
+  career.shards -= item.price;
+  const picked = applyMasteryBonus(weightedPick(pool));
+  addToRoster(picked);
+  trackScoutedCharacter(picked);
+  saveCareer();
+  logEvent(`🛒 Recruited ${picked.name} (${item.rarity}) for ${item.price} shards`);
+  runProgressionChecks();
+  renderShop();
+  refreshUI();
 }
 
 function buyShopItem(item) {

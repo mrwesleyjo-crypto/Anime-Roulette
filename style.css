@@ -295,6 +295,8 @@ h1 {
 }
 
 .roster-card-image {
+  position: relative;
+  overflow: hidden;
   width: 100%;
   aspect-ratio: 1 / 1;
   display: flex;
@@ -305,6 +307,24 @@ h1 {
   font-weight: 800;
   color: #0a0614;
   background: linear-gradient(160deg, var(--rarity-color, #555), #0a0614 130%);
+}
+
+.avatar-fallback-text {
+  position: relative;
+  z-index: 1;
+}
+
+.char-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  z-index: 2;
+}
+
+.has-image .avatar-fallback-text {
+  display: none;
 }
 
 .roster-card-body {
@@ -618,6 +638,8 @@ h1 {
 }
 
 .strip-item .avatar {
+  position: relative;
+  overflow: hidden;
   width: 52px;
   height: 52px;
   border-radius: 50%;
@@ -1058,6 +1080,8 @@ button:disabled {
 }
 
 .battle-avatar {
+  position: relative;
+  overflow: hidden;
   width: 68px;
   height: 68px;
   border-radius: 50%;
@@ -1128,8 +1152,16 @@ button:disabled {
   width: 30px;
   height: 30px;
   padding: 0;
+  margin: 0;
   border-radius: 50%;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  font-family: 'Rajdhani', sans-serif;
+  letter-spacing: 0;
+  text-transform: none;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: rgba(255,255,255,0.08);
   box-shadow: none;
 }
@@ -1426,3 +1458,4 @@ button:disabled {
   border-color: #3a3550;
   color: #5a5570;
 }
+
