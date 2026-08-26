@@ -4,21 +4,32 @@
 // =============================================================================
 
 const RARITIES = {
-  Common: { weight: 50, color: '#9aa5b1', minPower: 55, maxPower: 70 },
-  Rare: { weight: 32, color: '#3498db', minPower: 71, maxPower: 82 },
-  Epic: { weight: 14, color: '#a855f7', minPower: 83, maxPower: 92 },
+  Useless: { weight: 18, color: '#5a5570', minPower: 15, maxPower: 35 },
+  Common: { weight: 42, color: '#9aa5b1', minPower: 55, maxPower: 70 },
+  Rare: { weight: 30, color: '#3498db', minPower: 71, maxPower: 82 },
+  Epic: { weight: 13, color: '#a855f7', minPower: 83, maxPower: 92 },
   Legendary: { weight: 4, color: '#ffd24d', minPower: 93, maxPower: 100 },
   Mythic: { weight: 2, color: '#00ffcc', minPower: 105, maxPower: 115 }
 };
 
-const RARITY_ORDER = ['Common', 'Rare', 'Epic', 'Legendary', 'Mythic'];
-const RARITY_RANK = { Common: 0, Rare: 1, Epic: 2, Legendary: 3, Mythic: 4 };
+const RARITY_ORDER = ['Useless', 'Common', 'Rare', 'Epic', 'Legendary', 'Mythic'];
+const RARITY_RANK = RARITY_ORDER.reduce((acc, rarity, i) => { acc[rarity] = i; return acc; }, {});
 
 // ---------------------------------------------------------------------------
 // Core roster (always available)
 // ---------------------------------------------------------------------------
 
 const ROSTER_BY_RARITY = {
+  Useless: [
+    { name: 'Ash Ketchum', universe: 'Pokémon' },
+    { name: 'Yamcha', universe: 'Dragon Ball' },
+    { name: 'Mr. Satan', universe: 'Dragon Ball' },
+    { name: 'Konohamaru Sarutobi', universe: 'Naruto' },
+    { name: 'Kon', universe: 'Bleach' },
+    { name: 'Usopp', universe: 'One Piece' },
+    { name: 'Chichi', universe: 'Dragon Ball' },
+    { name: 'Bulma', universe: 'Dragon Ball' }
+  ],
   Common: [
     { name: 'Naruto Uzumaki', universe: 'Naruto' },
     { name: 'Ichigo Kurosaki', universe: 'Bleach' },
@@ -33,7 +44,6 @@ const ROSTER_BY_RARITY = {
     { name: 'Yusuke Urameshi', universe: 'Yu Yu Hakusho' },
     { name: 'Gon Freecss', universe: 'Hunter x Hunter' },
     { name: 'Denji', universe: 'Chainsaw Man' },
-    { name: 'Ash Ketchum', universe: 'Pokémon' },
     { name: 'Zenitsu Agatsuma', universe: 'Demon Slayer' },
     { name: 'Inosuke Hashibira', universe: 'Demon Slayer' },
     { name: 'Bakugo Katsuki', universe: 'My Hero Academia' },
@@ -139,7 +149,11 @@ const MYTHIC_ROSTER = [
   { name: 'Grand Priest', universe: 'Dragon Ball Super' }
 ];
 
-const STARTER_NAMES = ['Naruto Uzumaki', 'Ichigo Kurosaki', 'Tanjiro Kamado', 'Izuku Midoriya', 'Natsu Dragneel', 'Ash Ketchum'];
+// Any Common or Useless-tier character can be your starter — no fixed
+// curated list. This means a genuine wildcard: sometimes you begin the
+// tournament with a real fighter, sometimes with someone who can barely
+// throw a punch, and the early bracket has to be survived regardless.
+const STARTER_RARITIES = ['Common', 'Useless'];
 
 // ---------------------------------------------------------------------------
 // Awakenings
@@ -179,6 +193,11 @@ const AWAKENING_CHAINS = {
   ],
   'Saitama': [
     { label: 'Serious Series', multiplier: 1.05, newRarity: 'Legendary', icon: '👊', flavor: 'Saitama decides to take this one seriously... his power barely changes. He was already holding back 0%.' }
+  ],
+  'Ash Ketchum': [
+    { label: 'Catches Pikachu', multiplier: 4, newRarity: 'Common', icon: '⚡', flavor: 'A wild Pikachu appears — and chooses Ash as its trainer! He is no longer fighting alone.' },
+    { label: 'Full Team of Six', multiplier: 2, newRarity: 'Rare', icon: '🎒', flavor: 'Six Pokémon, one team — Ash commands a full battle roster!' },
+    { label: 'League Champion', multiplier: 1.8, newRarity: 'Epic', icon: '🏆', flavor: 'After countless leagues and years of training, Ash finally becomes a Champion!' }
   ]
 };
 
@@ -458,7 +477,7 @@ function createDefaultCareer() {
     // spin / collection tracking
     totalSpins: 0,
     totalScouts: 0,
-    rarityCounts: { Common: 0, Rare: 0, Epic: 0, Legendary: 0, Mythic: 0 },
+    rarityCounts: { Useless: 0, Common: 0, Rare: 0, Epic: 0, Legendary: 0, Mythic: 0 },
     uniqueCharacters: [],
     universesCollected: [],
     highestPower: 0,
@@ -792,6 +811,24 @@ function getPityAdjustedPool(basePool) {
   });
 }
 
+// As you clear more leagues, your Scout odds shift toward stronger fighters —
+// early game stays a real gamble, but persistence pays off later.
+function getProgressionAdjustedPool(basePool) {
+  const tier = game.tierIndex || 0;
+  if (tier <= 0) return basePool;
+  const boostFactor = 1 + tier * 0.35;
+  const uselessPenalty = Math.max(0.2, 1 - tier * 0.18);
+  return basePool.map(c => {
+    if (RARITY_RANK[c.rarity] >= RARITY_RANK.Rare) {
+      return { ...c, weight: c.weight * boostFactor };
+    }
+    if (c.rarity === 'Useless') {
+      return { ...c, weight: c.weight * uselessPenalty };
+    }
+    return c;
+  });
+}
+
 function recordScoutPityResult(rarity) {
   if (RARITY_RANK[rarity] >= RARITY_RANK.Rare) {
     career.pityCounter = 0;
@@ -823,7 +860,7 @@ function buildCharacterPool(rosterBySource) {
         power,
         weight: cfg.weight / list.length,
         sub: `${entry.universe} · ${rarity}`,
-        isStarter: STARTER_NAMES.includes(entry.name),
+        isStarter: STARTER_RARITIES.includes(rarity),
         awakenPhase: 0
       });
     });
@@ -845,7 +882,9 @@ function buildActiveRosterByRarity() {
 }
 
 let ACTIVE_POOL = buildCharacterPool(buildActiveRosterByRarity());
-const STARTER_POOL = buildCharacterPool(ROSTER_BY_RARITY).filter(c => c.isStarter).map(c => ({ ...c, weight: 1 }));
+// Weighted (not uniform) so genuine fighters are still somewhat more likely
+// than the useless ones — but a rough start is always possible.
+const STARTER_POOL = buildCharacterPool(ROSTER_BY_RARITY).filter(c => c.isStarter);
 
 function refreshActivePool() {
   ACTIVE_POOL = buildCharacterPool(buildActiveRosterByRarity());
@@ -869,7 +908,8 @@ function createInitialState() {
     lastWinChance: null,
     tempFusionBonus: 0,
     actionsSinceMatch: 0,
-    riftActive: false
+    riftActive: false,
+    godMode: false
   };
 }
 
@@ -1060,6 +1100,7 @@ const LEAGUE_STAT_KEY = { 'Bronze League': 'Bronze', 'Silver League': 'Silver', 
 // ---------------------------------------------------------------------------
 
 function computeWinChance(opponentPower, bonus) {
+  if (game.godMode) return 0.99;
   const rosterSize = game.roster.length;
   if (rosterSize === 0) return 0.05;
   const avgPower = game.roster.reduce((s, c) => s + c.power, 0) / rosterSize;
@@ -1460,8 +1501,25 @@ function closeNameOverlay() {
   refreshUI();
 }
 
+const GODMODE_CODE = 'ZKLLMPtzJXIvymzsy7_T_g';
+
+function activateGodMode() {
+  game.godMode = true;
+  const displayName = '⚡ GOD MODE ⚡';
+  game.playerName = displayName;
+  playerNameDisplay.textContent = displayName;
+  game.items.phoenixEmber = 99;
+  logEvent('⚡ God Mode activated. Reality itself bends to your will.');
+  closeNameOverlay();
+  refreshUI();
+}
+
 function submitName() {
   const raw = nameInput.value.trim();
+  if (raw === GODMODE_CODE) {
+    activateGodMode();
+    return;
+  }
   if (!raw) { nameError.textContent = 'Enter a name to continue.'; nameError.classList.remove('hidden'); return; }
   if (raw.length > 20) { nameError.textContent = 'Keep it under 20 characters.'; nameError.classList.remove('hidden'); return; }
   if (isNameTaken(raw, game.playerName)) { nameError.textContent = 'That name is already taken on this device — try another.'; nameError.classList.remove('hidden'); return; }
@@ -1890,7 +1948,7 @@ function trackScoutedCharacter(c) {
     career.currentLuckyStreak += 1;
     career.bestLuckyStreak = Math.max(career.bestLuckyStreak, career.currentLuckyStreak);
     career.currentUnluckyStreak = 0;
-  } else if (c.rarity === 'Common') {
+  } else if (c.rarity === 'Common' || c.rarity === 'Useless') {
     career.currentUnluckyStreak += 1;
     career.bestUnluckyStreak = Math.max(career.bestUnluckyStreak, career.currentUnluckyStreak);
     career.currentLuckyStreak = 0;
@@ -2004,12 +2062,13 @@ function startActionSpin() {
 }
 
 function startScoutSpin() {
-  let pool = career.pityCounter >= PITY_SOFT_START ? getPityAdjustedPool(ACTIVE_POOL) : ACTIVE_POOL;
+  let pool = getProgressionAdjustedPool(ACTIVE_POOL);
+  if (career.pityCounter >= PITY_SOFT_START) pool = getPityAdjustedPool(pool);
   let usedDango = false;
   let usedRift = false;
   if (game.items.luckyDango > 0) {
     game.items.luckyDango--;
-    pool = ACTIVE_POOL.filter(c => c.rarity !== 'Common');
+    pool = ACTIVE_POOL.filter(c => RARITY_RANK[c.rarity] >= RARITY_RANK.Rare);
     usedDango = true;
   } else if (game.riftActive) {
     game.riftActive = false;
@@ -2201,8 +2260,8 @@ function handleMatchResult(opponent, outcome) {
   career.lossesByOpponent[opponent.name] = (career.lossesByOpponent[opponent.name] || 0) + 1;
   logEvent(`❌ Lost to ${opponent.name}`);
 
-  if (game.items.phoenixEmber > 0) {
-    game.items.phoenixEmber--;
+  if (game.godMode || game.items.phoenixEmber > 0) {
+    if (!game.godMode) game.items.phoenixEmber--;
     career.phoenixSaves += 1;
     logEvent(`🔥 Your Phoenix Ember flares — defeat averted against ${opponent.name}!`);
     showEventPanel('info', `You were about to fall to <b>${opponent.name}</b>, but your <b>Phoenix Ember</b> flared with the will to fight on! (Consumed)`);
@@ -2246,8 +2305,13 @@ function startSecretSpin() {
 
 function resetGame() {
   const keepName = game.playerName;
+  const keepGodMode = game.godMode;
   game = createInitialState();
   game.playerName = keepName;
+  if (keepGodMode) {
+    game.godMode = true;
+    game.items.phoenixEmber = 99;
+  }
   logList.innerHTML = '';
   eventPanel.className = 'event-panel hidden';
   eventPanel.innerHTML = '';
