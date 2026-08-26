@@ -127,13 +127,28 @@ h1 {
   box-shadow: none;
 }
 
-.subtitle {
-  margin: 12px 0 16px;
-  color: #c7c2df;
-  font-size: 0.92rem;
+.subtitle-short {
+  margin: 8px 0 14px;
+  color: #a9a3c2;
+  font-size: 0.8rem;
   font-weight: 600;
-  line-height: 1.5;
+  line-height: 1.4;
   text-align: left;
+}
+
+#howto-inline-link {
+  color: var(--league-text, #00e5ff);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.howto-goal {
+  font-size: 0.85rem !important;
+  color: #c7c2df !important;
+  line-height: 1.55 !important;
+  margin-bottom: 18px !important;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
 /* ---------- How to play ---------- */
@@ -255,6 +270,14 @@ h1 {
 }
 
 @media (max-width: 760px) {
+  /* backdrop-filter is a common cause of repaint/ghosting glitches on
+     mobile GPUs, especially combined with live CSS transitions — drop it
+     on small screens and fall back to the (already opaque-ish) solid tint. */
+  .page {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(20, 12, 33, 0.92);
+  }
   .layout {
     flex-direction: column;
   }
