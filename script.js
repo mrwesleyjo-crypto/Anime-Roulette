@@ -1617,16 +1617,28 @@ function getAudioCtx() {
 }
 
 // Browsers only allow an AudioContext to start/resume when that call happens
-// synchronously inside a real user-gesture handler (a click). Our reveal
-// sounds fire several setTimeout()s deep inside the spin sequence, which is
-// too far removed from the original click for browsers to allow — so we
-// "unlock" audio eagerly on the very first click anywhere on the page.
-function unlockAudioOnce() {
+// synchronously inside a real user-gesture handler (a tap/click). Mobile
+// Safari is stricter still: it needs an actual sound-producing node started
+// synchronously in the gesture to fully "prime" the audio session, and the
+// context can re-suspend after the screen locks or the tab backgrounds — so
+// this runs on every tap/click, not just once.
+function unlockAudio() {
   const ctx = getAudioCtx();
-  if (ctx && ctx.state === 'suspended') ctx.resume();
-  document.removeEventListener('click', unlockAudioOnce);
+  if (!ctx) return;
+  if (ctx.state === 'suspended') {
+    ctx.resume().catch(() => {});
+  }
+  try {
+    const buffer = ctx.createBuffer(1, 1, 22050);
+    const primer = ctx.createBufferSource();
+    primer.buffer = buffer;
+    primer.connect(ctx.destination);
+    primer.start(0);
+  } catch (e) { /* ignore — best-effort priming */ }
 }
-document.addEventListener('click', unlockAudioOnce);
+['touchstart', 'touchend', 'click'].forEach(evt => {
+  document.addEventListener(evt, unlockAudio, { passive: true });
+});
 
 function playTone(freq, startTime, duration, type, gainPeak) {
   const ctx = getAudioCtx();
@@ -1671,6 +1683,22 @@ function playRaritySound(rarity) {
     playTone(784, 0.24, 0.1, 'sawtooth', 0.18);
     playTone(988, 0.32, 0.65, 'sine', 0.26);
     playTone(1174, 0.4, 0.65, 'sine', 0.2);
+  }
+}
+
+// A satisfying decelerating "tick" run for the whole spin duration, timed to
+// roughly follow the strip's own ease-out — fast ticks at first, slowing
+// toward the landing, like a real prize wheel or slot machine.
+function playSpinTicks(durationMs) {
+  const ctx = getAudioCtx();
+  if (!ctx) return;
+  const totalSeconds = durationMs / 1000;
+  const tickCount = Math.round(18 + totalSeconds * 4);
+  for (let i = 1; i <= tickCount; i++) {
+    const progress = 1 - Math.pow(1 - i / tickCount, 3); // ease-out cubic
+    const t = progress * totalSeconds;
+    const freq = 150 + Math.random() * 30;
+    playTone(freq, t, 0.035, 'square', 0.06);
   }
 }
 
@@ -1763,6 +1791,7 @@ function runRoulette(pool, titleText, onComplete, options) {
     track.style.transition = `transform ${duration}ms ${EASING}`;
     track.style.transform = `translateX(${finalX}px)`;
   });
+  playSpinTicks(duration);
 
   let settled = false;
   const finish = () => {
@@ -2065,33 +2094,4 @@ const LEAGUE_THEMES = [
   { text: '#ff6b9d', border: 'rgba(255,45,107,0.45)', borderStrong: 'rgba(255,45,107,0.6)', glow: 'rgba(255,45,107,0.2)', glowStrong: 'rgba(255,45,107,0.5)' }
 ];
 
-function applyLeagueTheme() {
-  const theme = LEAGUE_THEMES[Math.min(game.tierIndex, LEAGUE_THEMES.length - 1)];
-  const root = document.documentElement.style;
-  root.setProperty('--league-text', theme.text);
-  root.setProperty('--league-border', theme.border);
-  root.setProperty('--league-border-strong', theme.borderStrong);
-  root.setProperty('--league-glow', theme.glow);
-  root.setProperty('--league-glow-strong', theme.glowStrong);
-}
-
-function refreshUI() {
-  flushPlaytime();
-  applyLeagueTheme();
-  renderRosterSidebar();
-  renderItemsSidebar();
-  renderDailyQuests();
-  renderTrophyCase();
-  renderBracket();
-  renderLeaderboard();
-
-  shardBalanceInline.textContent = career.shards;
-  titleDisplay.textContent = career.equippedTitle ? `· ${career.equippedTitle}` : '';
-
-  mainBtn.textContent = PHASE_LABELS[game.phase];
-  mainBtn.disabled = isSpinning;
-  rouletteTitle.textContent = PHASE_TITLES[game.phase] || PHASE_TITLES.action;
-  viewport.classList.toggle('rift-active', !!game.riftActive);
-}
-
-// ----------------------
+function ap
