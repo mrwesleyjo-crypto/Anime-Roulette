@@ -273,6 +273,17 @@ h1 {
   font-style: italic;
 }
 
+.roster-power-summary {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #ffd24d;
+  background: rgba(255,210,77,0.08);
+  border: 1px solid rgba(255,210,77,0.25);
+  border-radius: 6px;
+  padding: 6px 10px;
+  margin-bottom: 10px;
+}
+
 .roster-card {
   display: flex;
   flex-direction: column;
