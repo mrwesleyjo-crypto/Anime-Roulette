@@ -45,7 +45,9 @@ const ROSTER_BY_RARITY = {
     { name: 'Power', universe: 'Chainsaw Man' },
     { name: 'Aki Hayakawa', universe: 'Chainsaw Man' },
     { name: 'Genos', universe: 'One Punch Man' },
-    { name: 'Mob (Shigeo Kageyama)', universe: 'Mob Psycho 100' }
+    { name: 'Mob (Shigeo Kageyama)', universe: 'Mob Psycho 100' },
+    { name: 'Sung Jin-Woo (E-Rank Hunter)', universe: 'Solo Leveling' },
+    { name: 'Gohan (Kid Gohan)', universe: 'Dragon Ball' }
   ],
   Rare: [
     { name: 'Monkey D. Luffy', universe: 'One Piece' },
@@ -55,10 +57,9 @@ const ROSTER_BY_RARITY = {
     { name: 'Itachi Uchiha', universe: 'Naruto' },
     { name: 'Kakashi Hatake', universe: 'Naruto' },
     { name: 'Vegeta', universe: 'Dragon Ball' },
-    { name: 'Meliodas', universe: 'The Seven Deadly Sins' },
-    { name: 'Erza Scarlet', universe: 'Fairy Tail' },
+    { name: 'Meliodas (Fairy King\'s Forest)', universe: 'The Seven Deadly Sins' },
+    { name: 'Erza Scarlet (Heart Kreuz Armor)', universe: 'Fairy Tail' },
     { name: 'Rimuru Tempest', universe: 'That Time I Got Reincarnated as a Slime' },
-    { name: 'All Might', universe: 'My Hero Academia' },
     { name: 'Shanks', universe: 'One Piece' },
     { name: 'Todoroki Shoto', universe: 'My Hero Academia' },
     { name: 'Trafalgar Law', universe: 'One Piece' },
@@ -71,24 +72,24 @@ const ROSTER_BY_RARITY = {
     { name: 'Jotaro Kujo', universe: "JoJo's Bizarre Adventure" },
     { name: 'Portgas D. Ace', universe: 'One Piece' },
     { name: 'Piccolo', universe: 'Dragon Ball' },
-    { name: 'Yoruichi Shihoin', universe: 'Bleach' }
+    { name: 'Yoruichi Shihoin', universe: 'Bleach' },
+    { name: 'Guts (Band of the Hawk)', universe: 'Berserk' },
+    { name: 'Kaneki Ken (Half-Ghoul)', universe: 'Tokyo Ghoul' },
+    { name: 'L', universe: 'Death Note' }
   ],
   Epic: [
     { name: 'Goku', universe: 'Dragon Ball' },
     { name: 'Gojo Satoru', universe: 'Jujutsu Kaisen' },
     { name: 'Madara Uchiha', universe: 'Naruto' },
     { name: 'Aizen Sosuke', universe: 'Bleach' },
-    { name: 'Whitebeard', universe: 'One Piece' },
-    { name: 'Sung Jin-Woo', universe: 'Solo Leveling' },
     { name: 'Alucard', universe: 'Hellsing' },
-    { name: 'Guts', universe: 'Berserk' },
     { name: 'Jiraiya', universe: 'Naruto' },
     { name: 'Tsunade', universe: 'Naruto' },
-    { name: 'Gohan', universe: 'Dragon Ball' },
     { name: 'Roy Mustang', universe: 'Fullmetal Alchemist' },
     { name: 'Lelouch Lamperouge', universe: 'Code Geass' },
-    { name: 'L', universe: 'Death Note' },
-    { name: 'Kaneki Ken', universe: 'Tokyo Ghoul' }
+    { name: 'All Might', universe: 'My Hero Academia' },
+    { name: 'Guts (Berserker Armor)', universe: 'Berserk' },
+    { name: 'Erza Scarlet (Nakagami Armor)', universe: 'Fairy Tail' }
   ],
   Legendary: [
     { name: 'Saitama', universe: 'One Punch Man' },
@@ -97,7 +98,12 @@ const ROSTER_BY_RARITY = {
     { name: 'Dio Brando', universe: "JoJo's Bizarre Adventure" },
     { name: 'Escanor', universe: 'The Seven Deadly Sins' },
     { name: 'Anos Voldigoad', universe: 'The Misfit of Demon King Academy' },
-    { name: 'Ainz Ooal Gown', universe: 'Overlord' }
+    { name: 'Ainz Ooal Gown', universe: 'Overlord' },
+    { name: 'Whitebeard', universe: 'One Piece' },
+    { name: 'Sung Jin-Woo (Shadow Monarch)', universe: 'Solo Leveling' },
+    { name: 'Gohan (Beast Gohan)', universe: 'Dragon Ball' },
+    { name: 'Meliodas (Demon King)', universe: 'The Seven Deadly Sins' },
+    { name: 'Kaneki Ken (One-Eyed King)', universe: 'Tokyo Ghoul' }
   ]
 };
 
@@ -339,7 +345,7 @@ const ACHIEVEMENT_DEFS = [
   // Collection
   { id: 'collect-10', category: 'Collection', name: 'Budding Roster', desc: 'Collect 10 unique fighters (career total).', reward: 20, check: c => c.uniqueCharacters.length >= 10 },
   { id: 'collect-40', category: 'Collection', name: 'Seasoned Collector', desc: 'Collect 40 unique fighters (career total).', reward: 50, check: c => c.uniqueCharacters.length >= 40 },
-  { id: 'collect-all', category: 'Collection', name: 'Completionist', desc: 'Collect every fighter in the core roster.', reward: 200, check: c => c.uniqueCharacters.length >= 72 },
+  { id: 'collect-all', category: 'Collection', name: 'Completionist', desc: 'Collect every fighter in the core roster.', reward: 200, check: c => c.uniqueCharacters.length >= Object.values(ROSTER_BY_RARITY).reduce((s, l) => s + l.length, 0) },
   { id: 'villain-5', category: 'Collection', name: 'Villain Hunter', desc: 'Defeat 5 different villains (career total).', reward: 25, check: c => c.villainsDefeated.length >= 5 },
   { id: 'villain-all', category: 'Collection', name: 'Multiverse Exterminator', desc: 'Defeat every villain in the tournament.', reward: 150, check: c => c.villainsDefeated.length >= TIERS.reduce((s, t) => s + t.bracket.length, 0) },
   { id: 'anime-15', category: 'Collection', name: 'World Traveler', desc: 'Scout fighters from 15 different anime.', reward: 40, check: c => c.universesCollected.length >= 15 },
@@ -754,7 +760,8 @@ function createInitialState() {
     finaleWon: false,
     items: { phoenixEmber: 1, chakraDraft: 0, twinMoon: 0, spiritWhistle: 0, luckyDango: 0 },
     lastWinChance: null,
-    tempFusionBonus: 0
+    tempFusionBonus: 0,
+    actionsSinceMatch: 0
   };
 }
 
@@ -772,6 +779,7 @@ const rouletteTitle = document.getElementById('roulette-title');
 const eventPanel = document.getElementById('event-panel');
 const logList = document.getElementById('log-list');
 const rosterList = document.getElementById('roster-list');
+const rosterPowerSummary = document.getElementById('roster-power-summary');
 const itemsList = document.getElementById('items-list');
 const dailyQuestList = document.getElementById('daily-quest-list');
 const trophyCase = document.getElementById('trophy-case');
@@ -1050,6 +1058,10 @@ function showEventPanel(kind, html) {
 }
 
 function renderRosterSidebar() {
+  const totalPower = game.roster.reduce((s, c) => s + c.power, 0);
+  const avgPower = game.roster.length > 0 ? Math.round(totalPower / game.roster.length) : 0;
+  rosterPowerSummary.textContent = `Team Power: ${totalPower} total · ${avgPower} avg`;
+
   rosterList.innerHTML = '';
   if (game.roster.length === 0) {
     const empty = document.createElement('span');
@@ -1580,6 +1592,17 @@ function trackScoutedCharacter(c) {
   if (RARITY_RANK[c.rarity] >= RARITY_RANK.Epic) bumpDailyStat('dailyEpicPlus', 1);
 }
 
+function rosterOwnedNames() {
+  return new Set(game.roster.map(c => c.name));
+}
+
+function poolExcludingRoster(pool) {
+  const owned = rosterOwnedNames();
+  const filtered = pool.filter(c => !owned.has(c.name));
+  // Fallback (should only happen if the whole pool is somehow owned already)
+  return filtered.length > 0 ? filtered : pool;
+}
+
 function addToRoster(character) {
   const c = { ...character, awakenPhase: 0 };
   if (game.roster.length < MAX_ROSTER) {
@@ -1601,13 +1624,18 @@ function addToRoster(character) {
 }
 
 function buildEventPool() {
-  const entries = [{ value: 'scout', weight: 26 }];
+  // The longer you avoid a match (scouting/trading/opening treasure instead),
+  // the more the odds tilt toward forcing a match — you can't stall forever.
+  const pressure = game.actionsSinceMatch || 0;
+  const decay = Math.max(0.25, 1 - pressure * 0.15);
+
+  const entries = [{ value: 'scout', weight: 26 * decay }];
   if (game.roster.length > 0) {
     entries.push({ value: 'train', weight: 16 });
-    entries.push({ value: 'trade', weight: 8 });
+    entries.push({ value: 'trade', weight: 8 * decay });
   }
-  if (!game.finaleWon) entries.push({ value: 'match', weight: 34 });
-  entries.push({ value: 'item', weight: 10 });
+  if (!game.finaleWon) entries.push({ value: 'match', weight: 34 + pressure * 8 });
+  entries.push({ value: 'item', weight: 10 * decay });
   if (game.tierIndex >= AWAKENING_UNLOCK_TIER && awakenableRoster().length > 0) {
     entries.push({ value: 'awaken', weight: 8 });
   }
@@ -1642,6 +1670,7 @@ function startActionSpin() {
     logEvent(`🎲 Event: ${winner.name}`);
     showEventPanel('info', `Coming up: <b>${winner.name}</b>`);
     game.phase = winner.value;
+    game.actionsSinceMatch = winner.value === 'match' ? 0 : (game.actionsSinceMatch || 0) + 1;
     refreshUI();
   });
 }
@@ -1654,6 +1683,7 @@ function startScoutSpin() {
     pool = ACTIVE_POOL.filter(c => c.rarity !== 'Common');
     usedDango = true;
   }
+  pool = poolExcludingRoster(pool);
   runRoulette(pool, PHASE_TITLES.scout, winner => {
     addToRoster(winner);
     trackScoutedCharacter(winner);
@@ -1665,7 +1695,8 @@ function startScoutSpin() {
 }
 
 function startTradeSpin() {
-  runRoulette(ACTIVE_POOL, PHASE_TITLES.trade, winner => {
+  const pool = poolExcludingRoster(ACTIVE_POOL);
+  runRoulette(pool, PHASE_TITLES.trade, winner => {
     trackScoutedCharacter(winner);
     if (game.roster.length === 0) {
       addToRoster(winner);
