@@ -21,6 +21,7 @@
       <div class="player-id">
         Playing as <b id="player-name-display">—</b> <span id="title-display" class="title-badge"></span>
         <button class="link-btn" id="change-name-btn">Change name</button>
+        <button class="link-btn" id="open-howto-btn">❓ How to Play</button>
         <button class="link-btn" id="open-collection-btn">📖 Collection</button>
         <button class="link-btn" id="open-stats-btn">📊 Stats</button>
         <button class="link-btn" id="open-shop-btn">🛒 Shop (<span id="shard-balance-inline">0</span> 🔷)</button>
@@ -34,22 +35,6 @@
       <br><br>
       <b>Warning:</b> this is single elimination. Lose a match and your run ends — unless a Phoenix Ember saves you.
     </p>
-
-    <div class="how-to">
-      <span class="how-to-title">How it works</span>
-      <ul>
-        <li><b>Scout</b> — spin to recruit a new fighter to your roster (rarer fighters are stronger, but less likely).</li>
-        <li><b>Train</b> — spin to pick a roster member and permanently boost their power.</li>
-        <li><b>Dimensional Swap</b> — spin to pull a fighter through a rift, then spin again to see who it swaps places with.</li>
-        <li><b>Match</b> — face the next opponent in your current league's bracket, shown on the map below.</li>
-        <li><b>Treasure</b> — spin to find a one-time support item, kept separate from your roster.</li>
-        <li><b>Awakening</b> — from the Gold League onward, certain fighters can unlock legendary power-ups.</li>
-        <li>🔥 You start with a <b>Phoenix Ember</b> — it revives you once if you'd be eliminated. Lose without one and your run is over.</li>
-        <li>🔷 Earn <b>Shards</b> from achievements and quests — spend them in the Shop for extra items.</li>
-        <li>📖 The <b>Collection Index</b> groups fighters by anime — complete a series for a shard bonus and a title.</li>
-        <li>★ Re-scouting a fighter you've met before grants small <b>Mastery</b> bonuses instead of being wasted.</li>
-      </ul>
-    </div>
 
     <div class="trophy-case" id="trophy-case"></div>
 
@@ -188,6 +173,26 @@
 
       <h3 class="stats-subheading">📜 Permanent Quests</h3>
       <div class="quest-list" id="permanent-quest-list"></div>
+    </div>
+  </div>
+
+  <div id="howto-overlay" class="celebration-overlay howto-overlay hidden">
+    <div class="celebration-modal howto-modal">
+      <button class="modal-close-x" id="howto-close-x">✕</button>
+      <h2>❓ How It Works</h2>
+      <ul class="howto-list">
+        <li><b>Scout</b> — spin to recruit a new fighter to your roster (rarer fighters are stronger, but less likely).</li>
+        <li><b>Train</b> — spin to pick a roster member and permanently boost their power.</li>
+        <li><b>Dimensional Swap</b> — spin to pull a fighter through a rift, then spin again to see who it swaps places with.</li>
+        <li><b>Match</b> — face the next opponent in your current league's bracket, shown on the map below.</li>
+        <li><b>Treasure</b> — spin to find a one-time support item, kept separate from your roster.</li>
+        <li><b>Awakening</b> — from the Gold League onward, certain fighters can unlock legendary power-ups.</li>
+        <li>🔥 You start with a <b>Phoenix Ember</b> — it revives you once if you'd be eliminated. Lose without one and your run is over.</li>
+        <li>🔷 Earn <b>Shards</b> from achievements and quests — spend them in the Shop for extra items.</li>
+        <li>📖 The <b>Collection Index</b> groups fighters by anime — complete a series for a shard bonus and a title.</li>
+        <li>★ Re-scouting a fighter you've met before grants small <b>Mastery</b> bonuses instead of being wasted.</li>
+      </ul>
+      <button id="howto-got-it">Got it!</button>
     </div>
   </div>
 

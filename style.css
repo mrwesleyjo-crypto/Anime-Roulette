@@ -138,33 +138,30 @@ h1 {
 
 /* ---------- How to play ---------- */
 
-.how-to {
+/* ---------- How to Play modal ---------- */
+
+.howto-modal {
+  max-width: 560px;
+  max-height: 82vh;
+  overflow-y: auto;
   text-align: left;
-  background: rgba(10, 6, 20, 0.6);
-  border: 1px solid rgba(0, 229, 255, 0.15);
-  border-radius: 10px;
-  padding: 12px 16px;
-  margin-bottom: 18px;
 }
 
-.how-to-title {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 0.68rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+.howto-modal h2 {
+  text-align: center;
   color: var(--league-text, #00e5ff);
-  transition: color 0.8s ease;
-  display: block;
-  margin-bottom: 6px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.15rem;
+  margin-bottom: 16px;
 }
 
-.how-to ul {
-  margin: 0;
+.howto-list {
+  margin: 0 0 20px;
   padding-left: 18px;
   font-size: 0.85rem;
   font-weight: 600;
   color: #d3cfe8;
-  line-height: 1.65;
+  line-height: 1.7;
 }
 
 /* ---------- Trophy case ---------- */
@@ -861,36 +858,7 @@ h1 {
   box-shadow: 0 0 25px var(--rarity-color, #555), inset 0 0 20px rgba(0,0,0,0.3);
 }
 
-/* ---------- Silhouette hold + rarity reveals ---------- */
-
-.strip-item.silhouette {
-  background: #050208 !important;
-}
-
-.strip-item.silhouette .avatar,
-.strip-item.silhouette .name,
-.strip-item.silhouette .sub-tag {
-  visibility: hidden;
-}
-
-.strip-item.silhouette::after {
-  content: '?';
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2.4rem;
-  font-weight: 900;
-  color: var(--rarity-color, #fff);
-  text-shadow: 0 0 20px var(--rarity-color, #fff);
-  animation: silhouettePulse 0.9s ease-in-out infinite;
-}
-
-@keyframes silhouettePulse {
-  0%, 100% { opacity: 0.55; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.12); }
-}
+/* ---------- Rarity reveal animations ---------- */
 
 .strip-item.reveal-common { animation: revealCommon 0.3s ease; }
 .strip-item.reveal-useless { animation: revealCommon 0.3s ease; }

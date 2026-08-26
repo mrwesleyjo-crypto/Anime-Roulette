@@ -20,15 +20,15 @@ const RARITY_RANK = RARITY_ORDER.reduce((acc, rarity, i) => { acc[rarity] = i; r
 // ---------------------------------------------------------------------------
 
 const POWER_TIERS = [
-  { max: 30, label: 'Academy Student', icon: '💤', color: '#7a7a8a' },
-  { max: 55, label: 'Rookie Fighter', icon: '🌱', color: '#9aa5b1' },
-  { max: 75, label: 'Trained Warrior', icon: '⚔️', color: '#3498db' },
-  { max: 95, label: 'Elite Combatant', icon: '🔥', color: '#5dade2' },
-  { max: 120, label: 'S-Class Hunter', icon: '⭐', color: '#a855f7' },
-  { max: 160, label: 'Legendary Powerhouse', icon: '👑', color: '#ffd24d' },
-  { max: 250, label: 'World Breaker', icon: '🌍', color: '#ff9f43' },
-  { max: 500, label: 'Multiversal Threat', icon: '🌌', color: '#ff2d6b' },
-  { max: Infinity, label: 'Beyond Comprehension', icon: '♾️', color: '#00ffcc' }
+  { max: 30, label: 'Unranked', icon: '💤', color: '#7a7a8a' },
+  { max: 55, label: 'E-Rank Talent', icon: '🌱', color: '#9aa5b1' },
+  { max: 75, label: 'D-Rank Threat', icon: '⚡', color: '#3498db' },
+  { max: 95, label: 'C-Rank Threat', icon: '🔥', color: '#5dade2' },
+  { max: 120, label: 'B-Rank Threat', icon: '⭐', color: '#a855f7' },
+  { max: 160, label: 'A-Rank Threat', icon: '👑', color: '#ffd24d' },
+  { max: 250, label: 'S-Rank Threat', icon: '🌍', color: '#ff9f43' },
+  { max: 500, label: 'SS-Rank Catastrophe', icon: '🌌', color: '#ff2d6b' },
+  { max: Infinity, label: 'SSS-Rank — Unclassifiable', icon: '♾️', color: '#00ffcc' }
 ];
 
 function getPowerTier(avgPower) {
@@ -1402,6 +1402,10 @@ const shopCloseX = document.getElementById('shop-close-x');
 const collectionOverlay = document.getElementById('collection-overlay');
 const collectionList = document.getElementById('collection-list');
 const openCollectionBtn = document.getElementById('open-collection-btn');
+const openHowtoBtn = document.getElementById('open-howto-btn');
+const howtoOverlay = document.getElementById('howto-overlay');
+const howtoCloseX = document.getElementById('howto-close-x');
+const howtoGotIt = document.getElementById('howto-got-it');
 const collectionCloseX = document.getElementById('collection-close-x');
 
 // ---------------------------------------------------------------------------
@@ -1640,7 +1644,6 @@ function playRaritySound(rarity) {
 // Reveal effects — screen flash, shake, and particle burst, scaled by rarity.
 // ---------------------------------------------------------------------------
 
-const REVEAL_SILHOUETTE_MS = { Useless: 200, Common: 300, Rare: 550, Epic: 950, Legendary: 1600, Mythic: 2400 };
 const REVEAL_SETTLE_MS = { Useless: 150, Common: 200, Rare: 350, Epic: 550, Legendary: 800, Mythic: 1100 };
 const REVEAL_DURATION_BONUS_MS = { Useless: 0, Common: 0, Rare: 250, Epic: 700, Legendary: 1500, Mythic: 2400 };
 
@@ -1734,18 +1737,13 @@ function runRoulette(pool, titleText, onComplete, options) {
     const winnerEl = track.children[WINNER_INDEX];
 
     if (characterReveal && winnerEl && winner.rarity) {
-      winnerEl.classList.add('silhouette');
-      const holdMs = REVEAL_SILHOUETTE_MS[winner.rarity] || 250;
+      winnerEl.classList.add('winner', `reveal-${winner.rarity.toLowerCase()}`);
+      triggerRevealEffects(winner.rarity, winner.color);
+      const settleMs = REVEAL_SETTLE_MS[winner.rarity] || 200;
       setTimeout(() => {
-        winnerEl.classList.remove('silhouette');
-        winnerEl.classList.add('winner', `reveal-${winner.rarity.toLowerCase()}`);
-        triggerRevealEffects(winner.rarity, winner.color);
-        const settleMs = REVEAL_SETTLE_MS[winner.rarity] || 200;
-        setTimeout(() => {
-          isSpinning = false;
-          onComplete(winner);
-        }, settleMs);
-      }, holdMs);
+        isSpinning = false;
+        onComplete(winner);
+      }, settleMs);
     } else {
       if (winnerEl) winnerEl.classList.add('winner');
       isSpinning = false;
@@ -1780,11 +1778,6 @@ function checkUnlocks() {
     career.unlockedMythic = true;
     changed = true;
     showToast('unlock', '🔓 Unlocked: Mythic Rarity', 'A new top-tier rarity has entered the pool!');
-  }
-  if (!career.unlockedFusion && career.battlesWon >= 20) {
-    career.unlockedFusion = true;
-    changed = true;
-    showToast('unlock', '🔓 Unlocked: Fusion Roulette', 'Fuse two fighters for a temporary power surge!');
   }
   if (!career.unlockedSecretOpponent && career.hadSaitamaEscanor) {
     career.unlockedSecretOpponent = true;
@@ -2123,11 +2116,13 @@ function submitName() {
   if (!raw) { nameError.textContent = 'Enter a name to continue.'; nameError.classList.remove('hidden'); return; }
   if (raw.length > 24) { nameError.textContent = 'Keep it under 24 characters.'; nameError.classList.remove('hidden'); return; }
   if (isNameTaken(raw, game.playerName)) { nameError.textContent = 'That name is already taken on this device — try another.'; nameError.classList.remove('hidden'); return; }
+  const isFirstEverVisit = !loadJSON('mat_playerName', null);
   reserveName(raw);
   game.playerName = raw;
   saveJSON('mat_playerName', raw);
   playerNameDisplay.textContent = raw;
   closeNameOverlay();
+  if (isFirstEverVisit) showHowto();
 }
 
 nameSubmit.addEventListener('click', submitName);
@@ -2588,13 +2583,25 @@ function renderCollectionIndex() {
 openCollectionBtn.addEventListener('click', () => { renderCollectionIndex(); collectionOverlay.classList.remove('hidden'); });
 collectionCloseX.addEventListener('click', () => collectionOverlay.classList.add('hidden'));
 
+function showHowto() {
+  howtoOverlay.classList.remove('hidden');
+}
+
+function hideHowto() {
+  howtoOverlay.classList.add('hidden');
+}
+
+openHowtoBtn.addEventListener('click', showHowto);
+howtoCloseX.addEventListener('click', hideHowto);
+howtoGotIt.addEventListener('click', hideHowto);
+
 // ---------------------------------------------------------------------------
 // Shard shop
 // ---------------------------------------------------------------------------
 
 function renderShop() {
   shardBalance.textContent = career.shards;
-  const runActive = game.phase !== 'victory' && game.phase !== 'gameover';
+  const runActive = game.phase !== 'victory' && game.phase !== 'gameover' && !isSpinning;
   shopNote.textContent = runActive ? '' : 'Your run just ended — start a new tournament to spend shards again.';
 
   shopCharacterList.innerHTML = '';
@@ -2653,6 +2660,7 @@ function renderShop() {
 }
 
 function buyShopCharacter(item) {
+  if (isSpinning) return;
   if (career.shards < item.price) return;
   const pool = poolExcludingRoster(ACTIVE_POOL.filter(c => c.rarity === item.rarity));
   if (pool.length === 0) {
@@ -2660,14 +2668,16 @@ function buyShopCharacter(item) {
     return;
   }
   career.shards -= item.price;
-  const picked = applyMasteryBonus(weightedPick(pool));
-  addToRoster(picked);
-  trackScoutedCharacter(picked);
   saveCareer();
-  logEvent(`🛒 Recruited ${picked.name} (${item.rarity}) for ${item.price} shards`);
-  runProgressionChecks();
-  renderShop();
-  refreshUI();
+  shopOverlay.classList.add('hidden');
+  runRoulette(pool, `Recruiting a ${item.rarity} fighter!`, winnerRaw => {
+    const picked = applyMasteryBonus(winnerRaw);
+    addToRoster(picked);
+    trackScoutedCharacter(picked);
+    logEvent(`🛒 Recruited ${picked.name} (${item.rarity}) for ${item.price} shards`);
+    runProgressionChecks();
+    refreshUI();
+  }, { characterReveal: true });
 }
 
 function buyShopItem(item) {
@@ -2825,9 +2835,6 @@ function buildEventPool() {
   entries.push({ value: 'item', weight: 10 * decay });
   if (game.tierIndex >= AWAKENING_UNLOCK_TIER && awakenableRoster().length > 0) {
     entries.push({ value: 'awaken', weight: 8 });
-  }
-  if (career.unlockedFusion && game.roster.length >= 2) {
-    entries.push({ value: 'fusion', weight: 3 });
   }
   if (career.unlockedSecretOpponent) {
     entries.push({ value: 'secret', weight: 5 });
@@ -2998,22 +3005,6 @@ function startAwakenSpin() {
   });
 }
 
-const FUSION_FLAVOR_LINES = [
-  'A blinding flash of light — two fighters become one, if only for a moment!',
-  'Power surges as their auras intertwine into something new entirely!',
-  'For one match, they fight as a single, combined being!',
-  'The fusion holds — barely — but the power boost is very real!'
-];
-
-function generateFusionName(nameA, nameB) {
-  const firstA = nameA.split(' ')[0].replace(/[()]/g, '');
-  const firstB = nameB.split(' ')[0].replace(/[()]/g, '');
-  const a = firstA.slice(0, Math.max(2, Math.ceil(firstA.length / 2)));
-  const bTail = firstB.slice(Math.max(1, Math.floor(firstB.length * 0.35)));
-  const b = bTail.length > 0 ? bTail.charAt(0).toUpperCase() + bTail.slice(1) : firstB;
-  return a + b;
-}
-
 // Actually merges two roster members into one permanent fusion character —
 // this costs a roster slot (2 members become 1), which is the real balance
 // lever: fusing trades team size/synergy potential for raw power.
@@ -3051,45 +3042,25 @@ function performFusionMerge(baseNameA, baseNameB, fusionName, icon, isSpecial) {
 }
 
 function startFusionSpin() {
-  if (game.roster.length < 2) { game.phase = 'action'; refreshUI(); return; }
-
+  // Fusion only ever happens for curated special pairs (Goku+Vegeta, etc.) —
+  // buildEventPool() only offers this phase when such a pair is present, so
+  // this should always find one. The action-phase fallback is just a safety net.
   const special = getAvailableSpecialFusion();
-  if (special) {
-    const owned = new Set(game.roster.map(c => c.baseName || c.name));
-    const pairMembers = game.roster.filter(c => owned.has(c.baseName || c.name) && special.pair.includes(c.baseName || c.name));
-    const pool = pairMembers.map(c => ({ ...c, weight: 1 }));
-    runRoulette(pool.length > 0 ? pool : game.roster.map(c => ({ ...c, weight: 1 })), `Fusion: ${special.name}!`, () => {
-      const fused = performFusionMerge(special.pair[0], special.pair[1], special.name, special.icon, true);
-      if (fused) {
-        logEvent(`🌀 SPECIAL FUSION: ${special.pair[0]} + ${special.pair[1]} permanently merge into ${special.name}! (Power ${fused.power})`);
-        showEventPanel('success', `<b>${special.pair[0]}</b> and <b>${special.pair[1]}</b> permanently fuse into <b>${special.name}</b>! <b>Power ${fused.power}</b> — but they now share one roster slot.`);
-      }
-      game.phase = 'action';
-      runProgressionChecks();
-      refreshUI();
-      showCelebration(special.name, special.flavor, special.icon);
-    });
-    return;
-  }
+  if (!special) { game.phase = 'action'; refreshUI(); return; }
 
-  const pool = game.roster.map(c => ({ ...c, weight: 1 }));
-  runRoulette(pool, PHASE_TITLES.fusion, lead => {
-    const partners = game.roster.filter(c => c.name !== lead.name);
-    const partner = partners.length > 0 ? partners[Math.floor(Math.random() * partners.length)] : lead;
-    if (partner === lead) { game.phase = 'action'; refreshUI(); return; }
-
-    const fusionName = generateFusionName(lead.name, partner.name);
-    const flavor = FUSION_FLAVOR_LINES[Math.floor(Math.random() * FUSION_FLAVOR_LINES.length)];
-    const fused = performFusionMerge(lead.baseName || lead.name, partner.baseName || partner.name, fusionName, '🌀', false);
-
+  const owned = new Set(game.roster.map(c => c.baseName || c.name));
+  const pairMembers = game.roster.filter(c => owned.has(c.baseName || c.name) && special.pair.includes(c.baseName || c.name));
+  const pool = pairMembers.map(c => ({ ...c, weight: 1 }));
+  runRoulette(pool.length > 0 ? pool : game.roster.map(c => ({ ...c, weight: 1 })), `Fusion: ${special.name}!`, () => {
+    const fused = performFusionMerge(special.pair[0], special.pair[1], special.name, special.icon, true);
     if (fused) {
-      logEvent(`🌀 Fusion: ${lead.name} + ${partner.name} permanently merge into ${fusionName}! (Power ${fused.power})`);
-      showEventPanel('success', `<b>${lead.name}</b> and <b>${partner.name}</b> permanently fuse into <b>${fusionName}</b>! <b>Power ${fused.power}</b> — but they now share one roster slot.`);
+      logEvent(`🌀 SPECIAL FUSION: ${special.pair[0]} + ${special.pair[1]} permanently merge into ${special.name}! (Power ${fused.power})`);
+      showEventPanel('success', `<b>${special.pair[0]}</b> and <b>${special.pair[1]}</b> permanently fuse into <b>${special.name}</b>! <b>Power ${fused.power}</b> — but they now share one roster slot.`);
     }
     game.phase = 'action';
     runProgressionChecks();
     refreshUI();
-    showCelebration(`${fusionName}!`, flavor, '🌀');
+    showCelebration(special.name, special.flavor, special.icon);
   });
 }
 
