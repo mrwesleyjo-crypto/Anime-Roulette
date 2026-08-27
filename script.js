@@ -1608,6 +1608,45 @@ function targetTranslateX() {
 // Pull sound effects — synthesized with Web Audio, no external files needed.
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Custom sound files (optional). Drop mp3s into a "sounds/" folder next to
+// index.html, named exactly as listed below. If a file is missing, the game
+// automatically falls back to the built-in synthesized tone — nothing breaks.
+//   sounds/spin-tick.mp3        — plays repeatedly while the wheel spins
+//   sounds/reveal-useless.mp3   — plays on a Useless-rarity reveal
+//   sounds/reveal-common.mp3
+//   sounds/reveal-rare.mp3
+//   sounds/reveal-epic.mp3
+//   sounds/reveal-legendary.mp3
+//   sounds/reveal-mythic.mp3
+// ---------------------------------------------------------------------------
+
+const CUSTOM_SOUND_DIR = 'sounds/';
+const CUSTOM_SOUND_KEYS = ['spin-tick', 'reveal-useless', 'reveal-common', 'reveal-rare', 'reveal-epic', 'reveal-legendary', 'reveal-mythic'];
+const customSoundAvailable = {};
+const customSoundElements = {};
+
+function preloadCustomSounds() {
+  CUSTOM_SOUND_KEYS.forEach(key => {
+    const audio = new Audio(`${CUSTOM_SOUND_DIR}${key}.mp3`);
+    audio.preload = 'auto';
+    audio.addEventListener('canplaythrough', () => { customSoundAvailable[key] = true; }, { once: true });
+    audio.addEventListener('error', () => { customSoundAvailable[key] = false; }, { once: true });
+    customSoundElements[key] = audio;
+    audio.load();
+  });
+}
+preloadCustomSounds();
+
+function playCustomSound(key, volume) {
+  const base = customSoundElements[key];
+  if (!base) return false;
+  const instance = base.cloneNode(); // clone so overlapping plays don't cut each other off
+  instance.volume = volume != null ? volume : 0.7;
+  instance.play().catch(() => {});
+  return true;
+}
+
 let audioCtx = null;
 function getAudioCtx() {
   if (!audioCtx) {
@@ -1657,6 +1696,9 @@ function playTone(freq, startTime, duration, type, gainPeak) {
 }
 
 function playRaritySound(rarity) {
+  const key = `reveal-${rarity.toLowerCase()}`;
+  if (customSoundAvailable[key] && playCustomSound(key, 0.8)) return;
+
   const ctx = getAudioCtx();
   if (!ctx) return;
   if (ctx.state === 'suspended') ctx.resume();
@@ -1690,10 +1732,20 @@ function playRaritySound(rarity) {
 // roughly follow the strip's own ease-out — fast ticks at first, slowing
 // toward the landing, like a real prize wheel or slot machine.
 function playSpinTicks(durationMs) {
-  const ctx = getAudioCtx();
-  if (!ctx) return;
   const totalSeconds = durationMs / 1000;
   const tickCount = Math.round(18 + totalSeconds * 4);
+
+  if (customSoundAvailable['spin-tick']) {
+    for (let i = 1; i <= tickCount; i++) {
+      const progress = 1 - Math.pow(1 - i / tickCount, 3);
+      const delayMs = progress * durationMs;
+      setTimeout(() => playCustomSound('spin-tick', 0.5), delayMs);
+    }
+    return;
+  }
+
+  const ctx = getAudioCtx();
+  if (!ctx) return;
   for (let i = 1; i <= tickCount; i++) {
     const progress = 1 - Math.pow(1 - i / tickCount, 3); // ease-out cubic
     const t = progress * totalSeconds;
