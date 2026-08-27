@@ -1,0 +1,160 @@
+=== CHARACTERS (base roster + bonus pack + mythic) — images/characters/ ===
+
+Ainz Ooal Gown  ->  images/characters/ainz-ooal-gown.png
+Aizen Sosuke  ->  images/characters/aizen-sosuke.png
+Aki Hayakawa  ->  images/characters/aki-hayakawa.png
+All Might  ->  images/characters/all-might.png
+Alucard  ->  images/characters/alucard.png
+Alucard (No Life King)  ->  images/characters/alucard-no-life-king.png
+Anos Voldigoad  ->  images/characters/anos-voldigoad.png
+Armin Arlert  ->  images/characters/armin-arlert.png
+Ash Ketchum  ->  images/characters/ash-ketchum.png
+Asta  ->  images/characters/asta.png
+Bakugo Katsuki  ->  images/characters/bakugo-katsuki.png
+Ban  ->  images/characters/ban.png
+Bulma  ->  images/characters/bulma.png
+Chichi  ->  images/characters/chichi.png
+Denji  ->  images/characters/denji.png
+Dio Brando  ->  images/characters/dio-brando.png
+Edward Elric  ->  images/characters/edward-elric.png
+Eren Yeager  ->  images/characters/eren-yeager.png
+Erza Scarlet (Heart Kreuz Armor)  ->  images/characters/erza-scarlet-heart-kreuz-armor.png
+Erza Scarlet (Nakagami Armor)  ->  images/characters/erza-scarlet-nakagami-armor.png
+Escanor  ->  images/characters/escanor.png
+Genos  ->  images/characters/genos.png
+Ging Freecss  ->  images/characters/ging-freecss.png
+Giyu Tomioka  ->  images/characters/giyu-tomioka.png
+Gohan (Beast Gohan)  ->  images/characters/gohan-beast-gohan.png
+Gohan (Kid Gohan)  ->  images/characters/gohan-kid-gohan.png
+Gojo Satoru  ->  images/characters/gojo-satoru.png
+Goku  ->  images/characters/goku.png
+Gon Freecss  ->  images/characters/gon-freecss.png
+Grand Priest  ->  images/characters/grand-priest.png
+Gray Fullbuster  ->  images/characters/gray-fullbuster.png
+Guts (Band of the Hawk)  ->  images/characters/guts-band-of-the-hawk.png
+Guts (Berserker Armor)  ->  images/characters/guts-berserker-armor.png
+Ichigo Kurosaki  ->  images/characters/ichigo-kurosaki.png
+Inosuke Hashibira  ->  images/characters/inosuke-hashibira.png
+Isagi Yoichi  ->  images/characters/isagi-yoichi.png
+Itachi Uchiha  ->  images/characters/itachi-uchiha.png
+Izuku Midoriya  ->  images/characters/izuku-midoriya.png
+Jiraiya  ->  images/characters/jiraiya.png
+Jotaro Kujo  ->  images/characters/jotaro-kujo.png
+Kakashi Hatake  ->  images/characters/kakashi-hatake.png
+Kaneki Ken (Half-Ghoul)  ->  images/characters/kaneki-ken-half-ghoul.png
+Kaneki Ken (One-Eyed King)  ->  images/characters/kaneki-ken-one-eyed-king.png
+Killua Zoldyck  ->  images/characters/killua-zoldyck.png
+Kon  ->  images/characters/kon.png
+Konohamaru Sarutobi  ->  images/characters/konohamaru-sarutobi.png
+L  ->  images/characters/l.png
+Lelouch Lamperouge  ->  images/characters/lelouch-lamperouge.png
+Levi Ackerman  ->  images/characters/levi-ackerman.png
+Light Yagami  ->  images/characters/light-yagami.png
+Madara Uchiha  ->  images/characters/madara-uchiha.png
+Megumi Fushiguro  ->  images/characters/megumi-fushiguro.png
+Meliodas (Demon King)  ->  images/characters/meliodas-demon-king.png
+Meliodas (Fairy King's Forest)  ->  images/characters/meliodas-fairy-kings-forest.png
+Might Guy  ->  images/characters/might-guy.png
+Mikasa Ackerman  ->  images/characters/mikasa-ackerman.png
+Mob (Shigeo Kageyama)  ->  images/characters/mob-shigeo-kageyama.png
+Monkey D. Luffy  ->  images/characters/monkey-d-luffy.png
+Mr. Satan  ->  images/characters/mr-satan.png
+Naruto Uzumaki  ->  images/characters/naruto-uzumaki.png
+Natsu Dragneel  ->  images/characters/natsu-dragneel.png
+Nobara Kugisaki  ->  images/characters/nobara-kugisaki.png
+Piccolo  ->  images/characters/piccolo.png
+Portgas D. Ace  ->  images/characters/portgas-d-ace.png
+Power  ->  images/characters/power.png
+Reigen Arataka  ->  images/characters/reigen-arataka.png
+Rimuru Tempest  ->  images/characters/rimuru-tempest.png
+Roronoa Zoro  ->  images/characters/roronoa-zoro.png
+Roy Mustang  ->  images/characters/roy-mustang.png
+Rukia Kuchiki  ->  images/characters/rukia-kuchiki.png
+Saitama  ->  images/characters/saitama.png
+Sasuke Uchiha  ->  images/characters/sasuke-uchiha.png
+Shanks  ->  images/characters/shanks.png
+Shinobu Kocho  ->  images/characters/shinobu-kocho.png
+Spike Spiegel  ->  images/characters/spike-spiegel.png
+Sung Jin-Woo (E-Rank Hunter)  ->  images/characters/sung-jin-woo-e-rank-hunter.png
+Sung Jin-Woo (Shadow Monarch)  ->  images/characters/sung-jin-woo-shadow-monarch.png
+Tanjiro Kamado  ->  images/characters/tanjiro-kamado.png
+Thorfinn  ->  images/characters/thorfinn.png
+Todoroki Shoto  ->  images/characters/todoroki-shoto.png
+Toshiro Hitsugaya  ->  images/characters/toshiro-hitsugaya.png
+Trafalgar Law  ->  images/characters/trafalgar-law.png
+Tsunade  ->  images/characters/tsunade.png
+Usopp  ->  images/characters/usopp.png
+Vegeta  ->  images/characters/vegeta.png
+Whis  ->  images/characters/whis.png
+Whitebeard  ->  images/characters/whitebeard.png
+Yamcha  ->  images/characters/yamcha.png
+Yami Sukehiro  ->  images/characters/yami-sukehiro.png
+Yhwach  ->  images/characters/yhwach.png
+Yoruichi Shihoin  ->  images/characters/yoruichi-shihoin.png
+Yuji Itadori  ->  images/characters/yuji-itadori.png
+Yusuke Urameshi  ->  images/characters/yusuke-urameshi.png
+Zenitsu Agatsuma  ->  images/characters/zenitsu-agatsuma.png
+Zeno  ->  images/characters/zeno.png
+
+=== AWAKENING FORMS (new name/image per phase) — images/characters/ ===
+
+Ash Ketchum (Catches Pikachu)  ->  images/characters/ash-ketchum-catches-pikachu.png
+Ash Ketchum (Full Team of Six)  ->  images/characters/ash-ketchum-full-team-of-six.png
+Ash Ketchum (League Champion)  ->  images/characters/ash-ketchum-league-champion.png
+Goku (Super Saiyan Blue)  ->  images/characters/goku-super-saiyan-blue.png
+Goku (Super Saiyan)  ->  images/characters/goku-super-saiyan.png
+Goku (Ultra Instinct)  ->  images/characters/goku-ultra-instinct.png
+Ichigo Kurosaki (Bankai)  ->  images/characters/ichigo-kurosaki-bankai.png
+Ichigo Kurosaki (Final Getsuga Tensho)  ->  images/characters/ichigo-kurosaki-final-getsuga-tensho.png
+Izuku Midoriya (Full Cowl 100%)  ->  images/characters/izuku-midoriya-full-cowl-100.png
+Monkey D. Luffy (Gear Fifth)  ->  images/characters/monkey-d-luffy-gear-fifth.png
+Monkey D. Luffy (Gear Fourth)  ->  images/characters/monkey-d-luffy-gear-fourth.png
+Monkey D. Luffy (Gear Second)  ->  images/characters/monkey-d-luffy-gear-second.png
+Naruto Uzumaki (Nine-Tails Chakra Mode)  ->  images/characters/naruto-uzumaki-nine-tails-chakra-mode.png
+Naruto Uzumaki (Six Paths Sage Mode)  ->  images/characters/naruto-uzumaki-six-paths-sage-mode.png
+Saitama (Serious Series)  ->  images/characters/saitama-serious-series.png
+Sasuke Uchiha (Rinnegan Susanoo)  ->  images/characters/sasuke-uchiha-rinnegan-susanoo.png
+Sasuke Uchiha (Susanoo)  ->  images/characters/sasuke-uchiha-susanoo.png
+Vegeta (Super Saiyan Blue)  ->  images/characters/vegeta-super-saiyan-blue.png
+Vegeta (Super Saiyan)  ->  images/characters/vegeta-super-saiyan.png
+
+=== SPECIAL FUSION RESULTS — images/characters/ ===
+
+Best Friends Combo  ->  images/characters/best-friends-combo.png
+Gogeta  ->  images/characters/gogeta.png
+Master & Disciple  ->  images/characters/master-disciple.png
+Naruto & Sasuke: Perfect Combo  ->  images/characters/naruto-sasuke-perfect-combo.png
+Shinigami Duo  ->  images/characters/shinigami-duo.png
+Straw Hat Vanguard  ->  images/characters/straw-hat-vanguard.png
+
+=== SECRET PULL — images/characters/ ===
+
+Ultra Instinct Shaggy  ->  images/characters/ultra-instinct-shaggy.png
+
+=== VILLAINS (bracket opponents + secret opponent) — images/villains/ ===
+
+Akaza  ->  images/villains/akaza.png
+All For One  ->  images/villains/all-for-one.png
+Beerus  ->  images/villains/beerus.png
+Big Mom  ->  images/villains/big-mom.png
+Captain Ginyu  ->  images/villains/captain-ginyu.png
+Cell  ->  images/villains/cell.png
+Donquixote Doflamingo  ->  images/villains/donquixote-doflamingo.png
+Enel  ->  images/villains/enel.png
+Frieza (Final Form)  ->  images/villains/frieza-final-form.png
+Frieza (Golden Form)  ->  images/villains/frieza-golden-form.png
+Fused Zamasu  ->  images/villains/fused-zamasu.png
+Griffith  ->  images/villains/griffith.png
+Grimmjow Jaegerjaquez  ->  images/villains/grimmjow-jaegerjaquez.png
+Hidan  ->  images/villains/hidan.png
+Kabuto Yakushi  ->  images/villains/kabuto-yakushi.png
+Kaguya Otsutsuki  ->  images/villains/kaguya-otsutsuki.png
+Kaido  ->  images/villains/kaido.png
+Kars  ->  images/villains/kars.png
+Majin Buu  ->  images/villains/majin-buu.png
+Meruem  ->  images/villains/meruem.png
+Muzan Kibutsuji  ->  images/villains/muzan-kibutsuji.png
+Orochimaru  ->  images/villains/orochimaru.png
+The Watcher  ->  images/villains/the-watcher.png
+Ulquiorra Cifer  ->  images/villains/ulquiorra-cifer.png
+Zabuza Momochi  ->  images/villains/zabuza-momochi.png

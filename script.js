@@ -489,7 +489,7 @@ const SYNERGY_DEFS = [
   groupSynergy('big-brother-energy', 'Big Brother Energy', '🫂', 16, 'Whitebeard, All Might, and Kakashi — mentors who protect everyone around them.', ['Whitebeard', 'All Might', 'Kakashi Hatake'], 2),
   groupSynergy('comic-relief-crew', 'Comic Relief Crew', '🤡', 12, 'Yamcha, Mr. Satan, and Usopp — legendary cowards, occasional heroes.', ['Yamcha', 'Mr. Satan', 'Usopp'], 2),
   pairSynergy('reapers-and-ghouls', 'Reapers & Ghouls', '💀', 14, 'Ichigo and Kaneki — death and hunger, crossing paths.', ['Ichigo Kurosaki', KANEKI_ANY]),
-  groupSynergy('multiverse-core-four', 'The Core Four', '🔱', 34, 'Naruto, Luffy, Goku, and Ichigo — four of the most iconic protagonists in anime, together.', ['Naruto Uzumaki', 'Monkey D. Luffy', 'Goku', 'Ichigo Kurosaki'], 3),
+  groupSynergy('multiverse-core-four', 'The Core Four', '🔱', 34, 'Naruto, Luffy, Goku, and Ichigo — four of the most iconic protagonists in anime, together.', ['Naruto Uzumaki', 'Monkey D. Luffy', 'Goku', 'Ichigo Kurosaki'], 4),
   groupSynergy('big-three', 'The Big Three', '🔱', 30, 'Naruto, Luffy, and Goku all on one roster — the three shonen legends fight side by side.', ['Naruto Uzumaki', 'Monkey D. Luffy', 'Goku'], 3),
 
   // --- Awakened-state synergies (name reflects the current transformation) -------
@@ -2309,9 +2309,9 @@ function drawShareBadge(ctx, isChampion, opponentName, rosterImages) {
   const w = 800;
   const radius = 52;
   const rowHeight = 132;
-  const headerHeight = 330;
+  const headerHeight = 360;
   const footerHeight = 90;
-  const h = Math.max(560, headerHeight + game.roster.length * rowHeight + footerHeight);
+  const h = Math.max(590, headerHeight + game.roster.length * rowHeight + footerHeight);
   const accent = isChampion ? '#ffd24d' : '#e74c3c';
 
   const bg = ctx.createLinearGradient(0, 0, 0, h);
@@ -2349,18 +2349,24 @@ function drawShareBadge(ctx, isChampion, opponentName, rosterImages) {
     w / 2, 185
   );
 
+  const synergy = computeActiveSynergy();
+  const teamName = synergy ? `${synergy.icon} "${synergy.name}"` : '⚔️ "Multiverse Squad"';
+  ctx.fillStyle = accent;
+  ctx.font = 'italic bold 24px "Segoe UI", sans-serif';
+  ctx.fillText(teamName, w / 2, 220);
+
   const score = liveScore();
   const totalPower = game.roster.reduce((s, c) => s + c.power, 0);
   ctx.fillStyle = '#00e5ff';
   ctx.font = 'bold 26px "Segoe UI", sans-serif';
-  ctx.fillText(`${score} / ${TOTAL_MATCHES} matches won`, w / 2, 235);
+  ctx.fillText(`${score} / ${TOTAL_MATCHES} matches won`, w / 2, 265);
   ctx.fillStyle = '#ffd24d';
-  ctx.fillText(`Team Power: ${totalPower}`, w / 2, 270);
+  ctx.fillText(`Team Power: ${totalPower}`, w / 2, 300);
 
   ctx.textAlign = 'left';
   ctx.fillStyle = '#ffffff';
   ctx.font = 'bold 22px "Segoe UI", sans-serif';
-  ctx.fillText('Final Roster:', 60, 320);
+  ctx.fillText('Final Roster:', 60, 350);
 
   let y = headerHeight;
   game.roster.forEach((c, i) => {
@@ -2425,10 +2431,10 @@ function drawShareBadge(ctx, isChampion, opponentName, rosterImages) {
 }
 
 async function downloadShareBadge(isChampion, opponentName) {
-  const radius = 52, rowHeight = 132, headerHeight = 330, footerHeight = 90;
+  const radius = 52, rowHeight = 132, headerHeight = 360, footerHeight = 90;
   const canvas = document.createElement('canvas');
   canvas.width = 800;
-  canvas.height = Math.max(560, headerHeight + game.roster.length * rowHeight + footerHeight);
+  canvas.height = Math.max(590, headerHeight + game.roster.length * rowHeight + footerHeight);
   const ctx = canvas.getContext('2d');
 
   const rosterImages = await Promise.all(
