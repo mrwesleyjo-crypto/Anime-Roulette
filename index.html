@@ -79,6 +79,30 @@
 
         <span class="roster-label items-label">Daily Quests</span>
         <div class="quest-list" id="daily-quest-list"></div>
+
+        <a class="support-card" id="support-card" href="https://ko-fi.com/wesleyyyy" target="_blank" rel="noopener noreferrer">
+          <span class="support-card-icon">☕</span>
+          <span class="support-card-text">
+            <b>Buy me a coffee?</b>
+            <span>Enjoying the game? A tip helps keep it going!</span>
+          </span>
+        </a>
+
+        <button class="support-card feedback-card" id="open-feedback-btn" type="button">
+          <span class="support-card-icon">💬</span>
+          <span class="support-card-text">
+            <b>Send feedback</b>
+            <span>Found a bug or have an idea? Let me know!</span>
+          </span>
+        </button>
+
+        <button class="support-card share-card" id="open-share-btn" type="button">
+          <span class="support-card-icon">📤</span>
+          <span class="support-card-text">
+            <b id="share-card-title">Share &amp; unlock a fighter!</b>
+            <span id="share-card-subtitle">Share the game once to permanently unlock Rengoku Kyojuro.</span>
+          </span>
+        </button>
       </aside>
     </div>
   </div>
@@ -167,6 +191,18 @@
 
       <h3 class="stats-subheading">📜 Permanent Quests</h3>
       <div class="quest-list" id="permanent-quest-list"></div>
+    </div>
+  </div>
+
+  <div id="feedback-overlay" class="celebration-overlay feedback-overlay hidden">
+    <div class="celebration-modal feedback-modal">
+      <button class="modal-close-x" id="feedback-close-x">✕</button>
+      <h2>💬 Send Feedback</h2>
+      <p class="feedback-intro">Bug reports, balance complaints, feature ideas — all welcome. This goes straight to my inbox.</p>
+      <textarea id="feedback-text" placeholder="What's on your mind?" rows="5"></textarea>
+      <input type="email" id="feedback-email" placeholder="Your email (optional, in case I want to follow up)">
+      <p class="feedback-status hidden" id="feedback-status"></p>
+      <button id="feedback-submit">Send</button>
     </div>
   </div>
 

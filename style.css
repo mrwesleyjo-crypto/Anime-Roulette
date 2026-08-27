@@ -604,6 +604,146 @@ h1 {
   gap: 6px;
 }
 
+/* ---------- Support / Feedback cards ---------- */
+
+.support-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(255,210,77,0.08);
+  border: 1px solid rgba(255,210,77,0.3);
+  text-decoration: none;
+  cursor: pointer;
+  font-family: 'Rajdhani', sans-serif;
+  width: 100%;
+  text-align: left;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.support-card:hover {
+  background: rgba(255,210,77,0.16);
+  transform: translateY(-1px);
+}
+
+.support-card-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.support-card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.support-card-text b {
+  font-size: 0.82rem;
+  color: #ffd24d;
+}
+
+.support-card-text span {
+  font-size: 0.7rem;
+  color: #b8b3cc;
+  font-weight: 600;
+}
+
+.feedback-card {
+  background: rgba(0,229,255,0.08);
+  border-color: rgba(0,229,255,0.3);
+}
+
+.feedback-card:hover {
+  background: rgba(0,229,255,0.16);
+}
+
+.feedback-card .support-card-text b {
+  color: #00e5ff;
+}
+
+.share-card {
+  background: rgba(46,204,113,0.08);
+  border-color: rgba(46,204,113,0.3);
+}
+
+.share-card:hover {
+  background: rgba(46,204,113,0.16);
+}
+
+.share-card .support-card-text b {
+  color: #2ecc71;
+}
+
+.share-card.unlocked-state {
+  opacity: 0.75;
+}
+
+.feedback-modal {
+  max-width: 440px;
+  text-align: left;
+}
+
+.feedback-modal h2 {
+  text-align: center;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+  color: var(--league-text, #00e5ff);
+}
+
+.feedback-intro {
+  font-size: 0.82rem;
+  color: #b8b3cc;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+#feedback-text, #feedback-email {
+  width: 100%;
+  box-sizing: border-box;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  color: #e8e4f5;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 0.9rem;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  resize: vertical;
+}
+
+#feedback-text:focus, #feedback-email:focus {
+  outline: none;
+  border-color: var(--league-text, #00e5ff);
+}
+
+.feedback-status {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.feedback-status.hidden {
+  display: none;
+}
+
+.feedback-status.ok {
+  color: #2ecc71;
+}
+
+.feedback-status.error {
+  color: #e74c3c;
+}
+
+#feedback-submit {
+  width: 100%;
+  background: linear-gradient(135deg, #00e5ff, #3498db);
+}
+
+
 .quest-row {
   display: flex;
   align-items: center;
@@ -1491,8 +1631,36 @@ button:disabled {
 }
 
 .enemy-side .battle-avatar {
+  width: 128px;
+  height: 128px;
+  border-width: 3px;
   border-color: #ff2d6b;
-  box-shadow: 0 0 18px rgba(255,45,107,0.5);
+  box-shadow: 0 0 35px rgba(255,45,107,0.55), 0 0 70px rgba(255,45,107,0.25);
+  animation: bossAuraPulse 2.2s ease-in-out infinite;
+}
+
+.enemy-side .battle-avatar::before {
+  content: '';
+  position: absolute;
+  inset: -14px;
+  border-radius: 50%;
+  border: 2px dashed rgba(255,45,107,0.45);
+  animation: bossRingSpin 9s linear infinite;
+  pointer-events: none;
+}
+
+.enemy-side .battle-avatar .avatar-fallback-text {
+  font-size: 3.4rem;
+}
+
+@keyframes bossRingSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes bossAuraPulse {
+  0%, 100% { box-shadow: 0 0 35px rgba(255,45,107,0.55), 0 0 70px rgba(255,45,107,0.25); }
+  50% { box-shadow: 0 0 55px rgba(255,45,107,0.85), 0 0 100px rgba(255,45,107,0.4); }
 }
 
 .battle-side-label {
