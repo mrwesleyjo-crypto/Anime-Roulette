@@ -433,6 +433,16 @@ h1 {
   display: none;
 }
 
+.synergy-banner.synergy-negative {
+  color: #ff9b9b;
+  background: rgba(231,76,60,0.12);
+  border-color: rgba(231,76,60,0.4);
+}
+
+.synergy-bonus-negative {
+  color: #e74c3c !important;
+}
+
 .synergy-banner .synergy-icon {
   font-size: 1.2rem;
   flex-shrink: 0;

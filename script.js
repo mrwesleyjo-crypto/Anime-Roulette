@@ -403,63 +403,63 @@ function stateSynergy(id, name, icon, bonus, desc, substring) {
 
 const SYNERGY_DEFS = [
   // --- Iconic teams, duos & trios -------------------------------------------------
-  groupSynergy('team-7', 'Team 7', '🍥', 585, 'Naruto, Sasuke, and Kakashi — the legendary genin squad reunites.', ['Naruto Uzumaki', 'Sasuke Uchiha', 'Kakashi Hatake'], 2),
-  pairSynergy('sannin', 'Legendary Sannin', '🐌', 520, 'Jiraiya and Tsunade — two of the three legendary Sannin.', ['Jiraiya', 'Tsunade']),
-  groupSynergy('leaf-legends', 'Leaf Village Legends', '🍃', 390, 'A gathering of Konoha\'s finest.', ['Naruto Uzumaki', 'Kakashi Hatake', 'Jiraiya', 'Tsunade', 'Might Guy'], 2),
-  groupSynergy('uchiha-bloodline', 'Uchiha Bloodline', '👁️', 520, 'Sasuke, Itachi, and Madara — the Sharingan runs deep in this roster.', ['Sasuke Uchiha', 'Itachi Uchiha', 'Madara Uchiha'], 2),
-  pairSynergy('ninja-academy', 'Ninja Academy', '📜', 260, 'Naruto looks out for the next generation.', ['Naruto Uzumaki', 'Konohamaru Sarutobi']),
-  pairSynergy('akatsuki-ties', 'Akatsuki Ties', '☁️', 325, 'Itachi and Madara, bound by a dangerous organization\'s history.', ['Itachi Uchiha', 'Madara Uchiha']),
-  pairSynergy('family-ties-uchiha', 'Brothers in Blood', '🩸', 325, 'Itachi and Sasuke — brothers, rivals, family.', ['Itachi Uchiha', 'Sasuke Uchiha']),
-  pairSynergy('mentor-jiraiya', 'The Toad Sage\'s Student', '🐸', 260, 'Jiraiya trained him well.', ['Jiraiya', 'Naruto Uzumaki']),
-  pairSynergy('mentor-kakashi', 'Copy Ninja\'s Pupil', '🐺', 260, 'Kakashi never truly stops watching over his students.', ['Kakashi Hatake', 'Sasuke Uchiha']),
+  groupSynergy('team-7', 'Team 7', '🍥', 0, 'Naruto, Sasuke, and Kakashi — the legendary genin squad reunites.', ['Naruto Uzumaki', 'Sasuke Uchiha', 'Kakashi Hatake'], 2),
+  pairSynergy('sannin', 'Legendary Sannin', '🐌', 130, 'Jiraiya and Tsunade — two of the three legendary Sannin.', ['Jiraiya', 'Tsunade']),
+  groupSynergy('leaf-legends', 'Leaf Village Legends', '🍃', 0, 'A gathering of Konoha\'s finest.', ['Naruto Uzumaki', 'Kakashi Hatake', 'Jiraiya', 'Tsunade', 'Might Guy'], 2),
+  groupSynergy('uchiha-bloodline', 'Uchiha Bloodline', '👁️', 0, 'Sasuke, Itachi, and Madara — the Sharingan runs deep in this roster.', ['Sasuke Uchiha', 'Itachi Uchiha', 'Madara Uchiha'], 2),
+  pairSynergy('ninja-academy', 'Ninja Academy', '📜', 130, 'Naruto looks out for the next generation.', ['Naruto Uzumaki', 'Konohamaru Sarutobi']),
+  pairSynergy('akatsuki-ties', 'Akatsuki Ties', '☁️', 130, 'Itachi and Madara, bound by a dangerous organization\'s history.', ['Itachi Uchiha', 'Madara Uchiha']),
+  pairSynergy('family-ties-uchiha', 'Brothers in Blood', '🩸', 130, 'Itachi and Sasuke — brothers, rivals, family.', ['Itachi Uchiha', 'Sasuke Uchiha']),
+  pairSynergy('mentor-jiraiya', 'The Toad Sage\'s Student', '🐸', 130, 'Jiraiya trained him well.', ['Jiraiya', 'Naruto Uzumaki']),
+  pairSynergy('mentor-kakashi', 'Copy Ninja\'s Pupil', '🐺', 130, 'Kakashi never truly stops watching over his students.', ['Kakashi Hatake', 'Sasuke Uchiha']),
 
-  groupSynergy('straw-hats', 'Straw Hat Alliance', '🏴‍☠️', 455, 'Multiple Straw Hat crew members, sailing and fighting as one.', ['Monkey D. Luffy', 'Roronoa Zoro', 'Portgas D. Ace', 'Shanks'], 2),
-  groupSynergy('east-blue-trio', 'East Blue Trio', '⛵', 455, 'Luffy, Zoro, and Usopp — where the legend began.', ['Monkey D. Luffy', 'Roronoa Zoro', 'Usopp'], 2),
-  pairSynergy('yonko-alliance', 'Yonko\'s Shadow', '👑', 455, 'Whitebeard and Shanks — two of the Four Emperors.', ['Whitebeard', 'Shanks']),
-  pairSynergy('legendary-blades', 'Legendary Blades', '⚔️', 325, 'Zoro and Levi — masters of the sword, from different worlds.', ['Roronoa Zoro', 'Levi Ackerman']),
+  groupSynergy('straw-hats', 'Straw Hat Alliance', '🏴‍☠️', 0, 'Multiple Straw Hat crew members, sailing and fighting as one.', ['Monkey D. Luffy', 'Roronoa Zoro', 'Portgas D. Ace', 'Shanks'], 2),
+  groupSynergy('east-blue-trio', 'East Blue Trio', '⛵', 0, 'Luffy, Zoro, and Usopp — where the legend began.', ['Monkey D. Luffy', 'Roronoa Zoro', 'Usopp'], 2),
+  pairSynergy('yonko-alliance', 'Yonko\'s Shadow', '👑', 130, 'Whitebeard and Shanks — two of the Four Emperors.', ['Whitebeard', 'Shanks']),
+  pairSynergy('legendary-blades', 'Legendary Blades', '⚔️', 130, 'Zoro and Levi — masters of the sword, from different worlds.', ['Roronoa Zoro', 'Levi Ackerman']),
 
-  groupSynergy('z-fighters', 'Z Fighters', '🐉', 585, 'Goku, Vegeta, Gohan, and Piccolo assemble to defend the universe.', ['Goku', 'Vegeta', GOHAN_ANY, 'Piccolo'], 2),
-  pairSynergy('saiyan-pride', 'Saiyan Pride', '⚡', 455, 'Goku and Vegeta together — rival Saiyans pushing each other past their limits.', ['Goku', 'Vegeta']),
-  groupSynergy('bulma-crew', 'Bulma\'s Support Squad', '🔧', 325, 'Bulma, Chichi, and Yamcha — the ones who keep the Z Fighters grounded.', ['Bulma', 'Chichi', 'Yamcha'], 2),
-  groupSynergy('angels-and-gods', 'Angels & Gods', '😇', 650, 'Whis, the Grand Priest, and Zeno — beings above mortal power scales entirely.', ['Whis', 'Grand Priest', 'Zeno'], 2),
+  groupSynergy('z-fighters', 'Z Fighters', '🐉', 0, 'Goku, Vegeta, Gohan, and Piccolo assemble to defend the universe.', ['Goku', 'Vegeta', GOHAN_ANY, 'Piccolo'], 2),
+  pairSynergy('saiyan-pride', 'Saiyan Pride', '⚡', 130, 'Goku and Vegeta together — rival Saiyans pushing each other past their limits.', ['Goku', 'Vegeta']),
+  groupSynergy('bulma-crew', 'Bulma\'s Support Squad', '🔧', 260, 'Bulma, Chichi, and Yamcha — the ones who keep the Z Fighters grounded.', ['Bulma', 'Chichi', 'Yamcha'], 2),
+  groupSynergy('angels-and-gods', 'Angels & Gods', '😇', 0, 'Whis, the Grand Priest, and Zeno — beings above mortal power scales entirely.', ['Whis', 'Grand Priest', 'Zeno'], 2),
 
-  groupSynergy('soul-society', 'Soul Society', '⚔️', 455, 'Ichigo, Rukia, Toshiro, and Yoruichi represent the Soul Reapers.', ['Ichigo Kurosaki', 'Rukia Kuchiki', 'Toshiro Hitsugaya', 'Yoruichi Shihoin'], 2),
-  pairSynergy('substitute-and-officer', 'Substitute Shinigami Duo', '❄️', 455, 'Ichigo and Rukia — the pair that started it all.', ['Ichigo Kurosaki', 'Rukia Kuchiki']),
+  groupSynergy('soul-society', 'Soul Society', '⚔️', 0, 'Ichigo, Rukia, Toshiro, and Yoruichi represent the Soul Reapers.', ['Ichigo Kurosaki', 'Rukia Kuchiki', 'Toshiro Hitsugaya', 'Yoruichi Shihoin'], 2),
+  pairSynergy('substitute-and-officer', 'Substitute Shinigami Duo', '❄️', 130, 'Ichigo and Rukia — the pair that started it all.', ['Ichigo Kurosaki', 'Rukia Kuchiki']),
 
-  groupSynergy('class-1a', 'Class 1-A', '🎓', 455, 'Izuku, Bakugo, and Todoroki — UA\'s brightest (and loudest) students.', ['Izuku Midoriya', 'Bakugo Katsuki', 'Todoroki Shoto'], 2),
-  pairSynergy('symbol-of-peace-legacy', 'Symbol of Peace\'s Legacy', '💪', 390, 'All Might passed the torch — and still fights beside his successor.', ['All Might', 'Izuku Midoriya']),
+  groupSynergy('class-1a', 'Class 1-A', '🎓', 0, 'Izuku, Bakugo, and Todoroki — UA\'s brightest (and loudest) students.', ['Izuku Midoriya', 'Bakugo Katsuki', 'Todoroki Shoto'], 2),
+  pairSynergy('symbol-of-peace-legacy', 'Symbol of Peace\'s Legacy', '💪', 130, 'All Might passed the torch — and still fights beside his successor.', ['All Might', 'Izuku Midoriya']),
 
-  groupSynergy('demon-slayer-corps', 'Demon Slayer Corps', '🗡️', 520, 'Tanjiro, Zenitsu, and Inosuke reunite — the training-arc trio rides again.', ['Tanjiro Kamado', 'Zenitsu Agatsuma', 'Inosuke Hashibira'], 2),
-  pairSynergy('hashira-council', 'Hashira Council', '🌸', 390, 'Giyu and Shinobu — Pillars of the Demon Slayer Corps.', ['Giyu Tomioka', 'Shinobu Kocho']),
+  groupSynergy('demon-slayer-corps', 'Demon Slayer Corps', '🗡️', 0, 'Tanjiro, Zenitsu, and Inosuke reunite — the training-arc trio rides again.', ['Tanjiro Kamado', 'Zenitsu Agatsuma', 'Inosuke Hashibira'], 2),
+  pairSynergy('hashira-council', 'Hashira Council', '🌸', 130, 'Giyu and Shinobu — Pillars of the Demon Slayer Corps.', ['Giyu Tomioka', 'Shinobu Kocho']),
 
-  groupSynergy('jujutsu-high', 'Jujutsu High', '🔮', 455, 'Yuji, Megumi, and Nobara — first-years with unlimited potential.', ['Yuji Itadori', 'Megumi Fushiguro', 'Nobara Kugisaki'], 2),
-  pairSynergy('six-eyes-sensei', 'Six Eyes Sensei', '👓', 455, 'Gojo keeps a close eye on his most promising student.', ['Gojo Satoru', 'Megumi Fushiguro']),
+  groupSynergy('jujutsu-high', 'Jujutsu High', '🔮', 0, 'Yuji, Megumi, and Nobara — first-years with unlimited potential.', ['Yuji Itadori', 'Megumi Fushiguro', 'Nobara Kugisaki'], 2),
+  pairSynergy('six-eyes-sensei', 'Six Eyes Sensei', '👓', 130, 'Gojo keeps a close eye on his most promising student.', ['Gojo Satoru', 'Megumi Fushiguro']),
 
-  pairSynergy('hxh-duo', 'Gon & Killua', '🤝', 390, 'Best friends since the Hunter Exam — they always fight better together.', ['Gon Freecss', 'Killua Zoldyck']),
-  pairSynergy('freecss-family', 'Freecss Family', '🎣', 325, 'Gon finally fights alongside the father he searched the world for.', ['Gon Freecss', 'Ging Freecss']),
+  pairSynergy('hxh-duo', 'Gon & Killua', '🤝', 130, 'Best friends since the Hunter Exam — they always fight better together.', ['Gon Freecss', 'Killua Zoldyck']),
+  pairSynergy('freecss-family', 'Freecss Family', '🎣', 130, 'Gon finally fights alongside the father he searched the world for.', ['Gon Freecss', 'Ging Freecss']),
 
-  groupSynergy('fairy-tail-guild', 'Fairy Tail Guild', '🧚', 455, 'Natsu, Gray, and Erza — the guild\'s strongest mages, united.', ['Natsu Dragneel', 'Gray Fullbuster', ERZA_ANY], 2),
-  pairSynergy('fire-and-ice', 'Fire and Ice', '🔥', 325, 'Natsu and Gray — eternal rivals, unstoppable together.', ['Natsu Dragneel', 'Gray Fullbuster']),
+  groupSynergy('fairy-tail-guild', 'Fairy Tail Guild', '🧚', 0, 'Natsu, Gray, and Erza — the guild\'s strongest mages, united.', ['Natsu Dragneel', 'Gray Fullbuster', ERZA_ANY], 2),
+  pairSynergy('fire-and-ice', 'Fire and Ice', '🔥', 130, 'Natsu and Gray — eternal rivals, unstoppable together.', ['Natsu Dragneel', 'Gray Fullbuster']),
 
-  groupSynergy('survey-corps', 'Survey Corps', '🦅', 520, 'Eren, Mikasa, Armin, and Levi — humanity\'s strongest soldiers.', ['Eren Yeager', 'Mikasa Ackerman', 'Armin Arlert', 'Levi Ackerman'], 2),
-  groupSynergy('childhood-trio', 'Childhood Trio', '🏠', 390, 'Eren, Mikasa, and Armin — friends since before the walls fell.', ['Eren Yeager', 'Mikasa Ackerman', 'Armin Arlert'], 2),
+  groupSynergy('survey-corps', 'Survey Corps', '🦅', 0, 'Eren, Mikasa, Armin, and Levi — humanity\'s strongest soldiers.', ['Eren Yeager', 'Mikasa Ackerman', 'Armin Arlert', 'Levi Ackerman'], 2),
+  groupSynergy('childhood-trio', 'Childhood Trio', '🏠', 0, 'Eren, Mikasa, and Armin — friends since before the walls fell.', ['Eren Yeager', 'Mikasa Ackerman', 'Armin Arlert'], 2),
 
-  groupSynergy('devil-hunters', 'Devil Hunters', '🩸', 455, 'Denji, Power, and Aki — Public Safety\'s most chaotic division.', ['Denji', 'Power', 'Aki Hayakawa'], 2),
+  groupSynergy('devil-hunters', 'Devil Hunters', '🩸', 0, 'Denji, Power, and Aki — Public Safety\'s most chaotic division.', ['Denji', 'Power', 'Aki Hayakawa'], 2),
 
-  pairSynergy('cat-and-mouse', 'Cat and Mouse', '🔍', 455, 'Light and L — the greatest rivalry ever written, now on the same team.', ['Light Yagami', 'L']),
-  pairSynergy('genius-strategists-2', 'Battle of Wits', '🧠', 455, 'Two of the sharpest minds across the multiverse, for once cooperating.', ['L', 'Lelouch Lamperouge']),
+  pairSynergy('cat-and-mouse', 'Cat and Mouse', '🔍', 130, 'Light and L — the greatest rivalry ever written, now on the same team.', ['Light Yagami', 'L']),
+  pairSynergy('genius-strategists-2', 'Battle of Wits', '🧠', 130, 'Two of the sharpest minds across the multiverse, for once cooperating.', ['L', 'Lelouch Lamperouge']),
 
-  pairSynergy('stand-users', 'Stand Users', '⭐', 455, 'Jotaro and Dio — bitter enemies, undeniable power.', ['Jotaro Kujo', 'Dio Brando']),
+  pairSynergy('stand-users', 'Stand Users', '⭐', 130, 'Jotaro and Dio — bitter enemies, undeniable power.', ['Jotaro Kujo', 'Dio Brando']),
 
-  pairSynergy('spirits-and-guys', 'Spirits and Guys', '👻', 325, 'Mob and Reigen — psychic power meets pure confidence.', ['Mob (Shigeo Kageyama)', 'Reigen Arataka']),
+  pairSynergy('spirits-and-guys', 'Spirits and Guys', '👻', 130, 'Mob and Reigen — psychic power meets pure confidence.', ['Mob (Shigeo Kageyama)', 'Reigen Arataka']),
 
-  pairSynergy('hero-duo', 'Master & Disciple', '👊', 455, 'Saitama and Genos — one serious punch, one cyborg barrage.', ['Saitama', 'Genos']),
-  pairSynergy('number-one-heroes', 'Number One Heroes', '🥇', 520, 'Saitama and All Might — two answers to "who is the strongest hero?"', ['Saitama', 'All Might']),
+  pairSynergy('hero-duo', 'Master & Disciple', '👊', 130, 'Saitama and Genos — one serious punch, one cyborg barrage.', ['Saitama', 'Genos']),
+  pairSynergy('number-one-heroes', 'Number One Heroes', '🥇', 130, 'Saitama and All Might — two answers to "who is the strongest hero?"', ['Saitama', 'All Might']),
 
-  groupSynergy('sin-brothers', 'Sin Brothers', '7️⃣', 585, 'Escanor, Ban, and Meliodas — three of the Seven Deadly Sins.', ['Escanor', 'Ban', MELIODAS_ANY], 2),
+  groupSynergy('sin-brothers', 'Sin Brothers', '7️⃣', 0, 'Escanor, Ban, and Meliodas — three of the Seven Deadly Sins.', ['Escanor', 'Ban', MELIODAS_ANY], 2),
 
-  pairSynergy('magic-knights', 'Magic Knights', '🍀', 325, 'Asta and Yami — the Black Bulls\' most explosive duo.', ['Asta', 'Yami Sukehiro']),
-  pairSynergy('elric-and-mustang', 'State Alchemists', '🔥', 325, 'Edward and Roy — equivalent exchange meets the Flame Alchemist.', ['Edward Elric', 'Roy Mustang']),
+  pairSynergy('magic-knights', 'Magic Knights', '🍀', 130, 'Asta and Yami — the Black Bulls\' most explosive duo.', ['Asta', 'Yami Sukehiro']),
+  pairSynergy('elric-and-mustang', 'State Alchemists', '🔥', 130, 'Edward and Roy — equivalent exchange meets the Flame Alchemist.', ['Edward Elric', 'Roy Mustang']),
 
   // --- "Twin Selves" — owning both versions of a split character at once ---------
   bothFormsSynergy('twin-selves-gohan', 'Two Gohans, One Timeline', '♊', 455, 'Kid Gohan and Beast Gohan, somehow standing side by side.', GOHAN_ANY),
@@ -471,48 +471,48 @@ const SYNERGY_DEFS = [
   bothFormsSynergy('twin-selves-meliodas', 'Captain and Demon King', '♊', 455, 'Meliodas before and after his true nature awakens.', MELIODAS_ANY),
 
   // --- Trope & joke synergies -----------------------------------------------------
-  groupSynergy('overpowered-protagonists', 'Strongest There Is', '💥', 585, 'Saitama, Escanor, and All Might — each the undisputed strongest of their world.', ['Saitama', 'Escanor', 'All Might'], 2),
-  groupSynergy('isekai-legends', 'Isekai Legends', '🌀', 520, 'Rimuru, Anos, and Ainz — reincarnated (or transported) into unstoppable power.', ['Rimuru Tempest', 'Anos Voldigoad', 'Ainz Ooal Gown'], 2),
-  pairSynergy('reincarnated-heroes', 'Reincarnated Heroes', '🔁', 325, 'Rimuru and Anos, both given a second life and a first-class power set.', ['Rimuru Tempest', 'Anos Voldigoad']),
-  groupSynergy('shadow-and-demon-kings', 'Shadow & Demon Kings', '😈', 585, 'Sung Jin-Woo, Meliodas, and Anos — rulers of darkness in their own right.', [SUNGJINWOO_ANY, MELIODAS_ANY, 'Anos Voldigoad'], 2),
-  groupSynergy('the-kings', 'The Kings', '👑', 585, 'Ainz, Anos, and Meliodas — each a king of their own domain.', ['Ainz Ooal Gown', 'Anos Voldigoad', MELIODAS_ANY], 2),
+  groupSynergy('overpowered-protagonists', 'Strongest There Is', '💥', 0, 'Saitama, Escanor, and All Might — each the undisputed strongest of their world.', ['Saitama', 'Escanor', 'All Might'], 2),
+  groupSynergy('isekai-legends', 'Isekai Legends', '🌀', 0, 'Rimuru, Anos, and Ainz — reincarnated (or transported) into unstoppable power.', ['Rimuru Tempest', 'Anos Voldigoad', 'Ainz Ooal Gown'], 2),
+  pairSynergy('reincarnated-heroes', 'Reincarnated Heroes', '🔁', 130, 'Rimuru and Anos, both given a second life and a first-class power set.', ['Rimuru Tempest', 'Anos Voldigoad']),
+  groupSynergy('shadow-and-demon-kings', 'Shadow & Demon Kings', '😈', 0, 'Sung Jin-Woo, Meliodas, and Anos — rulers of darkness in their own right.', [SUNGJINWOO_ANY, MELIODAS_ANY, 'Anos Voldigoad'], 2),
+  groupSynergy('the-kings', 'The Kings', '👑', 0, 'Ainz, Anos, and Meliodas — each a king of their own domain.', ['Ainz Ooal Gown', 'Anos Voldigoad', MELIODAS_ANY], 2),
 
-  groupSynergy('silver-haired-squad', 'Silver-Haired Squad', '🩶', 325, 'Toshiro, Killua, and Kakashi — a coincidence of hair color, or a sign of power?', ['Toshiro Hitsugaya', 'Killua Zoldyck', 'Kakashi Hatake'], 2),
-  groupSynergy('golden-hair-alliance', 'Golden Hair Alliance', '💛', 260, 'Naruto, Armin, Edward, and Zenitsu — a blonde battalion.', ['Naruto Uzumaki', 'Armin Arlert', 'Edward Elric', 'Zenitsu Agatsuma'], 2),
-  pairSynergy('redhead-rally', 'Redhead Rally', '🔴', 325, 'Erza and Shanks — fire-haired and fiercely powerful.', [ERZA_ANY, 'Shanks']),
+  groupSynergy('silver-haired-squad', 'Silver-Haired Squad', '🩶', 0, 'Toshiro, Killua, and Kakashi — a coincidence of hair color, or a sign of power?', ['Toshiro Hitsugaya', 'Killua Zoldyck', 'Kakashi Hatake'], 2),
+  groupSynergy('golden-hair-alliance', 'Golden Hair Alliance', '💛', 0, 'Naruto, Armin, Edward, and Zenitsu — a blonde battalion.', ['Naruto Uzumaki', 'Armin Arlert', 'Edward Elric', 'Zenitsu Agatsuma'], 2),
+  pairSynergy('redhead-rally', 'Redhead Rally', '🔴', 130, 'Erza and Shanks — fire-haired and fiercely powerful.', [ERZA_ANY, 'Shanks']),
 
-  groupSynergy('swordsmen-union', 'Swordsmen Union', '🗡️', 455, 'Zoro, Levi, Guts, and Erza — masters of the blade from every corner of the multiverse.', ['Roronoa Zoro', 'Levi Ackerman', GUTS_ANY, ERZA_ANY], 2),
-  groupSynergy('fists-of-fury', 'Fists of Fury', '👊', 455, 'Saitama, All Might, Bakugo, and Might Guy — pure martial power, no weapons needed.', ['Saitama', 'All Might', 'Bakugo Katsuki', 'Might Guy'], 2),
-  groupSynergy('genius-strategists', 'Genius Strategists', '🧩', 455, 'L, Lelouch, and Light — masterminds who see ten moves ahead.', ['L', 'Lelouch Lamperouge', 'Light Yagami'], 2),
-  groupSynergy('prodigies', 'Prodigies', '✨', 455, 'Itachi, Gojo, Killua, and Todoroki — child geniuses who never stopped growing.', ['Itachi Uchiha', 'Gojo Satoru', 'Killua Zoldyck', 'Todoroki Shoto'], 2),
-  groupSynergy('immortals-club', 'Immortals Club', '♾️', 520, 'Ban, Alucard, and Yhwach — death is more of a suggestion to this crowd.', ['Ban', ALUCARD_ANY, 'Yhwach'], 2),
-  groupSynergy('big-brother-energy', 'Big Brother Energy', '🫂', 325, 'Whitebeard, All Might, and Kakashi — mentors who protect everyone around them.', ['Whitebeard', 'All Might', 'Kakashi Hatake'], 2),
-  groupSynergy('comic-relief-crew', 'Comic Relief Crew', '🤡', 260, 'Yamcha, Mr. Satan, and Usopp — legendary cowards, occasional heroes.', ['Yamcha', 'Mr. Satan', 'Usopp'], 2),
-  pairSynergy('reapers-and-ghouls', 'Reapers & Ghouls', '💀', 325, 'Ichigo and Kaneki — death and hunger, crossing paths.', ['Ichigo Kurosaki', KANEKI_ANY]),
+  groupSynergy('swordsmen-union', 'Swordsmen Union', '🗡️', 0, 'Zoro, Levi, Guts, and Erza — masters of the blade from every corner of the multiverse.', ['Roronoa Zoro', 'Levi Ackerman', GUTS_ANY, ERZA_ANY], 2),
+  groupSynergy('fists-of-fury', 'Fists of Fury', '👊', 0, 'Saitama, All Might, Bakugo, and Might Guy — pure martial power, no weapons needed.', ['Saitama', 'All Might', 'Bakugo Katsuki', 'Might Guy'], 2),
+  groupSynergy('genius-strategists', 'Genius Strategists', '🧩', 0, 'L, Lelouch, and Light — masterminds who see ten moves ahead.', ['L', 'Lelouch Lamperouge', 'Light Yagami'], 2),
+  groupSynergy('prodigies', 'Prodigies', '✨', 0, 'Itachi, Gojo, Killua, and Todoroki — child geniuses who never stopped growing.', ['Itachi Uchiha', 'Gojo Satoru', 'Killua Zoldyck', 'Todoroki Shoto'], 2),
+  groupSynergy('immortals-club', 'Immortals Club', '♾️', 0, 'Ban, Alucard, and Yhwach — death is more of a suggestion to this crowd.', ['Ban', ALUCARD_ANY, 'Yhwach'], 2),
+  groupSynergy('big-brother-energy', 'Big Brother Energy', '🫂', 0, 'Whitebeard, All Might, and Kakashi — mentors who protect everyone around them.', ['Whitebeard', 'All Might', 'Kakashi Hatake'], 2),
+  groupSynergy('comic-relief-crew', 'Comic Relief Crew', '🤡', 0, 'Yamcha, Mr. Satan, and Usopp — legendary cowards, occasional heroes.', ['Yamcha', 'Mr. Satan', 'Usopp'], 2),
+  pairSynergy('reapers-and-ghouls', 'Reapers & Ghouls', '💀', 130, 'Ichigo and Kaneki — death and hunger, crossing paths.', ['Ichigo Kurosaki', KANEKI_ANY]),
   groupSynergy('multiverse-core-four', 'The Core Four', '🔱', 715, 'Naruto, Luffy, Goku, and Ichigo — four of the most iconic protagonists in anime, together.', ['Naruto Uzumaki', 'Monkey D. Luffy', 'Goku', 'Ichigo Kurosaki'], 4),
   groupSynergy('big-three', 'The Big Three', '🔱', 650, 'Naruto, Luffy, and Goku all on one roster — the three shonen legends fight side by side.', ['Naruto Uzumaki', 'Monkey D. Luffy', 'Goku'], 3),
 
   // --- Awakened-state synergies (name reflects the current transformation) -------
-  stateSynergy('six-paths-active', 'Six Paths Awakened', '☯️', 455, 'Naruto has reached Six Paths Sage Mode — a power beyond mortal limits.', 'Six Paths'),
-  stateSynergy('ultra-instinct-active', 'Ultra Instinct Engaged', '⬜', 585, 'Goku moves on pure instinct, body ahead of mind.', 'Ultra Instinct'),
-  stateSynergy('super-saiyan-active', 'Super Saiyan Ascended', '⚡', 390, 'A golden aura burns — Super Saiyan has been unlocked.', 'Super Saiyan'),
-  stateSynergy('bankai-released', 'Bankai Released', '🌑', 390, '"Bankai!" — a Zanpakuto\'s true form has been revealed.', 'Bankai'),
-  stateSynergy('getsuga-active', 'Final Getsuga Tensho', '🌌', 520, 'A power that costs everything has been unleashed.', 'Getsuga'),
-  stateSynergy('gear-fifth-active', 'Gear Fifth Unlocked', '☀️', 520, 'The laughter of legend — Luffy has reached his ultimate form.', 'Gear Fifth'),
-  stateSynergy('susanoo-active', 'Susanoo Manifested', '👹', 390, 'Ribs of chakra tower over the arena.', 'Susanoo'),
-  stateSynergy('full-cowl-active', 'Full Cowl 100%', '💚', 325, 'One For All is surging at its absolute limit.', 'Full Cowl'),
+  stateSynergy('six-paths-active', 'Six Paths Awakened', '☯️', 0, 'Naruto has reached Six Paths Sage Mode — a power beyond mortal limits.', 'Six Paths'),
+  stateSynergy('ultra-instinct-active', 'Ultra Instinct Engaged', '⬜', 0, 'Goku moves on pure instinct, body ahead of mind.', 'Ultra Instinct'),
+  stateSynergy('super-saiyan-active', 'Super Saiyan Ascended', '⚡', 0, 'A golden aura burns — Super Saiyan has been unlocked.', 'Super Saiyan'),
+  stateSynergy('bankai-released', 'Bankai Released', '🌑', 0, '"Bankai!" — a Zanpakuto\'s true form has been revealed.', 'Bankai'),
+  stateSynergy('getsuga-active', 'Final Getsuga Tensho', '🌌', 0, 'A power that costs everything has been unleashed.', 'Getsuga'),
+  stateSynergy('gear-fifth-active', 'Gear Fifth Unlocked', '☀️', 0, 'The laughter of legend — Luffy has reached his ultimate form.', 'Gear Fifth'),
+  stateSynergy('susanoo-active', 'Susanoo Manifested', '👹', 0, 'Ribs of chakra tower over the arena.', 'Susanoo'),
+  stateSynergy('full-cowl-active', 'Full Cowl 100%', '💚', 0, 'One For All is surging at its absolute limit.', 'Full Cowl'),
 
   // --- Roster size synergies -------------------------------------------------------
-  sizeSynergy('dynamic-duo', 'Dynamic Duo', '👥', 195, 'Two fighters, perfectly in sync.', 2),
-  sizeSynergy('terrific-trio', 'Terrific Trio', '👨‍👩‍👧', 195, 'Three fighters covering every angle.', 3),
-  sizeSynergy('fantastic-four', 'Fantastic Four', '🃏', 260, 'A well-rounded four-fighter roster.', 4),
-  sizeSynergy('famous-five', 'Famous Five', '🖐️', 325, 'Five fighters deep — very few gaps left to exploit.', 5),
-  sizeSynergy('final-six', 'Final Six', '💯', 325, 'A completely full roster — every slot earning its place.', 6),
+  sizeSynergy('dynamic-duo', 'Dynamic Duo', '👥', 0, 'Two fighters, perfectly in sync.', 2),
+  sizeSynergy('terrific-trio', 'Terrific Trio', '👨‍👩‍👧', 0, 'Three fighters covering every angle.', 3),
+  sizeSynergy('fantastic-four', 'Fantastic Four', '🃏', 0, 'A well-rounded four-fighter roster.', 4),
+  sizeSynergy('famous-five', 'Famous Five', '🖐️', 0, 'Five fighters deep — very few gaps left to exploit.', 5),
+  sizeSynergy('final-six', 'Final Six', '💯', 0, 'A completely full roster — every slot earning its place.', 6),
 
   // --- Rarity composition -----------------------------------------------------------
-  rarityCompositionSynergy('all-common', 'Grounded Squad', '⚪', 195, 'Every fighter is Common rarity — humble, but reliable.', 'Common'),
-  rarityCompositionSynergy('all-rare', 'Rare Formation', '🔵', 325, 'Every fighter on this roster is Rare or better, uniformly.', 'Rare'),
-  rarityCompositionSynergy('all-epic', 'Epic Formation', '🟣', 520, 'A roster built entirely of Epic-tier fighters.', 'Epic'),
+  rarityCompositionSynergy('all-common', 'Grounded Squad', '⚪', 0, 'Every fighter is Common rarity — humble, but reliable.', 'Common'),
+  rarityCompositionSynergy('all-rare', 'Rare Formation', '🔵', 0, 'Every fighter on this roster is Rare or better, uniformly.', 'Rare'),
+  rarityCompositionSynergy('all-epic', 'Epic Formation', '🟣', 0, 'A roster built entirely of Epic-tier fighters.', 'Epic'),
   {
     id: 'elite-tier',
     name: 'Multiversal Elite',
@@ -526,7 +526,7 @@ const SYNERGY_DEFS = [
     id: 'no-weak-links',
     name: 'No Weak Links',
     icon: '🛡️',
-    bonus: 390,
+    bonus: 0,
     desc: 'Not a single Useless or Common fighter in sight — a serious roster.',
     check: (names, roster) => roster.length >= 2 && roster.every(c => RARITY_RANK[c.rarity] >= RARITY_RANK.Rare)
   },
@@ -550,7 +550,7 @@ const SYNERGY_DEFS = [
     id: 'underdog-story',
     name: 'David and Goliath',
     icon: '🪨',
-    bonus: 260,
+    bonus: 0,
     desc: 'A Useless fighter and a Legendary-or-better fighter, side by side — the ultimate power gap.',
     check: (names, roster) => roster.some(c => c.rarity === 'Useless') && roster.some(c => RARITY_RANK[c.rarity] >= RARITY_RANK.Legendary)
   },
@@ -560,7 +560,7 @@ const SYNERGY_DEFS = [
     id: 'overwhelming-force',
     name: 'Overwhelming Force',
     icon: '💢',
-    bonus: 390,
+    bonus: 0,
     desc: 'Your average power exceeds 9750 — this team hits hard.',
     check: (names, roster) => roster.length >= 2 && (roster.reduce((s, c) => s + c.power, 0) / roster.length) > 9750
   },
@@ -568,7 +568,7 @@ const SYNERGY_DEFS = [
     id: 'absolute-power',
     name: 'Absolute Power',
     icon: '🌟',
-    bonus: 715,
+    bonus: 0,
     desc: 'Your average power exceeds 16250 — a roster that defies the power scale.',
     check: (names, roster) => roster.length >= 2 && (roster.reduce((s, c) => s + c.power, 0) / roster.length) > 16250
   },
@@ -576,7 +576,7 @@ const SYNERGY_DEFS = [
     id: 'glass-cannon-cinema',
     name: 'Power Overwhelming',
     icon: '💣',
-    bonus: 455,
+    bonus: 0,
     desc: 'Total combined power exceeds 39000.',
     check: (names, roster) => roster.reduce((s, c) => s + c.power, 0) > 39000
   },
@@ -584,7 +584,7 @@ const SYNERGY_DEFS = [
     id: 'balanced-squad',
     name: 'Perfectly Matched',
     icon: '⚖️',
-    bonus: 325,
+    bonus: 0,
     desc: 'Every fighter is within a tight power range of each other — no weak link to exploit.',
     check: (names, roster) => {
       if (roster.length < 3) return false;
@@ -598,7 +598,7 @@ const SYNERGY_DEFS = [
     id: 'veteran-squad',
     name: 'Battle-Tested',
     icon: '🎖️',
-    bonus: 325,
+    bonus: 0,
     desc: 'At least two fighters carry Mastery from being scouted before — experience shows.',
     check: (names, roster) => roster.filter(c => masteryLevelFor(c.baseName || c.name) > 0).length >= 2
   },
@@ -606,7 +606,7 @@ const SYNERGY_DEFS = [
     id: 'awakened-ensemble',
     name: 'Ascended Forms',
     icon: '✨',
-    bonus: 455,
+    bonus: 0,
     desc: 'At least two fighters have undergone an Awakening.',
     check: (names, roster) => roster.filter(c => c.awakenPhase > 0).length >= 2
   },
@@ -614,7 +614,7 @@ const SYNERGY_DEFS = [
     id: 'raw-potential',
     name: 'Raw Potential',
     icon: '🌱',
-    bonus: 195,
+    bonus: 0,
     desc: 'Not a single fighter has awakened yet — untapped power, still waiting.',
     check: (names, roster) => roster.length >= 3 && roster.every(c => c.awakenPhase === 0)
   },
@@ -622,7 +622,7 @@ const SYNERGY_DEFS = [
     id: 'rookie-roster',
     name: 'Rookie Roster',
     icon: '🆕',
-    bonus: 195,
+    bonus: 0,
     desc: 'A team of fresh faces — nobody here has Mastery yet.',
     check: (names, roster) => roster.length >= 3 && roster.every(c => masteryLevelFor(c.baseName || c.name) === 0)
   },
@@ -632,7 +632,7 @@ const SYNERGY_DEFS = [
     id: 'crossover-special',
     name: 'Crossover Special',
     icon: '🎬',
-    bonus: 325,
+    bonus: 0,
     desc: 'Fighters from at least 4 different anime, working together.',
     check: (names, roster) => new Set(roster.map(c => c.universe)).size >= 4
   },
@@ -640,7 +640,7 @@ const SYNERGY_DEFS = [
     id: 'multiverse-roadshow',
     name: 'Multiverse Roadshow',
     icon: '🚀',
-    bonus: 455,
+    bonus: 0,
     desc: 'Fighters from at least 5 different anime — a true crossover event.',
     check: (names, roster) => new Set(roster.map(c => c.universe)).size >= 5
   },
@@ -664,7 +664,7 @@ const SYNERGY_DEFS = [
     id: 'same-anime',
     name: 'One Universe, United',
     icon: '📖',
-    bonus: 455,
+    bonus: 0,
     desc: 'Every fighter on your roster hails from the same anime.',
     check: (names, roster) => roster.length >= 2 && new Set(roster.map(c => c.universe)).size === 1
   },
@@ -673,43 +673,86 @@ const SYNERGY_DEFS = [
     id: 'useless-squad',
     name: 'Useless Squad',
     icon: '🤡',
-    bonus: 195,
+    bonus: 0,
     desc: 'Every fighter on this team is, on paper, completely useless. There is a strange power in having absolutely nothing to lose.',
     check: (names, roster) => roster.length >= 2 && roster.every(c => c.rarity === 'Useless')
+  },
+
+  {
+    id: 'ego-overload',
+    name: 'Too Many Main Characters',
+    icon: '🗣️',
+    bonus: -455,
+    desc: '3 or more "chosen one" protagonists on one team — everybody wants to be the hero, nobody wants to follow orders.',
+    check: (names, roster) => {
+      const opProtagonists = ['Saitama', 'Goku', 'Monkey D. Luffy', 'Naruto Uzumaki', 'Escanor', 'All Might', 'Anos Voldigoad', 'Rimuru Tempest', 'Ainz Ooal Gown', 'Ichigo Kurosaki'];
+      return opProtagonists.filter(n => names.has(n)).length >= 3;
+    }
+  },
+  {
+    id: 'directionless',
+    name: 'No Clear Leader',
+    icon: '🤷',
+    bonus: -195,
+    desc: 'A near-full roster and still not one fighter above Common rarity — reliable enthusiasm, but nobody who can actually close out a fight.',
+    check: (names, roster) => roster.length >= 5 && roster.every(c => RARITY_RANK[c.rarity] <= RARITY_RANK.Common)
+  },
+  {
+    id: 'overextended',
+    name: 'Overextended',
+    icon: '📉',
+    bonus: -325,
+    desc: 'A massive gap between your strongest and weakest fighter — the team can only ever move as fast as its weakest link.',
+    check: (names, roster) => {
+      if (roster.length < 5) return false;
+      const powers = roster.map(c => c.power);
+      return (Math.max(...powers) - Math.min(...powers)) > 50000;
+    }
+  },
+  {
+    id: 'total-strangers',
+    name: 'Total Strangers',
+    icon: '🫥',
+    bonus: -260,
+    desc: "A full six-fighter roster and every single one is from a completely different anime — they've never so much as heard of each other. Zero chemistry.",
+    check: (names, roster) => roster.length === 6 && new Set(roster.map(c => c.universe)).size === 6
   },
 
   {
     id: 'multiverse-ensemble',
     name: 'Multiverse Ensemble',
     icon: '🌌',
-    bonus: 0, // computed dynamically below
-    desc: 'A team drawn from many different anime — raw crossover chemistry.',
+    bonus: 0,
+    desc: 'A team drawn from many different anime — no bonus, just an interesting crowd.',
     check: (names, roster) => roster.length >= 3
   }
 ];
 
+// Priority: a genuinely rare positive synergy first (real reward), then the
+// worst matching negative synergy (a warning worth noticing), then a plain
+// flavor name with no mechanical effect, then nothing at all — most teams,
+// most of the time, should show no synergy. That's what makes one special.
 function computeActiveSynergy() {
   const roster = game.roster;
   if (roster.length < 2) return null;
   const names = new Set(roster.map(c => c.baseName || c.name));
 
-  let best = null;
+  let bestPositive = null;
+  let worstNegative = null;
+  let firstFlavor = null;
+
   for (const def of SYNERGY_DEFS) {
-    if (def.id === 'multiverse-ensemble') continue; // fallback, evaluated last
-    if (def.check(names, roster)) {
-      if (!best || def.bonus > best.bonus) best = { ...def };
+    if (!def.check(names, roster)) continue;
+    if (def.bonus > 0) {
+      if (!bestPositive || def.bonus > bestPositive.bonus) bestPositive = def;
+    } else if (def.bonus < 0) {
+      if (!worstNegative || def.bonus < worstNegative.bonus) worstNegative = def;
+    } else if (!firstFlavor) {
+      firstFlavor = def;
     }
   }
-  if (best) return best;
 
-  // Fallback: reward genuine anime diversity across a near-full roster.
-  const ensembleDef = SYNERGY_DEFS.find(d => d.id === 'multiverse-ensemble');
-  if (ensembleDef.check(names, roster)) {
-    const uniqueUniverses = new Set(roster.map(c => c.universe)).size;
-    const bonus = Math.min(520, uniqueUniverses * 65);
-    return { ...ensembleDef, bonus };
-  }
-  return null;
+  return bestPositive || worstNegative || firstFlavor || null;
 }
 
 // ---------------------------------------------------------------------------
@@ -813,10 +856,10 @@ const ACHIEVEMENT_DEFS = [
   { id: 'anime-15', category: 'Collection', name: 'World Traveler', desc: 'Scout fighters from 15 different anime.', reward: 40, check: c => c.universesCollected.length >= 15 },
 
   // Power
-  { id: 'power-100', category: 'Power', name: 'Triple Digits', desc: 'Reach 6500 power on a single fighter.', reward: 15, check: c => c.highestPower >= 6500 },
+  { id: 'power-100', category: 'Power', name: 'Triple Digits', desc: 'Reach 8500 power on a single fighter.', reward: 15, check: c => c.highestPower >= 8500 },
   { id: 'power-over-9000', category: 'Power', name: "It's Over 9000!", desc: 'Reach 9001 power on a single fighter.', reward: 25, check: c => c.highestPower >= 9001 },
-  { id: 'power-250', category: 'Power', name: 'Breaking the Scale', desc: 'Reach 16250 power on a single fighter.', reward: 40, check: c => c.highestPower >= 16250 },
-  { id: 'power-500', category: 'Power', name: 'Power Level: Unmeasurable', desc: 'Reach 32500 power on a single fighter.', reward: 80, check: c => c.highestPower >= 32500 },
+  { id: 'power-250', category: 'Power', name: 'Breaking the Scale', desc: 'Reach 20000 power on a single fighter.', reward: 40, check: c => c.highestPower >= 20000 },
+  { id: 'power-500', category: 'Power', name: 'Power Level: Unmeasurable', desc: 'Reach 45000 power on a single fighter.', reward: 80, check: c => c.highestPower >= 45000 },
 
   // Combat / progress
   { id: 'first-win', category: 'Combat', name: 'First Blood', desc: 'Win your first match.', reward: 10, check: c => c.battlesWon >= 1 },
@@ -1981,7 +2024,13 @@ function renderRosterSidebar() {
   const synergy = computeActiveSynergy();
   if (synergy) {
     synergyBanner.classList.remove('hidden');
-    synergyBanner.innerHTML = `<span class="synergy-icon">${synergy.icon}</span><div><b>${synergy.name}</b> <span class="synergy-bonus">+${synergy.bonus} power</span><div class="synergy-desc">${synergy.desc}</div></div>`;
+    synergyBanner.classList.toggle('synergy-negative', synergy.bonus < 0);
+    const bonusText = synergy.bonus > 0
+      ? `<span class="synergy-bonus">+${synergy.bonus} power</span>`
+      : synergy.bonus < 0
+        ? `<span class="synergy-bonus synergy-bonus-negative">${synergy.bonus} power</span>`
+        : '';
+    synergyBanner.innerHTML = `<span class="synergy-icon">${synergy.icon}</span><div><b>${synergy.name}</b> ${bonusText}<div class="synergy-desc">${synergy.desc}</div></div>`;
   } else {
     synergyBanner.classList.add('hidden');
     synergyBanner.innerHTML = '';
