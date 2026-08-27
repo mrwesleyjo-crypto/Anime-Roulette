@@ -502,12 +502,14 @@ h1 {
 }
 
 .roster-card-name {
-  font-size: 0.7rem;
+  font-size: 0.66rem;
   font-weight: 700;
-  line-height: 1.15;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  word-break: break-word;
 }
 
 .roster-card-power {
@@ -1237,10 +1239,35 @@ button:disabled {
   text-align: left;
 }
 
+.leaderboard-summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  user-select: none;
+}
+
+.leaderboard-summary::-webkit-details-marker {
+  display: none;
+}
+
+.leaderboard-summary::before {
+  content: '▶';
+  font-size: 0.6rem;
+  transition: transform 0.2s ease;
+  display: inline-block;
+}
+
+.leaderboard-panel[open] .leaderboard-summary::before {
+  transform: rotate(90deg);
+}
+
 .leaderboard-list {
   display: flex;
   flex-direction: column;
   gap: 5px;
+  margin-top: 8px;
 }
 
 .leaderboard-empty {
@@ -1655,9 +1682,8 @@ button:disabled {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 4px;
-  max-width: 150px;
-  margin-bottom: 6px;
+  gap: 5px;
+  margin: 0 auto 8px;
 }
 
 .battle-mini-avatar {

@@ -90,7 +90,6 @@ const ROSTER_BY_RARITY = {
     { name: 'Meliodas (Fairy King\'s Forest)', universe: 'The Seven Deadly Sins' },
     { name: 'Erza Scarlet (Heart Kreuz Armor)', universe: 'Fairy Tail' },
     { name: 'Rimuru Tempest', universe: 'That Time I Got Reincarnated as a Slime' },
-    { name: 'Shanks', universe: 'One Piece' },
     { name: 'Todoroki Shoto', universe: 'My Hero Academia' },
     { name: 'Trafalgar Law', universe: 'One Piece' },
     { name: 'Nobara Kugisaki', universe: 'Jujutsu Kaisen' },
@@ -166,7 +165,8 @@ const BONUS_PACK_ROSTER = {
 
 const MYTHIC_ROSTER = [
   { name: 'Whis', universe: 'Dragon Ball Super' },
-  { name: 'Grand Priest', universe: 'Dragon Ball Super' }
+  { name: 'Grand Priest', universe: 'Dragon Ball Super' },
+  { name: 'Shanks', universe: 'One Piece' }
 ];
 
 // Any Common or Useless-tier character can be your starter — no fixed
@@ -2300,9 +2300,14 @@ function showBattleIntro(opponent) {
   battleYourPower.textContent = `Power ${totalRosterPower} total (${averageRosterPower()} avg)`;
 
   battleTeamStrip.innerHTML = '';
+  const miniSizeBySize = { 1: 84, 2: 68, 3: 56, 4: 48, 5: 40, 6: 34 };
+  const miniSize = miniSizeBySize[game.roster.length] || 30;
+  battleTeamStrip.style.maxWidth = `${Math.min(3, game.roster.length) * (miniSize + 4) + 20}px`;
   game.roster.forEach(c => {
     const mini = document.createElement('div');
     mini.className = 'battle-mini-avatar';
+    mini.style.width = `${miniSize}px`;
+    mini.style.height = `${miniSize}px`;
     mini.style.setProperty('--rarity-color', c.color);
     attachAvatarImage(mini, c.baseName || c.name, 'character', initials(c.name));
     battleTeamStrip.appendChild(mini);
