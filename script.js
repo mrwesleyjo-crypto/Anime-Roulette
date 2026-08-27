@@ -1663,6 +1663,7 @@ function createItemEl(entry) {
   if (entry.universe) {
     attachAvatarImage(avatar, entry.name, 'character', initials(entry.name));
   } else if (entry.value && ACTION_ICON_KEYS.includes(entry.value)) {
+    avatar.classList.add('action-icon-avatar');
     const fallback = document.createElement('span');
     fallback.className = 'avatar-fallback-text';
     fallback.textContent = entry.icon || initials(entry.name);

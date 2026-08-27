@@ -503,8 +503,15 @@ h1 {
 .action-icon-img {
   object-fit: contain !important;
   object-position: center !important;
-  padding: 4px;
+  padding: 2px;
   box-sizing: border-box;
+}
+
+.strip-item .avatar.action-icon-avatar {
+  width: 84px;
+  height: 84px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.05);
 }
 
 .has-image .avatar-fallback-text {
