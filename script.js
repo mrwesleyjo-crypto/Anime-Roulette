@@ -1531,6 +1531,12 @@ const CHARACTER_IMAGE_DIR = 'images/characters/';
 const VILLAIN_IMAGE_DIR = 'images/villains/';
 const SPECIAL_IMAGE_DIR = 'images/special/';
 const UI_IMAGE_DIR = 'images/ui/';
+const ICON_IMAGE_DIR = 'images/icons/';
+
+// Optional custom icons for the roulette's action events — drop PNGs into
+// images/icons/ named exactly: scout.png, train.png, trade.png, match.png,
+// item.png. Missing ones just keep their emoji icon — nothing breaks.
+const ACTION_ICON_KEYS = ['scout', 'train', 'trade', 'match', 'item'];
 
 // Optional custom battle-intro background — drop a "vs-background.png" into
 // images/ui/ (any wide image works, it gets cropped to fill nicely) and it
@@ -1656,6 +1662,19 @@ function createItemEl(entry) {
   avatar.className = 'avatar';
   if (entry.universe) {
     attachAvatarImage(avatar, entry.name, 'character', initials(entry.name));
+  } else if (entry.value && ACTION_ICON_KEYS.includes(entry.value)) {
+    const fallback = document.createElement('span');
+    fallback.className = 'avatar-fallback-text';
+    fallback.textContent = entry.icon || initials(entry.name);
+    avatar.appendChild(fallback);
+    const img = document.createElement('img');
+    img.className = 'char-img action-icon-img';
+    img.alt = entry.name;
+    img.loading = 'lazy';
+    img.onload = () => avatar.classList.add('has-image');
+    img.onerror = () => img.remove();
+    img.src = `${ICON_IMAGE_DIR}${entry.value}.png`;
+    avatar.appendChild(img);
   } else {
     avatar.textContent = entry.icon || initials(entry.name);
   }
