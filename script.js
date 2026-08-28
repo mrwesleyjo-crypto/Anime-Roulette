@@ -1417,6 +1417,22 @@ const eventPanel = document.getElementById('event-panel');
 const logList = document.getElementById('log-list');
 const rosterList = document.getElementById('roster-list');
 const rosterPowerSummary = document.getElementById('roster-power-summary');
+const mobileRosterBarList = document.getElementById('mobile-roster-bar-list');
+const mobileRosterBarPower = document.getElementById('mobile-roster-bar-power');
+
+function renderMobileRosterBar(totalPower) {
+  if (!mobileRosterBarList) return;
+  mobileRosterBarList.innerHTML = '';
+  game.roster.forEach(c => {
+    const mini = document.createElement('div');
+    mini.className = 'mobile-roster-bar-avatar';
+    mini.style.setProperty('--rarity-color', c.color);
+    attachAvatarImage(mini, c.baseName || c.name, 'character', initials(c.name));
+    mobileRosterBarList.appendChild(mini);
+  });
+  mobileRosterBarPower.textContent = game.roster.length > 0 ? `⚡ ${totalPower}` : '—';
+}
+
 const powerTierLabel = document.getElementById('power-tier-label');
 const powerTierBarFill = document.getElementById('power-tier-bar-fill');
 const synergyBanner = document.getElementById('synergy-banner');
@@ -2034,6 +2050,8 @@ function renderRosterSidebar() {
   const totalPower = game.roster.reduce((s, c) => s + c.power, 0);
   const avgPower = game.roster.length > 0 ? Math.round(totalPower / game.roster.length) : 0;
   rosterPowerSummary.textContent = `Team Power: ${totalPower} total · ${avgPower} avg`;
+
+  renderMobileRosterBar(totalPower);
 
   const powerTier = getPowerTier(avgPower);
   powerTierLabel.textContent = `${powerTier.icon} ${powerTier.label}`;
