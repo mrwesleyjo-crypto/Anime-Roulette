@@ -2562,92 +2562,191 @@ function loadImageWithFallback(src, timeoutMs) {
   });
 }
 
-function drawShareBadge(ctx, isChampion, opponentName, rosterImages) {
+function drawShareBadge(ctx, isChampion, opponentName, rosterImages, rosterTransparency) {
   const w = 800;
-  const radius = 52;
-  const rowHeight = 132;
-  const headerHeight = 360;
-  const footerHeight = 90;
-  const h = Math.max(590, headerHeight + game.roster.length * rowHeight + footerHeight);
+  const radius = 50;
+  const rowHeight = 128;
+  const headerHeight = 340;
+  const footerHeight = 96;
+  const h = Math.max(600, headerHeight + game.roster.length * rowHeight + footerHeight);
   const accent = isChampion ? '#ffd24d' : '#e74c3c';
+  const accentSoft = isChampion ? 'rgba(255,210,77,0.14)' : 'rgba(231,76,60,0.14)';
 
+  // ---------- Background ----------
   const bg = ctx.createLinearGradient(0, 0, 0, h);
   bg.addColorStop(0, '#241238');
   bg.addColorStop(1, '#07040e');
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, w, h);
 
+  // Subtle diagonal grid texture so the background isn't flat
+  ctx.save();
+  ctx.globalAlpha = 0.05;
+  ctx.strokeStyle = accent;
+  ctx.lineWidth = 1;
+  for (let gx = -h; gx < w + h; gx += 34) {
+    ctx.beginPath();
+    ctx.moveTo(gx, 0);
+    ctx.lineTo(gx + h, h);
+    ctx.stroke();
+  }
+  ctx.restore();
+
   // Large faint watermark so smaller rosters don't leave a bare card.
   ctx.save();
-  ctx.globalAlpha = 0.07;
+  ctx.globalAlpha = 0.06;
   ctx.textAlign = 'center';
   ctx.fillStyle = accent;
   ctx.font = 'bold 380px sans-serif';
   ctx.fillText(isChampion ? '👑' : '💀', w / 2, h / 2 + 130);
   ctx.restore();
 
+  // ---------- Outer frame (with real margin, nothing touches it) ----------
   ctx.strokeStyle = accent;
-  ctx.lineWidth = 6;
-  ctx.strokeRect(20, 20, w - 40, h - 40);
+  ctx.lineWidth = 5;
+  ctx.strokeRect(18, 18, w - 36, h - 36);
+  ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(26, 26, w - 52, h - 52);
+
+  // ---------- Header medallion ----------
+  const medY = 78;
+  const medR = 46;
+  ctx.save();
+  const medGlow = ctx.createRadialGradient(w / 2, medY, 4, w / 2, medY, medR + 22);
+  medGlow.addColorStop(0, accentSoft);
+  medGlow.addColorStop(1, 'transparent');
+  ctx.fillStyle = medGlow;
+  ctx.beginPath();
+  ctx.arc(w / 2, medY, medR + 22, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  const medGrad = ctx.createLinearGradient(w / 2 - medR, medY - medR, w / 2 + medR, medY + medR);
+  medGrad.addColorStop(0, accent);
+  medGrad.addColorStop(1, '#0a0614');
+  ctx.fillStyle = medGrad;
+  ctx.beginPath();
+  ctx.arc(w / 2, medY, medR, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = accent;
+  ctx.lineWidth = 3;
+  ctx.stroke();
 
   ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = '52px sans-serif';
+  ctx.fillText(isChampion ? '👑' : '💀', w / 2, medY + 4);
+  ctx.textBaseline = 'alphabetic';
+
+  // ---------- Title / name / subtitle ----------
   ctx.fillStyle = accent;
-  ctx.font = 'bold 40px "Segoe UI", sans-serif';
-  ctx.fillText(isChampion ? '👑 MULTIVERSE CHAMPION' : '💀 ELIMINATED', w / 2, 100);
+  ctx.font = '900 32px "Segoe UI", sans-serif';
+  ctx.fillText(isChampion ? 'MULTIVERSE CHAMPION' : 'ELIMINATED', w / 2, 150);
 
   ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 32px "Segoe UI", sans-serif';
-  ctx.fillText(game.playerName || 'Anonymous', w / 2, 150);
+  ctx.font = 'bold 26px "Segoe UI", sans-serif';
+  ctx.fillText(game.playerName || 'Anonymous', w / 2, 182);
 
-  ctx.fillStyle = '#c7c2df';
-  ctx.font = '20px "Segoe UI", sans-serif';
+  ctx.fillStyle = '#a9a3c2';
+  ctx.font = '16px "Segoe UI", sans-serif';
   ctx.fillText(
     isChampion ? `Defeated ${opponentName}` : `Fell to ${opponentName} in the ${currentTier().name}`,
-    w / 2, 185
+    w / 2, 206
   );
 
   const synergy = computeActiveSynergy();
-  const teamName = synergy ? `${synergy.icon} "${synergy.name}"` : '⚔️ "Multiverse Squad"';
+  const teamName = synergy ? `${synergy.icon}  “${synergy.name}”` : '⚔️  “Multiverse Squad”';
   ctx.fillStyle = accent;
-  ctx.font = 'italic bold 24px "Segoe UI", sans-serif';
-  ctx.fillText(teamName, w / 2, 220);
+  ctx.font = 'italic bold 19px "Segoe UI", sans-serif';
+  ctx.fillText(teamName, w / 2, 234);
 
+  // ---------- Stat chips ----------
   const score = liveScore();
   const totalPower = game.roster.reduce((s, c) => s + c.power, 0);
-  ctx.fillStyle = '#00e5ff';
-  ctx.font = 'bold 26px "Segoe UI", sans-serif';
-  ctx.fillText(`${score} / ${TOTAL_MATCHES} matches won`, w / 2, 265);
-  ctx.fillStyle = '#ffd24d';
-  ctx.fillText(`Team Power: ${totalPower}`, w / 2, 300);
+  const chipY = 254, chipH = 44, chipW = 300, chipGap = 16;
+  const chip1X = w / 2 - chipGap / 2 - chipW;
+  const chip2X = w / 2 + chipGap / 2;
 
+  function drawChip(x, icon, label, value, valueColor) {
+    ctx.fillStyle = 'rgba(255,255,255,0.05)';
+    roundRectPath(ctx, x, chipY, chipW, chipH, 10);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+    ctx.lineWidth = 1;
+    roundRectPath(ctx, x, chipY, chipW, chipH, 10);
+    ctx.stroke();
+
+    ctx.textAlign = 'left';
+    ctx.font = '22px sans-serif';
+    ctx.fillText(icon, x + 14, chipY + 29);
+    ctx.font = '12px "Segoe UI", sans-serif';
+    ctx.fillStyle = '#8a84a0';
+    ctx.fillText(label, x + 46, chipY + 17);
+    ctx.font = 'bold 18px "Segoe UI", sans-serif';
+    ctx.fillStyle = valueColor;
+    ctx.fillText(value, x + 46, chipY + 35);
+  }
+  drawChip(chip1X, '⚔️', 'MATCHES WON', `${score} / ${TOTAL_MATCHES}`, '#00e5ff');
+  drawChip(chip2X, '⚡', 'TEAM POWER', `${totalPower}`, '#ffd24d');
+
+  // ---------- Roster ----------
   ctx.textAlign = 'left';
   ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 22px "Segoe UI", sans-serif';
-  ctx.fillText('Final Roster:', 60, 350);
+  ctx.font = 'bold 18px "Segoe UI", sans-serif';
+  ctx.fillText('FINAL ROSTER', 46, 328);
+  ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(46, 336);
+  ctx.lineTo(w - 46, 336);
+  ctx.stroke();
 
   let y = headerHeight;
   game.roster.forEach((c, i) => {
-    const cx = 60 + radius, cy = y + radius;
+    const rowTop = y + 6;
+    const rowBottom = y + rowHeight - 6;
+    const cx = 46 + 20 + radius, cy = rowTop + (rowBottom - rowTop) / 2;
+
+    // Card background for this roster row
+    ctx.fillStyle = 'rgba(255,255,255,0.035)';
+    roundRectPath(ctx, 40, rowTop, w - 80, rowBottom - rowTop, 12);
+    ctx.fill();
+    ctx.fillStyle = c.color;
+    roundRectPath(ctx, 40, rowTop, 5, rowBottom - rowTop, 3);
+    ctx.fill();
+
     const img = rosterImages && rosterImages[i];
+    const isTransparent = rosterTransparency && rosterTransparency[i];
 
     ctx.save();
     ctx.shadowColor = c.color;
-    ctx.shadowBlur = 18;
+    ctx.shadowBlur = 16;
     if (img) {
       ctx.beginPath();
       ctx.arc(cx, cy, radius, 0, Math.PI * 2);
       ctx.closePath();
       ctx.clip();
-      // "Contain" fit here (not cover) — small circular badge, and this way
-      // transparent-background cutout art never gets zoomed/cropped oddly.
-      const scale = Math.min((radius * 1.9) / img.width, (radius * 1.9) / img.height);
-      const dw = img.width * scale, dh = img.height * scale;
       const grad = ctx.createLinearGradient(cx - radius, cy - radius, cx + radius, cy + radius);
       grad.addColorStop(0, c.color);
       grad.addColorStop(1, '#0a0614');
       ctx.fillStyle = grad;
       ctx.fillRect(cx - radius, cy - radius, radius * 2, radius * 2);
-      ctx.drawImage(img, cx - dw / 2, cy - dh / 2, dw, dh);
+      if (isTransparent) {
+        // Cutout art on a transparent background — show the whole image,
+        // never crop it (matches how the live game handles these).
+        const scale = Math.min((radius * 1.85) / img.width, (radius * 1.85) / img.height);
+        const dw = img.width * scale, dh = img.height * scale;
+        ctx.drawImage(img, cx - dw / 2, cy - dh / 2, dw, dh);
+      } else {
+        // Full scene/portrait art — fill the circle completely, cropping
+        // overflow, biased toward the top third (where faces usually are).
+        const scale = Math.max((radius * 2.05) / img.width, (radius * 2.05) / img.height);
+        const dw = img.width * scale, dh = img.height * scale;
+        const dx = cx - dw / 2;
+        const dy = cy - dh * 0.35;
+        ctx.drawImage(img, dx, dy, dw, dh);
+      }
     } else {
       const grad = ctx.createLinearGradient(cx - radius, cy - radius, cx + radius, cy + radius);
       grad.addColorStop(0, c.color);
@@ -2657,55 +2756,89 @@ function drawShareBadge(ctx, isChampion, opponentName, rosterImages) {
       ctx.arc(cx, cy, radius, 0, Math.PI * 2);
       ctx.fill();
       ctx.fillStyle = '#0a0614';
-      ctx.font = 'bold 34px "Segoe UI", sans-serif';
+      ctx.font = 'bold 32px "Segoe UI", sans-serif';
       ctx.textAlign = 'center';
       const initials = c.name.split(' ').map(word => word[0]).slice(0, 2).join('').toUpperCase();
-      ctx.fillText(initials, cx, cy + 12);
+      ctx.fillText(initials, cx, cy + 11);
       ctx.textAlign = 'left';
     }
     ctx.restore();
 
     ctx.strokeStyle = c.color;
-    ctx.lineWidth = 4;
+    ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.arc(cx, cy, radius, 0, Math.PI * 2);
     ctx.stroke();
 
-    const textX = cx + radius + 24;
+    const textX = cx + radius + 22;
+    ctx.textAlign = 'left';
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 24px "Segoe UI", sans-serif';
-    ctx.fillText(c.name, textX, cy - 6);
+    ctx.font = 'bold 21px "Segoe UI", sans-serif';
+    ctx.fillText(truncateToWidth(ctx, c.name, w - textX - 30), textX, cy - 9);
     ctx.fillStyle = c.color;
-    ctx.font = '19px "Segoe UI", sans-serif';
-    ctx.fillText(`Power ${c.power} · ${c.rarity}`, textX, cy + 24);
+    ctx.font = '16px "Segoe UI", sans-serif';
+    ctx.fillText(`Power ${c.power} · ${c.rarity}`, textX, cy + 12);
     ctx.fillStyle = '#8a84a0';
-    ctx.font = '15px "Segoe UI", sans-serif';
-    ctx.fillText(c.universe, textX, cy + 46);
+    ctx.font = '13px "Segoe UI", sans-serif';
+    ctx.fillText(c.universe, textX, cy + 30);
 
     y += rowHeight;
   });
 
+  // ---------- Footer ----------
+  ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(46, h - 62);
+  ctx.lineTo(w - 46, h - 62);
+  ctx.stroke();
+
   ctx.textAlign = 'center';
   ctx.fillStyle = '#6c6c78';
-  ctx.font = '16px "Segoe UI", sans-serif';
-  ctx.fillText('Multiverse Anime Tournament', w / 2, h - 42);
-  ctx.fillText(new Date().toLocaleDateString(), w / 2, h - 20);
+  ctx.font = '14px "Segoe UI", sans-serif';
+  ctx.fillText('Multiverse Anime Tournament', w / 2, h - 40);
+  ctx.fillText(new Date().toLocaleDateString(), w / 2, h - 22);
 
   return h;
 }
 
+function roundRectPath(ctx, x, y, width, height, radius) {
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.arcTo(x + width, y, x + width, y + height, radius);
+  ctx.arcTo(x + width, y + height, x, y + height, radius);
+  ctx.arcTo(x, y + height, x, y, radius);
+  ctx.arcTo(x, y, x + width, y, radius);
+  ctx.closePath();
+}
+
+function truncateToWidth(ctx, text, maxWidth) {
+  if (ctx.measureText(text).width <= maxWidth) return text;
+  let truncated = text;
+  while (truncated.length > 1 && ctx.measureText(truncated + '…').width > maxWidth) {
+    truncated = truncated.slice(0, -1);
+  }
+  return truncated + '…';
+}
+
 async function downloadShareBadge(isChampion, opponentName) {
-  const radius = 52, rowHeight = 132, headerHeight = 360, footerHeight = 90;
+  const radius = 50, rowHeight = 128, headerHeight = 340, footerHeight = 96;
   const canvas = document.createElement('canvas');
   canvas.width = 800;
-  canvas.height = Math.max(590, headerHeight + game.roster.length * rowHeight + footerHeight);
+  canvas.height = Math.max(600, headerHeight + game.roster.length * rowHeight + footerHeight);
   const ctx = canvas.getContext('2d');
 
   const rosterImages = await Promise.all(
     game.roster.map(c => loadImageWithFallback(imagePathFor(c.name, 'character')))
   );
+  const rosterTransparency = await Promise.all(
+    rosterImages.map(img => new Promise(resolve => {
+      if (!img) { resolve(false); return; }
+      detectMostlyTransparent(img, resolve);
+    }))
+  );
 
-  drawShareBadge(ctx, isChampion, opponentName, rosterImages);
+  drawShareBadge(ctx, isChampion, opponentName, rosterImages, rosterTransparency);
   const link = document.createElement('a');
   link.download = `multiverse-tournament-${isChampion ? 'champion' : 'run'}.png`;
   link.href = canvas.toDataURL('image/png');
