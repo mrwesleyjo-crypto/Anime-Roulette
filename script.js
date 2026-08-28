@@ -614,7 +614,7 @@ const SYNERGY_DEFS = [
     name: 'Battle-Tested',
     icon: '🎖️',
     bonus: 0,
-    desc: 'At least two fighters carry Mastery from being scouted before — experience shows.',
+    desc: 'At least two fighters carry a Veteran Bonus from being scouted before — experience shows.',
     check: (names, roster) => roster.filter(c => masteryLevelFor(c.baseName || c.name) > 0).length >= 2
   },
   {
@@ -638,7 +638,7 @@ const SYNERGY_DEFS = [
     name: 'Rookie Roster',
     icon: '🆕',
     bonus: 0,
-    desc: 'A team of fresh faces — nobody here has Mastery yet.',
+    desc: 'A team of fresh faces — nobody here has a Veteran Bonus yet.',
     check: (names, roster) => roster.length >= 3 && roster.every(c => masteryLevelFor(c.baseName || c.name) === 0)
   },
 
@@ -1442,7 +1442,7 @@ function renderMobileRosterBar(totalPower) {
     const mini = document.createElement('div');
     mini.className = 'mobile-roster-bar-avatar';
     mini.style.setProperty('--rarity-color', c.color);
-    attachAvatarImage(mini, c.baseName || c.name, 'character', initials(c.name));
+    attachAvatarImage(mini, c.name, 'character', initials(c.name));
     mobileRosterBarList.appendChild(mini);
   });
   mobileRosterBarPower.textContent = game.roster.length > 0 ? `⚡ ${totalPower}` : '—';
@@ -2129,7 +2129,11 @@ function renderRosterSidebar() {
 
     const power = document.createElement('div');
     power.className = 'roster-card-power';
-    power.textContent = `Power ${c.power} · ${c.universe}`;
+    power.textContent = `⚡ Power ${c.power}`;
+
+    const universe = document.createElement('div');
+    universe.className = 'roster-card-universe';
+    universe.textContent = c.universe;
 
     const rarity = document.createElement('span');
     rarity.className = 'roster-card-rarity';
@@ -2143,13 +2147,14 @@ function renderRosterSidebar() {
     powerBarFill.style.background = c.color;
     powerBarWrap.appendChild(powerBarFill);
 
-    body.append(name, power, rarity, powerBarWrap);
+    body.append(name, power, universe, rarity, powerBarWrap);
 
     const masteryLvl = masteryLevelFor(c.baseName || c.name);
     if (masteryLvl > 0) {
       const mastery = document.createElement('span');
       mastery.className = 'roster-card-mastery';
-      mastery.textContent = `★ Mastery +${masteryLvl} power`;
+      mastery.textContent = `🔁 Veteran Bonus: +${masteryLvl} power`;
+      mastery.title = "You've scouted this fighter before, elsewhere in your career — that experience carries over as a permanent power bonus.";
       body.appendChild(mastery);
     }
 
@@ -2425,7 +2430,7 @@ function showBattleIntro(opponent) {
     mini.style.width = `${miniSize}px`;
     mini.style.height = `${miniSize}px`;
     mini.style.setProperty('--rarity-color', c.color);
-    attachAvatarImage(mini, c.baseName || c.name, 'character', initials(c.name));
+    attachAvatarImage(mini, c.name, 'character', initials(c.name));
     battleTeamStrip.appendChild(mini);
   });
 
@@ -2610,7 +2615,7 @@ async function downloadShareBadge(isChampion, opponentName) {
   const ctx = canvas.getContext('2d');
 
   const rosterImages = await Promise.all(
-    game.roster.map(c => loadImageWithFallback(imagePathFor(c.baseName || c.name, 'character')))
+    game.roster.map(c => loadImageWithFallback(imagePathFor(c.name, 'character')))
   );
 
   drawShareBadge(ctx, isChampion, opponentName, rosterImages);

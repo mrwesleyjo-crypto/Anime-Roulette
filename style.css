@@ -648,7 +648,7 @@ h1 {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 15%;
+  object-position: center 22%;
   z-index: 2;
 }
 
@@ -692,11 +692,21 @@ h1 {
 
 .roster-card-power {
   font-size: 0.6rem;
+  font-weight: 700;
+  color: #ffd24d;
+  white-space: nowrap;
+}
+
+.roster-card-universe {
+  font-size: 0.56rem;
   font-weight: 600;
   color: #a9a3c2;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  word-break: break-word;
 }
 
 .roster-card-rarity {
