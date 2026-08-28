@@ -1411,7 +1411,8 @@ function createInitialState() {
     riftActive: false,
     godMode: false,
     pendingTradeIncoming: null,
-    justWonTrophy: false
+    justWonTrophy: false,
+    forceNextMatchLoss: false
   };
 }
 
@@ -2433,10 +2434,35 @@ function activateGodMode() {
   refreshUI();
 }
 
+// Testing-only cheat: drafts a solo Yamcha and force-loses the very next
+// match, so the Yamcha defeat easter egg can be checked on demand without
+// having to lose a real fight with him as your only fighter.
+const YAMCHA_TEST_CODE = 'yamcha-death-loop-QW9fL2';
+
+function activateYamchaTestMode() {
+  const yamchaCard = ACTIVE_POOL.find(c => c.name === 'Yamcha') || {
+    name: 'Yamcha', baseName: 'Yamcha', universe: 'Dragon Ball',
+    rarity: 'Useless', color: RARITIES.Useless.color, power: 1200, weight: 1
+  };
+  game.roster = [{ ...yamchaCard, awakenPhase: 0 }];
+  game.phase = 'match';
+  game.forceNextMatchLoss = true;
+  const displayName = '💥 YAMCHA TEST 💥';
+  game.playerName = displayName;
+  playerNameDisplay.textContent = displayName;
+  logEvent('💥 Yamcha test mode activated — your next match is a guaranteed loss.');
+  closeNameOverlay();
+  refreshUI();
+}
+
 function submitName() {
   const raw = nameInput.value.trim();
   if (raw === GODMODE_CODE) {
     activateGodMode();
+    return;
+  }
+  if (raw === YAMCHA_TEST_CODE) {
+    activateYamchaTestMode();
     return;
   }
   if (!raw) { nameError.textContent = 'Enter a name to continue.'; nameError.classList.remove('hidden'); return; }
@@ -3691,6 +3717,18 @@ function resolveMatch(opponent) {
   let bonus = 0;
   let forcedWin = false;
   let note = '';
+  if (game.forceNextMatchLoss) {
+    game.forceNextMatchLoss = false;
+    game.lastWinChance = 0.05;
+    const decoyPool = [
+      { name: 'Victory', icon: '🏆', color: '#2ecc71', win: true, weight: 50, sub: 'Result' },
+      { name: 'Defeat', icon: '💀', color: '#e74c3c', win: false, weight: 50, sub: 'Result' }
+    ];
+    runRoulette(decoyPool, `Match: vs ${opponent.name}!`, outcome => handleMatchResult(opponent, outcome), {
+      forcedWinner: { name: 'Defeat', icon: '💀', color: '#e74c3c', win: false, sub: 'Result' }
+    });
+    return;
+  }
   if (game.items.twinMoon > 0) {
     game.items.twinMoon--;
     forcedWin = true;
