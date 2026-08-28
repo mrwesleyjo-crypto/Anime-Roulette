@@ -348,6 +348,21 @@ function getAvailableSpecialFusion() {
   return SPECIAL_FUSIONS.find(f => owned.has(f.pair[0]) && owned.has(f.pair[1])) || null;
 }
 
+// If you already own exactly one half of a special-fusion pair, your next
+// Scout gets nudged toward finding the missing half — turns the fusion into
+// a reachable mini-quest instead of pure double-luck.
+function getMissingFusionPartners() {
+  const owned = new Set(game.roster.map(c => c.baseName || c.name));
+  const missing = [];
+  SPECIAL_FUSIONS.forEach(f => {
+    const hasFirst = owned.has(f.pair[0]);
+    const hasSecond = owned.has(f.pair[1]);
+    if (hasFirst && !hasSecond) missing.push(f.pair[1]);
+    else if (hasSecond && !hasFirst) missing.push(f.pair[0]);
+  });
+  return missing;
+}
+
 // ---------------------------------------------------------------------------
 // Team synergies — evaluated live against your current roster. Only the
 // single best-matching synergy applies at a time (no stacking) and grants a
@@ -2087,6 +2102,20 @@ function renderRosterSidebar() {
     card.className = 'roster-card';
     card.style.setProperty('--rarity-color', c.color);
 
+    const chainForCard = AWAKENING_CHAINS[c.baseName || c.name];
+    const isMaxAwakened = chainForCard && c.awakenPhase >= chainForCard.length;
+    if (isMaxAwakened) {
+      card.classList.add('max-awakened');
+      const crown = document.createElement('span');
+      crown.className = 'max-awakened-crown';
+      crown.textContent = '👑';
+      const cornerTL = document.createElement('span');
+      cornerTL.className = 'max-awakened-corner tl';
+      const cornerBR = document.createElement('span');
+      cornerBR.className = 'max-awakened-corner br';
+      card.append(crown, cornerTL, cornerBR);
+    }
+
     const image = document.createElement('div');
     image.className = 'roster-card-image';
     attachAvatarImage(image, c.name, 'character', initials(c.name));
@@ -3236,7 +3265,10 @@ function buildEventPool() {
   }
   entries.push({ value: 'item', weight: 10 * decay });
   if (game.tierIndex >= AWAKENING_UNLOCK_TIER && awakenableRoster().length > 0) {
-    entries.push({ value: 'awaken', weight: 8 });
+    // Weight scales with how many awakenable fighters you have, so multi-phase
+    // chains (which need several awaken events on the same fighter) stay
+    // realistically reachable instead of a near-impossible needle in a haystack.
+    entries.push({ value: 'awaken', weight: 20 + awakenableRoster().length * 8 });
   }
   if (career.unlockedSecretOpponent) {
     entries.push({ value: 'secret', weight: 5 });
@@ -3311,6 +3343,12 @@ function startScoutSpin() {
     pool = boosted.length > 0 ? boosted : ACTIVE_POOL;
     usedRift = true;
   }
+
+  const missingPartners = getMissingFusionPartners();
+  if (missingPartners.length > 0) {
+    pool = pool.map(c => missingPartners.includes(c.baseName || c.name) ? { ...c, weight: c.weight * 10 } : c);
+  }
+
   pool = poolExcludingRoster(pool);
   runRoulette(pool, PHASE_TITLES.scout, winnerRaw => {
     const winner = applyMasteryBonus(winnerRaw);
@@ -3318,6 +3356,7 @@ function startScoutSpin() {
     trackScoutedCharacter(winner);
     if (usedDango) logEvent('🍡 Lucky Dango Skewer guaranteed a Rare-or-better scout!');
     if (usedRift) logEvent('⚠️ The Dimensional Rift boosted this scout to Epic-or-better!');
+    if (missingPartners.includes(winner.baseName || winner.name)) logEvent(`✨ A familiar aura draws ${winner.name} to your team...`);
     game.phase = 'action';
     runProgressionChecks();
     refreshUI();
@@ -3325,7 +3364,11 @@ function startScoutSpin() {
 }
 
 function startTradeSpin() {
-  const pool = poolExcludingRoster(ACTIVE_POOL);
+  let pool = poolExcludingRoster(ACTIVE_POOL);
+  const missingPartners = getMissingFusionPartners();
+  if (missingPartners.length > 0) {
+    pool = pool.map(c => missingPartners.includes(c.baseName || c.name) ? { ...c, weight: c.weight * 10 } : c);
+  }
   runRoulette(pool, PHASE_TITLES.trade, winnerRaw => {
     const winner = applyMasteryBonus(winnerRaw);
     if (game.roster.length === 0) {
@@ -3408,6 +3451,7 @@ function startAwakenSpin() {
     if (!target) { game.phase = 'action'; refreshUI(); return; }
     const chain = AWAKENING_CHAINS[target.baseName || target.name];
     const phaseData = chain[target.awakenPhase];
+    const oldPower = target.power;
     target.power = Math.min(MAX_POWER, Math.round(target.power * phaseData.multiplier));
     target.rarity = phaseData.newRarity;
     target.color = RARITIES[phaseData.newRarity].color;
@@ -3419,9 +3463,58 @@ function startAwakenSpin() {
     game.phase = 'action';
     runProgressionChecks();
     refreshUI();
-    showCelebration(`${target.name}: ${phaseData.label}!`, phaseData.flavor, phaseData.icon);
+    showAwakenReveal(target, phaseData, oldPower);
   });
 }
+
+// ---------------------------------------------------------------------------
+// Epic awakening reveal popup — character portrait, rarity-colored rays,
+// power comparison, sound + screen effects reused from the gacha reveal system.
+// ---------------------------------------------------------------------------
+
+const awakenRevealOverlay = document.getElementById('awaken-reveal-overlay');
+const awakenRevealModal = document.getElementById('awaken-reveal-modal');
+const awakenRevealPortrait = document.getElementById('awaken-reveal-portrait');
+const awakenRevealIcon = document.getElementById('awaken-reveal-icon');
+const awakenRevealTitle = document.getElementById('awaken-reveal-title');
+const awakenRevealSubtitle = document.getElementById('awaken-reveal-subtitle');
+const awakenRevealFlavor = document.getElementById('awaken-reveal-flavor');
+const awakenRevealPower = document.getElementById('awaken-reveal-power');
+const awakenRevealContinue = document.getElementById('awaken-reveal-continue');
+
+function showAwakenReveal(character, phaseData, oldPower) {
+  awakenRevealModal.style.setProperty('--rarity-color', character.color);
+  awakenRevealIcon.textContent = phaseData.icon;
+  awakenRevealTitle.textContent = `${character.baseName || character.name} Awakens!`;
+  awakenRevealSubtitle.textContent = phaseData.label;
+  awakenRevealFlavor.textContent = phaseData.flavor;
+  awakenRevealPower.textContent = `Power ${oldPower} → ${character.power}`;
+
+  awakenRevealPortrait.innerHTML = '';
+  awakenRevealPortrait.style.setProperty('--rarity-color', character.color);
+  const fallback = document.createElement('span');
+  fallback.className = 'avatar-fallback-text';
+  fallback.textContent = initials(character.baseName || character.name);
+  awakenRevealPortrait.appendChild(fallback);
+  const img = document.createElement('img');
+  img.className = 'char-img';
+  img.alt = character.name;
+  img.onload = () => awakenRevealPortrait.classList.add('has-image');
+  img.onerror = () => img.remove();
+  img.src = imagePathFor(character.name, 'character');
+  awakenRevealPortrait.appendChild(img);
+
+  awakenRevealOverlay.classList.remove('hidden');
+  triggerRevealEffects(RARITY_RANK[character.rarity] >= RARITY_RANK.Legendary ? 'Legendary' : 'Epic', character.color);
+  mainBtn.disabled = true;
+}
+
+function hideAwakenReveal() {
+  awakenRevealOverlay.classList.add('hidden');
+  refreshUI();
+}
+
+awakenRevealContinue.addEventListener('click', hideAwakenReveal);
 
 // Actually merges two roster members into one permanent fusion character —
 // this costs a roster slot (2 members become 1), which is the real balance
@@ -3559,6 +3652,33 @@ function handleMatchResult(opponent, outcome) {
   career.battlesLost += 1;
   career.lossesByOpponent[opponent.name] = (career.lossesByOpponent[opponent.name] || 0) + 1;
   logEvent(`❌ Lost to ${opponent.name}`);
+
+  // "Gear Fifth happened because Luffy lost to Kaido." — if Luffy is sitting
+  // in his 2nd awakened form (Gear Fourth) when a defeat lands, despair
+  // triggers his final awakening immediately, no roulette needed — and the
+  // awakening itself IS the comeback, so it revives you even with zero
+  // Phoenix Embers left. Otherwise the moment would be pointless.
+  const luffyGear4 = game.roster.find(c => (c.baseName || c.name) === 'Monkey D. Luffy' && c.awakenPhase === 2);
+  if (luffyGear4) {
+    const chain = AWAKENING_CHAINS['Monkey D. Luffy'];
+    const phaseData = chain[luffyGear4.awakenPhase];
+    const oldPower = luffyGear4.power;
+    luffyGear4.power = Math.min(MAX_POWER, Math.round(luffyGear4.power * phaseData.multiplier));
+    luffyGear4.rarity = phaseData.newRarity;
+    luffyGear4.color = RARITIES[phaseData.newRarity].color;
+    luffyGear4.name = `${luffyGear4.baseName} (${phaseData.label})`;
+    luffyGear4.sub = `${luffyGear4.universe} · ${luffyGear4.rarity}`;
+    luffyGear4.awakenPhase++;
+    if (luffyGear4.power > career.highestPower) career.highestPower = luffyGear4.power;
+    logEvent(`☀️ Defeat becomes the catalyst — ${luffyGear4.name} awakens: ${phaseData.label}! (Power ${luffyGear4.power})`);
+    career.phoenixSaves += 1;
+    showEventPanel('success', `You were about to fall to <b>${opponent.name}</b> — but defeat itself was the spark. <b>${luffyGear4.name}</b> awakens: <b>${phaseData.label}</b>!`);
+    game.phase = 'action';
+    runProgressionChecks();
+    refreshUI();
+    showAwakenReveal(luffyGear4, phaseData, oldPower);
+    return;
+  }
 
   if (game.godMode || game.items.phoenixEmber > 0) {
     if (!game.godMode) game.items.phoenixEmber--;
