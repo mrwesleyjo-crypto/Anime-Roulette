@@ -270,6 +270,66 @@ h1 {
 }
 
 @media (max-width: 760px) {
+  /* Always-visible compact roster bar pinned to the bottom of the screen —
+     the full roster/stats panels live further down the page and get
+     scrolled out of view while spinning, so this keeps your team visible
+     no matter where you've scrolled. */
+  .mobile-roster-bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 120;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: rgba(10, 6, 20, 0.96);
+    border-top: 1px solid var(--league-border, rgba(0,229,255,0.25));
+    box-shadow: 0 -6px 20px rgba(0,0,0,0.5);
+  }
+
+  .mobile-roster-bar-list {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .mobile-roster-bar-avatar {
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 2px solid var(--rarity-color, #00e5ff);
+  }
+
+  .mobile-roster-bar-power {
+    flex-shrink: 0;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #ffd24d;
+    white-space: nowrap;
+    padding-left: 8px;
+    border-left: 1px solid rgba(255,255,255,0.15);
+  }
+
+  body {
+    padding-bottom: 62px;
+  }
+}
+
+@media (min-width: 761px) {
+  .mobile-roster-bar {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
   /* backdrop-filter is a common cause of repaint/ghosting glitches on
      mobile GPUs, especially combined with live CSS transitions — drop it
      on small screens and fall back to the (already opaque-ish) solid tint. */
@@ -303,6 +363,7 @@ h1 {
   }
   .strip-item {
     width: 120px;
+    height: 140px;
   }
   button {
     padding: 13px 24px;
@@ -341,6 +402,7 @@ h1 {
   }
   .strip-item {
     width: 100px;
+    height: 122px;
   }
   .roulette-viewport {
     height: 140px;
@@ -508,8 +570,8 @@ h1 {
 }
 
 .strip-item .avatar.action-icon-avatar {
-  width: 84px;
-  height: 84px;
+  width: 78%;
+  height: 78%;
   border-radius: 16px;
   background: rgba(255,255,255,0.05);
 }
