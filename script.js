@@ -1457,6 +1457,15 @@ const dailyQuestList = document.getElementById('daily-quest-list');
 const trophyCase = document.getElementById('trophy-case');
 const bracketTitle = document.getElementById('bracket-title');
 const leagueProgress = document.getElementById('league-progress');
+const playerStatAvatar = document.getElementById('player-stat-avatar');
+const playerStatName = document.getElementById('player-stat-name');
+const playerStatLeague = document.getElementById('player-stat-league');
+const playerStatWins = document.getElementById('player-stat-wins');
+const playerStatLosses = document.getElementById('player-stat-losses');
+const playerStatWinrate = document.getElementById('player-stat-winrate');
+const leagueBannerCount = document.getElementById('league-banner-count');
+const leagueBannerSub = document.getElementById('league-banner-sub');
+const dailyResetCountdown = document.getElementById('daily-reset-countdown');
 const bracketPath = document.getElementById('bracket-path');
 const shardBalanceInline = document.getElementById('shard-balance-inline');
 
@@ -1776,7 +1785,18 @@ function fitTextToOneLine(el, maxSizeRem, minSizeRem) {
 function renderStrip(items) {
   track.innerHTML = '';
   const fragment = document.createDocumentFragment();
-  items.forEach(entry => fragment.appendChild(createItemEl(entry)));
+  items.forEach((entry, i) => {
+    const el = createItemEl(entry);
+    // Subtle "barrel" tilt based on distance from the winner slot — an
+    // approximation of a curved 3D reel using flat CSS, cheap enough to
+    // set once at render time instead of recalculating every frame.
+    const dist = i - WINNER_INDEX;
+    const tilt = Math.max(-16, Math.min(16, dist * 3.5));
+    const scale = Math.max(0.9, 1 - Math.abs(dist) * 0.012);
+    el.style.setProperty('--tilt', `${tilt}deg`);
+    el.style.setProperty('--reel-scale', scale);
+    fragment.appendChild(el);
+  });
   track.appendChild(fragment);
   track.querySelectorAll('.strip-item .name').forEach(el => fitTextToOneLine(el, 0.8, 0.5));
 }
@@ -2303,6 +2323,43 @@ function renderTrophyCase() {
   });
 }
 
+function renderPlayerStatCard() {
+  const name = game.playerName || 'Anonymous';
+  playerStatAvatar.textContent = initials(name);
+  playerStatName.textContent = name;
+  playerStatLeague.textContent = game.finaleWon ? 'Multiverse Champion' : `${currentTier().name}`;
+  const wins = career.battlesWon || 0;
+  const losses = career.battlesLost || 0;
+  const total = wins + losses;
+  playerStatWins.textContent = wins;
+  playerStatLosses.textContent = losses;
+  playerStatWinrate.textContent = total > 0 ? `${Math.round((wins / total) * 100)}%` : '—';
+
+  const tier = currentTier();
+  if (game.finaleWon) {
+    leagueBannerCount.textContent = '👑 Champion';
+    leagueBannerSub.textContent = 'multiverse conquered';
+  } else {
+    const winsInLeague = Math.min(game.roundIndex, tier.bracket.length);
+    leagueBannerCount.textContent = `${winsInLeague} / ${tier.bracket.length}`;
+    const isLastLeague = game.tierIndex >= TIERS.length - 1;
+    leagueBannerSub.textContent = isLastLeague ? 'wins to become Champion' : `wins to ${TIERS[game.tierIndex + 1].name}`;
+  }
+}
+
+function updateDailyResetCountdown() {
+  if (!dailyResetCountdown) return;
+  const now = new Date();
+  const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
+  const msLeft = midnight - now;
+  const hh = Math.floor(msLeft / 3600000);
+  const mm = Math.floor((msLeft % 3600000) / 60000);
+  const ss = Math.floor((msLeft % 60000) / 1000);
+  dailyResetCountdown.textContent = `${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}:${String(ss).padStart(2, '0')}`;
+}
+setInterval(updateDailyResetCountdown, 1000);
+updateDailyResetCountdown();
+
 function renderBracket() {
   const tier = currentTier();
   bracketTitle.textContent = game.finaleWon ? 'Tournament Complete — Multiverse Champion!' : `${tier.name} — Bracket`;
@@ -2402,6 +2459,7 @@ function refreshUI() {
   applyLeagueTheme();
   document.body.classList.toggle('pre-draft', game.roster.length === 0 && !game.godMode);
   renderRosterSidebar();
+  renderPlayerStatCard();
   renderItemsSidebar();
   renderDailyQuests();
   renderTrophyCase();
