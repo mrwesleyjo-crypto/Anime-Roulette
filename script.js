@@ -795,13 +795,13 @@ const SECRET_OPPONENT = {
 const TOTAL_MATCHES = TIERS.length * 4; // 24 — the full-clear score
 
 const ACTION_META = {
-  scout: { name: 'Scout', icon: '🥷', kanji: '偵察', color: '#2ecc71' },
-  train: { name: 'Train', icon: '🥋', kanji: '修行', color: '#f1c40f' },
-  trade: { name: 'Dimensional Swap', icon: '🌌', kanji: '次元', color: '#3498db' },
-  match: { name: 'Match', icon: '⚔️', kanji: '決闘', color: '#e67e22' },
-  item: { name: 'Treasure', icon: '🎁', kanji: '秘宝', color: '#ff9f43' },
-  awaken: { name: 'Awakening', icon: '💥', kanji: '覚醒', color: '#ff6b81' },
-  fusion: { name: 'Fusion', icon: '🌀', kanji: '融合', color: '#00e5ff' }
+  scout: { name: 'Scout', icon: '🥷', color: '#2ecc71' },
+  train: { name: 'Train', icon: '🥋', color: '#f1c40f' },
+  trade: { name: 'Dimensional Swap', icon: '🌌', color: '#3498db' },
+  match: { name: 'Match', icon: '⚔️', color: '#e67e22' },
+  item: { name: 'Treasure', icon: '🎁', color: '#ff9f43' },
+  awaken: { name: 'Awakening', icon: '💥', color: '#ff6b81' },
+  fusion: { name: 'Fusion', icon: '🌀', color: '#00e5ff' }
 };
 
 const PHASE_LABELS = {
@@ -1552,7 +1552,7 @@ const ICON_IMAGE_DIR = 'images/icons/';
 // Optional custom icons for the roulette's action events — drop PNGs into
 // images/icons/ named exactly: scout.png, train.png, trade.png, match.png,
 // item.png. Missing ones just keep their emoji icon — nothing breaks.
-const ACTION_ICON_KEYS = ['scout', 'train', 'trade', 'match', 'item'];
+const ACTION_ICON_KEYS = ['scout', 'train', 'trade', 'match', 'item', 'awaken'];
 
 // Optional custom battle-intro background — drop a "vs-background.png" into
 // images/ui/ (any wide image works, it gets cropped to fill nicely) and it
@@ -3217,7 +3217,7 @@ function buildEventPool() {
   // very next event completely — 100% guaranteed, no other outcome possible.
   const special = getAvailableSpecialFusion();
   if (special) {
-    return [{ value: 'fusion', name: `${special.name} Fusion!`, icon: special.icon, color: special.color, weight: 100, sub: `Event · ${ACTION_META.fusion.kanji}` }];
+    return [{ value: 'fusion', name: `${special.name} Fusion!`, icon: special.icon, color: special.color, weight: 100, sub: 'Event' }];
   }
 
   // The longer you avoid a match (scouting/trading/opening treasure instead),
@@ -3241,7 +3241,7 @@ function buildEventPool() {
   if (career.unlockedSecretOpponent) {
     entries.push({ value: 'secret', weight: 5 });
   }
-  return entries.map(e => ({ ...ACTION_META[e.value], value: e.value, weight: e.weight, sub: `Event · ${ACTION_META[e.value].kanji}` }));
+  return entries.map(e => ({ ...ACTION_META[e.value], value: e.value, weight: e.weight, sub: 'Event' }));
 }
 
 // ---------------------------------------------------------------------------

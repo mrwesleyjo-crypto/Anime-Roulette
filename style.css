@@ -81,24 +81,6 @@ h1 {
   text-shadow: 0 0 30px rgba(0, 229, 255, 0.25);
 }
 
-.kanji-badge {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 0.55rem;
-  font-weight: 700;
-  letter-spacing: 2px;
-  vertical-align: middle;
-  padding: 3px 8px;
-  border-radius: 6px;
-  border: 1px solid var(--league-border, rgba(0,229,255,0.3));
-  color: var(--league-text, #00e5ff);
-  background: rgba(0,0,0,0.25);
-  -webkit-background-clip: initial;
-  background-clip: initial;
-  -webkit-text-fill-color: var(--league-text, #00e5ff);
-  text-shadow: none;
-  transition: color 0.8s ease, border-color 0.8s ease;
-}
-
 .player-id {
   font-size: 0.8rem;
   color: #a9a3c2;
