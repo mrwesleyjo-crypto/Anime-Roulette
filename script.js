@@ -3928,6 +3928,30 @@ function handleMainButtonClick() {
 // Init
 // ---------------------------------------------------------------------------
 
+// Warm the browser's image cache with every character/villain portrait the
+// game could possibly show, right away in the background — so by the time
+// you actually spin, images load instantly instead of racing the animation
+// and briefly showing the text fallback.
+function preloadAllGameArt() {
+  const characterNames = new Set();
+  Object.values(ROSTER_BY_RARITY).forEach(list => list.forEach(c => characterNames.add(c.name)));
+  Object.values(BONUS_PACK_ROSTER).forEach(list => list.forEach(c => characterNames.add(c.name)));
+  MYTHIC_ROSTER.forEach(c => characterNames.add(c.name));
+  Object.keys(AWAKENING_CHAINS).forEach(baseName => {
+    AWAKENING_CHAINS[baseName].forEach(phase => characterNames.add(`${baseName} (${phase.label})`));
+  });
+  SPECIAL_FUSIONS.forEach(f => characterNames.add(f.name));
+  characterNames.add(SECRET_PULL_CHARACTER.name);
+  characterNames.add(SHARE_UNLOCK_CHARACTER.name);
+  characterNames.forEach(name => { const img = new Image(); img.src = imagePathFor(name, 'character'); });
+
+  const villainNames = new Set();
+  TIERS.forEach(tier => tier.bracket.forEach(v => villainNames.add(v.name)));
+  villainNames.add(SECRET_OPPONENT.name);
+  villainNames.forEach(name => { const img = new Image(); img.src = imagePathFor(name, 'villain'); });
+}
+preloadAllGameArt();
+
 renderStrip(Array.from({ length: 20 }, () => weightedPick(ACTIVE_POOL)));
 mainBtn.addEventListener('click', handleMainButtonClick);
 
