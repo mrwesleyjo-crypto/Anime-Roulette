@@ -1456,6 +1456,7 @@ const itemsList = document.getElementById('items-list');
 const dailyQuestList = document.getElementById('daily-quest-list');
 const trophyCase = document.getElementById('trophy-case');
 const bracketTitle = document.getElementById('bracket-title');
+const leagueProgress = document.getElementById('league-progress');
 const bracketPath = document.getElementById('bracket-path');
 const shardBalanceInline = document.getElementById('shard-balance-inline');
 
@@ -1721,6 +1722,11 @@ function createItemEl(entry) {
   const el = document.createElement('div');
   el.className = 'strip-item';
   el.style.setProperty('--rarity-color', entry.color);
+  if (entry.rarity && (RARITY_RANK[entry.rarity] >= RARITY_RANK.Legendary)) {
+    el.classList.add('rarity-glow-strong');
+  } else if (entry.rarity && RARITY_RANK[entry.rarity] >= RARITY_RANK.Epic) {
+    el.classList.add('rarity-glow-soft');
+  }
   const avatar = document.createElement('div');
   avatar.className = 'avatar';
   if (entry.universe) {
@@ -2104,6 +2110,8 @@ function runProgressionChecks() {
 // ---------------------------------------------------------------------------
 
 function logEvent(text) {
+  const emptyMsg = logList.querySelector('.log-empty');
+  if (emptyMsg) emptyMsg.remove();
   const row = document.createElement('div');
   row.textContent = text;
   logList.prepend(row);
@@ -2145,10 +2153,18 @@ function renderRosterSidebar() {
 
   rosterList.innerHTML = '';
   if (game.roster.length === 0) {
-    const empty = document.createElement('span');
-    empty.className = 'roster-empty';
-    empty.textContent = 'No fighters yet — spin to draft your first one!';
-    rosterList.appendChild(empty);
+    rosterList.innerHTML = `
+      <div class="journey-empty">
+        <div class="journey-empty-title">Your Journey Begins</div>
+        <div class="journey-empty-text">Draft your first fighter and start building your Multiverse team.</div>
+        <div class="journey-steps">
+          <div class="journey-step active"><span class="journey-dot"></span>Draft a fighter</div>
+          <div class="journey-step-line"></div>
+          <div class="journey-step"><span class="journey-dot"></span>Build your team</div>
+          <div class="journey-step-line"></div>
+          <div class="journey-step"><span class="journey-dot"></span>Become Champion</div>
+        </div>
+      </div>`;
     return;
   }
   game.roster.forEach(c => {
@@ -2291,6 +2307,19 @@ function renderBracket() {
   const tier = currentTier();
   bracketTitle.textContent = game.finaleWon ? 'Tournament Complete — Multiverse Champion!' : `${tier.name} — Bracket`;
   bracketPath.innerHTML = '';
+
+  if (leagueProgress) {
+    if (game.finaleWon) {
+      leagueProgress.textContent = '';
+    } else {
+      const winsInLeague = Math.min(game.roundIndex, tier.bracket.length);
+      const isLastLeague = game.tierIndex >= TIERS.length - 1;
+      leagueProgress.innerHTML = isLastLeague
+        ? `<b>${winsInLeague} / ${tier.bracket.length}</b> wins to become Champion`
+        : `<b>${winsInLeague} / ${tier.bracket.length}</b> wins to ${TIERS[game.tierIndex + 1].name}`;
+    }
+  }
+
   tier.bracket.forEach((opponent, i) => {
     if (i > 0) {
       const arrow = document.createElement('span');
@@ -2371,6 +2400,7 @@ function applyLeagueTheme() {
 function refreshUI() {
   flushPlaytime();
   applyLeagueTheme();
+  document.body.classList.toggle('pre-draft', game.roster.length === 0 && !game.godMode);
   renderRosterSidebar();
   renderItemsSidebar();
   renderDailyQuests();
@@ -4027,7 +4057,7 @@ function resetGame() {
     game.godMode = true;
     game.items.phoenixEmber = 99;
   }
-  logList.innerHTML = '';
+  logList.innerHTML = '<span class="log-empty">Your tournament log will fill up here once you start spinning.</span>';
   eventPanel.className = 'event-panel hidden';
   eventPanel.innerHTML = '';
   renderStrip(Array.from({ length: 20 }, () => weightedPick(ACTIVE_POOL)));

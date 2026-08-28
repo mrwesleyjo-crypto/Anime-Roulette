@@ -706,10 +706,10 @@ h1 {
 }
 
 .roster-card-universe {
-  font-size: 0.56rem;
+  font-size: 0.62rem;
   font-weight: 600;
-  color: #a9a3c2;
-  line-height: 1.2;
+  color: #b9b4d4;
+  line-height: 1.25;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -2549,3 +2549,156 @@ button:disabled {
   color: #5a5570;
 }
 
+
+/* =====================================================================
+   First-time onboarding — a single state class toggled from JS whenever
+   the roster is empty. Nothing is removed or hidden, everything just
+   steps back visually so the draft area reads as the obvious next move.
+   ===================================================================== */
+
+body.pre-draft .trophy-case,
+body.pre-draft .bracket-panel,
+body.pre-draft .log-panel,
+body.pre-draft .leaderboard-panel,
+body.pre-draft .items-label,
+body.pre-draft #items-list,
+body.pre-draft .quest-list,
+body.pre-draft #daily-quest-list,
+body.pre-draft .support-card {
+  opacity: 0.5;
+  transition: opacity 0.5s ease;
+}
+
+body.pre-draft .trophy-case:hover,
+body.pre-draft .bracket-panel:hover,
+body.pre-draft .log-panel:hover,
+body.pre-draft .leaderboard-panel:hover,
+body.pre-draft #items-list:hover,
+body.pre-draft .quest-list:hover,
+body.pre-draft .support-card:hover {
+  opacity: 0.85;
+}
+
+body.pre-draft .roulette-viewport {
+  box-shadow: 0 0 55px var(--league-glow, rgba(0,229,255,0.3)), inset 0 0 30px rgba(0,0,0,0.3);
+}
+
+body.pre-draft #main-btn {
+  animation: preDraftPulse 2.2s ease-in-out infinite;
+}
+
+@keyframes preDraftPulse {
+  0%, 100% { box-shadow: 0 0 18px rgba(255,45,107,0.5); }
+  50% { box-shadow: 0 0 34px rgba(255,45,107,0.85); }
+}
+
+/* ---------- Onboarding journey steps (empty roster state) ---------- */
+
+.journey-empty {
+  text-align: center;
+  padding: 10px 4px 6px;
+}
+
+.journey-empty-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.95rem;
+  color: #ffd24d;
+  text-shadow: 0 0 14px rgba(255,210,77,0.4);
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
+}
+
+.journey-empty-text {
+  font-size: 0.78rem;
+  color: #c7c2df;
+  line-height: 1.4;
+  margin-bottom: 16px;
+}
+
+.journey-steps {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  padding-left: 4px;
+}
+
+.journey-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #6c6c78;
+  padding: 4px 0;
+}
+
+.journey-step.active {
+  color: #ffffff;
+}
+
+.journey-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid #6c6c78;
+  flex-shrink: 0;
+}
+
+.journey-step.active .journey-dot {
+  background: #ff2d6b;
+  border-color: #ff2d6b;
+  box-shadow: 0 0 8px rgba(255,45,107,0.7);
+}
+
+.journey-step-line {
+  width: 2px;
+  height: 14px;
+  background: #3a3550;
+  margin-left: 4px;
+}
+
+/* ---------- Fighter cards as the hero (roulette strip) ---------- */
+
+@media (hover: hover) {
+  .strip-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.4), 0 0 16px var(--rarity-color, #555), inset 0 0 20px rgba(0,0,0,0.3);
+  }
+}
+
+.strip-item .name {
+  text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+}
+
+/* ---------- League progress line ---------- */
+
+.league-progress {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #a9a3c2;
+  margin-top: 2px;
+  letter-spacing: 0.3px;
+}
+
+.league-progress b {
+  color: #00e5ff;
+}
+
+/* ---------- Empty log state ---------- */
+
+.log-empty {
+  color: #6c6c78;
+  font-size: 0.78rem;
+  font-style: italic;
+  font-weight: 600;
+}
+
+/* Legendary/Mythic fighter cards get a permanent soft glow even before you
+   hover or land on them — a "these are the exciting ones" signal at a glance. */
+.strip-item.rarity-glow-soft {
+  box-shadow: 0 0 12px var(--rarity-color, transparent), inset 0 0 20px rgba(0,0,0,0.4);
+}
+.strip-item.rarity-glow-strong {
+  box-shadow: 0 0 18px var(--rarity-color, transparent), inset 0 0 20px rgba(0,0,0,0.4);
+}
