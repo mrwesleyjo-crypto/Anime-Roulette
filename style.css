@@ -652,6 +652,16 @@ h1 {
   z-index: 2;
 }
 
+/* Cutout art on a transparent background looks bad cropped to fill the
+   frame — show the whole image instead, letting the rarity-colored
+   background behind it show through the transparent parts. */
+.has-transparency .char-img {
+  object-fit: contain !important;
+  object-position: center !important;
+  padding: 3%;
+  box-sizing: border-box;
+}
+
 .action-icon-img {
   object-fit: contain !important;
   object-position: center !important;

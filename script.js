@@ -1600,6 +1600,32 @@ function imagePathFor(name, kind) {
 // Renders into `container`: a fallback text/icon (shown by default) plus an
 // <img> that, if it loads successfully, covers the fallback. If the image
 // 404s, it silently removes itself and the fallback stays visible.
+// Some source images are full-bleed scenes (work great with a cropping
+// object-fit: cover), others are character cutouts on a transparent
+// background (cover would zoom awkwardly into empty space). This checks the
+// actual pixel alpha data after load and picks whichever fit looks right.
+function detectMostlyTransparent(img, callback) {
+  try {
+    const w = Math.min(img.naturalWidth || 64, 64);
+    const h = Math.min(img.naturalHeight || 64, 64);
+    if (!w || !h) { callback(false); return; }
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, w, h);
+    const data = ctx.getImageData(0, 0, w, h).data;
+    let transparentCount = 0;
+    const totalPixels = data.length / 4;
+    for (let i = 3; i < data.length; i += 4) {
+      if (data[i] < 200) transparentCount++;
+    }
+    callback((transparentCount / totalPixels) > 0.18);
+  } catch (e) {
+    callback(false); // canvas security error or similar — keep the default
+  }
+}
+
 function attachAvatarImage(container, name, kind, fallbackText) {
   const fallback = document.createElement('span');
   fallback.className = 'avatar-fallback-text';
@@ -1610,7 +1636,12 @@ function attachAvatarImage(container, name, kind, fallbackText) {
   img.className = 'char-img';
   img.alt = name;
   img.loading = 'lazy';
-  img.onload = () => container.classList.add('has-image');
+  img.onload = () => {
+    container.classList.add('has-image');
+    detectMostlyTransparent(img, isTransparent => {
+      if (isTransparent) container.classList.add('has-transparency');
+    });
+  };
   img.onerror = () => img.remove();
   img.src = imagePathFor(name, kind);
   container.appendChild(img);
@@ -2564,8 +2595,15 @@ function drawShareBadge(ctx, isChampion, opponentName, rosterImages) {
       ctx.arc(cx, cy, radius, 0, Math.PI * 2);
       ctx.closePath();
       ctx.clip();
-      const scale = Math.max((radius * 2) / img.width, (radius * 2) / img.height);
+      // "Contain" fit here (not cover) — small circular badge, and this way
+      // transparent-background cutout art never gets zoomed/cropped oddly.
+      const scale = Math.min((radius * 1.9) / img.width, (radius * 1.9) / img.height);
       const dw = img.width * scale, dh = img.height * scale;
+      const grad = ctx.createLinearGradient(cx - radius, cy - radius, cx + radius, cy + radius);
+      grad.addColorStop(0, c.color);
+      grad.addColorStop(1, '#0a0614');
+      ctx.fillStyle = grad;
+      ctx.fillRect(cx - radius, cy - radius, radius * 2, radius * 2);
       ctx.drawImage(img, cx - dw / 2, cy - dh / 2, dw, dh);
     } else {
       const grad = ctx.createLinearGradient(cx - radius, cy - radius, cx + radius, cy + radius);
@@ -3527,17 +3565,8 @@ function showAwakenReveal(character, phaseData, oldPower) {
 
   awakenRevealPortrait.innerHTML = '';
   awakenRevealPortrait.style.setProperty('--rarity-color', character.color);
-  const fallback = document.createElement('span');
-  fallback.className = 'avatar-fallback-text';
-  fallback.textContent = initials(character.baseName || character.name);
-  awakenRevealPortrait.appendChild(fallback);
-  const img = document.createElement('img');
-  img.className = 'char-img';
-  img.alt = character.name;
-  img.onload = () => awakenRevealPortrait.classList.add('has-image');
-  img.onerror = () => img.remove();
-  img.src = imagePathFor(character.name, 'character');
-  awakenRevealPortrait.appendChild(img);
+  awakenRevealPortrait.classList.remove('has-image', 'has-transparency');
+  attachAvatarImage(awakenRevealPortrait, character.name, 'character', initials(character.baseName || character.name));
 
   awakenRevealOverlay.classList.remove('hidden');
   triggerRevealEffects(RARITY_RANK[character.rarity] >= RARITY_RANK.Legendary ? 'Legendary' : 'Epic', character.color);
