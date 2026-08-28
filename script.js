@@ -1751,11 +1751,27 @@ function createItemEl(entry) {
   return el;
 }
 
+// Shrinks an element's font-size (instead of letting it wrap) until the text
+// fits on one line — keeps card layouts perfectly consistent no matter how
+// long a character's name is, instead of some cards being taller than others.
+function fitTextToOneLine(el, maxSizeRem, minSizeRem) {
+  if (!el) return;
+  let size = maxSizeRem;
+  el.style.fontSize = size + 'rem';
+  let guard = 0;
+  while (el.scrollWidth > el.clientWidth + 1 && size > minSizeRem && guard < 40) {
+    size -= 0.03;
+    el.style.fontSize = size + 'rem';
+    guard++;
+  }
+}
+
 function renderStrip(items) {
   track.innerHTML = '';
   const fragment = document.createDocumentFragment();
   items.forEach(entry => fragment.appendChild(createItemEl(entry)));
   track.appendChild(fragment);
+  track.querySelectorAll('.strip-item .name').forEach(el => fitTextToOneLine(el, 0.8, 0.5));
 }
 
 function targetTranslateX() {
@@ -2207,6 +2223,7 @@ function renderRosterSidebar() {
 
     card.append(image, body);
     rosterList.appendChild(card);
+    fitTextToOneLine(name, 0.66, 0.44);
   });
 }
 
@@ -3580,6 +3597,40 @@ function hideAwakenReveal() {
 
 awakenRevealContinue.addEventListener('click', hideAwakenReveal);
 
+// ---------------------------------------------------------------------------
+// Yamcha defeat easter egg — a lighthearted anime-fandom nod, purely for fun.
+// ---------------------------------------------------------------------------
+
+const YAMCHA_FLAVOR_LINES = [
+  "Yamcha has been defeated. Some things never change.",
+  "In the grand tradition of Yamcha, your solo run ends here — with dignity, mostly intact.",
+  "Yamcha's career win-rate remains an impressively consistent 0%.",
+  "A wild Saibaman was not even required this time. Yamcha simply lost.",
+  "Somewhere, a Dragon Ball fan nods knowingly.",
+  "Yamcha looked his opponent dead in the eyes... and lost anyway."
+];
+
+const yamchaOverlay = document.getElementById('yamcha-overlay');
+const yamchaFlavor = document.getElementById('yamcha-flavor');
+const yamchaContinue = document.getElementById('yamcha-continue');
+let yamchaResumeCallback = null;
+
+function showYamchaEasterEgg(onDismiss) {
+  yamchaResumeCallback = onDismiss || null;
+  yamchaFlavor.textContent = YAMCHA_FLAVOR_LINES[Math.floor(Math.random() * YAMCHA_FLAVOR_LINES.length)];
+  yamchaOverlay.classList.remove('hidden');
+  mainBtn.disabled = true;
+}
+
+function hideYamchaEasterEgg() {
+  yamchaOverlay.classList.add('hidden');
+  const cb = yamchaResumeCallback;
+  yamchaResumeCallback = null;
+  if (cb) cb();
+}
+
+yamchaContinue.addEventListener('click', hideYamchaEasterEgg);
+
 // Actually merges two roster members into one permanent fusion character —
 // this costs a roster slot (2 members become 1), which is the real balance
 // lever: fusing trades team size/synergy potential for raw power.
@@ -3714,6 +3765,18 @@ function handleMatchResult(opponent, outcome) {
   career.lossesByOpponent[opponent.name] = (career.lossesByOpponent[opponent.name] || 0) + 1;
   logEvent(`❌ Lost to ${opponent.name}`);
 
+  // Easter egg: losing with Yamcha as your one and only fighter is an
+  // anime-fandom rite of passage. Purely cosmetic — pause here for the fun
+  // aside, then resolve the real consequences once it's dismissed.
+  if (game.roster.length === 1 && (game.roster[0].baseName || game.roster[0].name) === 'Yamcha') {
+    showYamchaEasterEgg(() => resolveDefeatConsequences(opponent));
+    return;
+  }
+
+  resolveDefeatConsequences(opponent);
+}
+
+function resolveDefeatConsequences(opponent) {
   // "Gear Fifth happened because Luffy lost to Kaido." — if Luffy is sitting
   // in his 2nd awakened form (Gear Fourth) when a defeat lands, despair
   // triggers his final awakening immediately, no roulette needed — and the
