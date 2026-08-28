@@ -1942,7 +1942,13 @@ function runRoulette(pool, titleText, onComplete, options) {
   career.totalSpins += 1;
 
   const characterReveal = !!(options && options.characterReveal);
-  const winner = weightedPick(pool);
+  // A forced outcome (e.g. a guaranteed special fusion, or the ultra-rare
+  // secret pull) still needs to LOOK like a real gamble — so the winner is
+  // fixed, but the filler cards are drawn from a separate, varied decoy pool
+  // rather than repeating the same guaranteed result across the whole strip.
+  const forcedWinner = options && options.forcedWinner;
+  const decoyPool = (options && options.decoyPool) || pool;
+  const winner = forcedWinner || weightedPick(pool);
 
   const items = [];
   for (let i = 0; i < TOTAL_ITEMS; i++) {
@@ -1953,10 +1959,10 @@ function runRoulette(pool, titleText, onComplete, options) {
     // Fake-out: bias a few slots just before the pointer toward high-rarity
     // cards, so the strip teases a big pull even when the real winner is not one.
     if (characterReveal && i >= WINNER_INDEX - 5 && i < WINNER_INDEX && Math.random() < 0.3) {
-      const flashy = pool.filter(c => c.rarity && RARITY_RANK[c.rarity] >= RARITY_RANK.Epic);
-      items.push(flashy.length > 0 ? flashy[Math.floor(Math.random() * flashy.length)] : weightedPick(pool));
+      const flashy = decoyPool.filter(c => c.rarity && RARITY_RANK[c.rarity] >= RARITY_RANK.Epic);
+      items.push(flashy.length > 0 ? flashy[Math.floor(Math.random() * flashy.length)] : weightedPick(decoyPool));
     } else {
-      items.push(weightedPick(pool));
+      items.push(weightedPick(decoyPool));
     }
   }
   renderStrip(items);
@@ -3234,12 +3240,34 @@ function addToRoster(character) {
     showEventPanel('success', `You scouted <b>${c.name}</b>! (${c.universe} · ${c.rarity})`);
     return;
   }
-  const weakestIdx = game.roster.reduce((minI, t, i, arr) => (t.power < arr[minI].power ? i : minI), 0);
+
+  // Does this scout complete a special-fusion pair with someone already on
+  // the roster? If so, that's worth a slot even at lower raw power — but
+  // never at the cost of the very character that makes the fusion possible.
+  const cName = c.baseName || c.name;
+  const protectedNames = new Set();
+  SPECIAL_FUSIONS.forEach(f => {
+    if (!f.pair.includes(cName)) return;
+    const otherHalf = f.pair.find(p => p !== cName);
+    if (game.roster.some(m => (m.baseName || m.name) === otherHalf)) protectedNames.add(otherHalf);
+  });
+  const completesFusion = protectedNames.size > 0;
+
+  const candidates = game.roster.filter(m => !protectedNames.has(m.baseName || m.name));
+  const pool = candidates.length > 0 ? candidates : game.roster;
+  const weakestPick = pool.reduce((min, t) => (t.power < min.power ? t : min), pool[0]);
+  const weakestIdx = game.roster.indexOf(weakestPick);
   const weakest = game.roster[weakestIdx];
-  if (c.power > weakest.power) {
+
+  if (c.power > weakest.power || completesFusion) {
     game.roster[weakestIdx] = c;
-    logEvent(`🔁 ${weakest.name} replaced by ${c.name}`);
-    showEventPanel('success', `Your roster was full: <b>${weakest.name}</b> made way for <b>${c.name}</b> (${c.universe})!`);
+    if (completesFusion && c.power <= weakest.power) {
+      logEvent(`🔁 ${weakest.name} steps aside — ${c.name} completes a legendary fusion pair!`);
+      showEventPanel('success', `Your roster was full, but <b>${c.name}</b> completes a powerful fusion combo — <b>${weakest.name}</b> makes way!`);
+    } else {
+      logEvent(`🔁 ${weakest.name} replaced by ${c.name}`);
+      showEventPanel('success', `Your roster was full: <b>${weakest.name}</b> made way for <b>${c.name}</b> (${c.universe})!`);
+    }
   } else {
     logEvent(`↩️ ${c.name} walked away, your roster was already strong enough`);
     showEventPanel('info', `Your roster was full and already stronger than <b>${c.name}</b> — they moved on.`);
@@ -3247,13 +3275,6 @@ function addToRoster(character) {
 }
 
 function buildEventPool() {
-  // A ready special-pair fusion (e.g. Goku + Vegeta) always takes over the
-  // very next event completely — 100% guaranteed, no other outcome possible.
-  const special = getAvailableSpecialFusion();
-  if (special) {
-    return [{ value: 'fusion', name: `${special.name} Fusion!`, icon: special.icon, color: special.color, weight: 100, sub: 'Event' }];
-  }
-
   // The longer you avoid a match (scouting/trading/opening treasure instead),
   // the more the odds tilt toward forcing a match — you can't stall forever.
   const pressure = game.actionsSinceMatch || 0;
@@ -3300,6 +3321,15 @@ function startStarterSpin() {
 
 function startActionSpin() {
   const pool = buildEventPool();
+
+  // A ready special-pair fusion (e.g. Goku + Vegeta) always takes over the
+  // very next event — 100% guaranteed — but the strip still shows the normal
+  // varied mix of cards as it spins, so it never looks like an obvious fix.
+  const special = getAvailableSpecialFusion();
+  const forcedWinner = special
+    ? { value: 'fusion', name: `${special.name} Fusion!`, icon: special.icon, color: special.color, sub: 'Event' }
+    : null;
+
   runRoulette(pool, PHASE_TITLES.action, winner => {
     logEvent(`🎲 Event: ${winner.name}`);
     showEventPanel('info', `Coming up: <b>${winner.name}</b>`);
@@ -3314,7 +3344,7 @@ function startActionSpin() {
       showRiftPopup();
     }
     refreshUI();
-  });
+  }, { forcedWinner });
 }
 
 function startScoutSpin() {
@@ -3330,7 +3360,7 @@ function startScoutSpin() {
       game.phase = 'action';
       runProgressionChecks();
       refreshUI();
-    }, { characterReveal: true });
+    }, { characterReveal: true, forcedWinner: SECRET_PULL_CHARACTER, decoyPool: poolExcludingRoster(ACTIVE_POOL) });
     return;
   }
 
@@ -3564,20 +3594,17 @@ function startFusionSpin() {
   const special = getAvailableSpecialFusion();
   if (!special) { game.phase = 'action'; refreshUI(); return; }
 
-  const owned = new Set(game.roster.map(c => c.baseName || c.name));
-  const pairMembers = game.roster.filter(c => owned.has(c.baseName || c.name) && special.pair.includes(c.baseName || c.name));
-  const pool = pairMembers.map(c => ({ ...c, weight: 1 }));
-  runRoulette(pool.length > 0 ? pool : game.roster.map(c => ({ ...c, weight: 1 })), `Fusion: ${special.name}!`, () => {
-    const fused = performFusionMerge(special.pair[0], special.pair[1], special.name, special.icon, true);
-    if (fused) {
-      logEvent(`🌀 SPECIAL FUSION: ${special.pair[0]} + ${special.pair[1]} permanently merge into ${special.name}! (Power ${fused.power})`);
-      showEventPanel('success', `<b>${special.pair[0]}</b> and <b>${special.pair[1]}</b> permanently fuse into <b>${special.name}</b>! <b>Power ${fused.power}</b> — but they now share one roster slot.`);
-    }
-    game.phase = 'action';
-    runProgressionChecks();
-    refreshUI();
-    showCelebration(special.name, special.flavor, special.icon);
-  });
+  // No second "who fuses" spin needed — both members are already known and
+  // both are always used, so it goes straight to the reveal.
+  const fused = performFusionMerge(special.pair[0], special.pair[1], special.name, special.icon, true);
+  if (fused) {
+    logEvent(`🌀 SPECIAL FUSION: ${special.pair[0]} + ${special.pair[1]} permanently merge into ${special.name}! (Power ${fused.power})`);
+    showEventPanel('success', `<b>${special.pair[0]}</b> and <b>${special.pair[1]}</b> permanently fuse into <b>${special.name}</b>! <b>Power ${fused.power}</b> — but they now share one roster slot.`);
+  }
+  game.phase = 'action';
+  runProgressionChecks();
+  refreshUI();
+  showCelebration(special.name, special.flavor, special.icon);
 }
 
 function resolveMatch(opponent) {
