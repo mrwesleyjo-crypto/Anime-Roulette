@@ -32,7 +32,32 @@
 
     <div class="trophy-case" id="trophy-case"></div>
 
-    <div class="layout">
+    <div class="layout layout-3col">
+      <aside class="stats-col">
+        <div class="player-stat-card">
+          <div class="player-stat-avatar" id="player-stat-avatar"></div>
+          <div class="player-stat-name" id="player-stat-name">—</div>
+          <div class="player-stat-league" id="player-stat-league">Bronze League</div>
+          <div class="player-stat-rows">
+            <div class="player-stat-row"><span>Wins</span><b id="player-stat-wins">0</b></div>
+            <div class="player-stat-row"><span>Losses</span><b id="player-stat-losses">0</b></div>
+            <div class="player-stat-row"><span>Win Rate</span><b id="player-stat-winrate">—</b></div>
+          </div>
+        </div>
+
+        <span class="roster-label">Your Roster</span>
+        <div class="roster-power-summary" id="roster-power-summary">Team Power: 0 total · 0 avg</div>
+        <div class="power-tier-row" id="power-tier-row">
+          <span class="power-tier-label" id="power-tier-label">🌱 Rookie Fighter</span>
+          <div class="power-tier-bar"><div class="power-tier-bar-fill" id="power-tier-bar-fill"></div></div>
+        </div>
+        <div class="synergy-banner hidden" id="synergy-banner"></div>
+        <div class="roster-list" id="roster-list"></div>
+
+        <span class="roster-label items-label">Items</span>
+        <div class="items-list" id="items-list"></div>
+      </aside>
+
       <div class="main-col">
         <div class="bracket-panel">
           <span class="bracket-title" id="bracket-title">Bronze League — Bracket</span>
@@ -65,18 +90,17 @@
         </details>
       </div>
 
-      <aside class="sidebar">
-        <span class="roster-label">Your Roster</span>
-        <div class="roster-power-summary" id="roster-power-summary">Team Power: 0 total · 0 avg</div>
-        <div class="power-tier-row" id="power-tier-row">
-          <span class="power-tier-label" id="power-tier-label">🌱 Rookie Fighter</span>
-          <div class="power-tier-bar"><div class="power-tier-bar-fill" id="power-tier-bar-fill"></div></div>
+      <aside class="quests-col">
+        <div class="league-banner">
+          <span class="league-banner-label">NEXT LEAGUE</span>
+          <div class="league-banner-value"><span class="league-banner-icon">💎</span><span id="league-banner-count">0 / 4</span></div>
+          <span class="league-banner-sub" id="league-banner-sub">wins needed</span>
         </div>
-        <div class="synergy-banner hidden" id="synergy-banner"></div>
-        <div class="roster-list" id="roster-list"></div>
 
-        <span class="roster-label items-label">Items</span>
-        <div class="items-list" id="items-list"></div>
+        <div class="daily-bonus-strip">
+          <span>⏳ Quests reset in</span>
+          <b id="daily-reset-countdown">—</b>
+        </div>
 
         <span class="roster-label items-label">Daily Quests</span>
         <div class="quest-list" id="daily-quest-list"></div>
