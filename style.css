@@ -313,47 +313,85 @@ h1 {
   font-weight: 700;
 }
 
-/* ---------- League banner (right column, cosmetic "jackpot"-style) ---------- */
+/* ---------- Mini roster + items summary (right column) ---------- */
 
-.league-banner {
-  text-align: center;
-  padding: 14px 10px;
+.mini-summary-card {
+  padding: 12px;
   margin-bottom: 14px;
   border-radius: 10px;
-  background: linear-gradient(160deg, rgba(255,210,77,0.14), rgba(168,85,247,0.08));
-  border: 1px solid rgba(255,210,77,0.3);
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.1);
 }
 
-.league-banner-label {
+.mini-summary-label {
   display: block;
   font-size: 0.62rem;
   font-weight: 700;
-  letter-spacing: 1.5px;
-  color: #ffd24d;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #a9a3c2;
   margin-bottom: 6px;
 }
 
-.league-banner-value {
+.mini-summary-label + .mini-items-row,
+.mini-summary-label:not(:first-child) {
+  margin-top: 10px;
+}
+
+.mini-roster-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 4px;
+  min-height: 30px;
+}
+
+.mini-roster-avatar {
+  position: relative;
+  overflow: hidden;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid var(--rarity-color, #555);
+  flex-shrink: 0;
+}
+
+.mini-roster-empty {
+  font-size: 0.68rem;
+  color: #6c6c78;
+  font-style: italic;
+}
+
+.mini-items-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mini-item-chip {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 6px;
-  font-family: 'Orbitron', sans-serif;
-  font-weight: 900;
-  font-size: 1.3rem;
+  gap: 3px;
+  padding: 3px 7px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  font-size: 0.7rem;
+  opacity: 0.4;
+}
+
+.mini-item-chip.owned {
+  opacity: 1;
+  border-color: var(--item-color, #555);
+}
+
+.mini-item-chip .mini-item-count {
+  font-weight: 700;
+  color: #a9a3c2;
+}
+
+.mini-item-chip.owned .mini-item-count {
   color: #ffffff;
-  text-shadow: 0 0 14px rgba(255,210,77,0.5);
-}
-
-.league-banner-icon {
-  font-size: 1.1rem;
-}
-
-.league-banner-sub {
-  display: block;
-  font-size: 0.66rem;
-  color: #c7c2df;
-  margin-top: 2px;
 }
 
 .daily-bonus-strip {

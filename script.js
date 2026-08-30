@@ -1471,8 +1471,8 @@ const playerStatLeague = document.getElementById('player-stat-league');
 const playerStatWins = document.getElementById('player-stat-wins');
 const playerStatLosses = document.getElementById('player-stat-losses');
 const playerStatWinrate = document.getElementById('player-stat-winrate');
-const leagueBannerCount = document.getElementById('league-banner-count');
-const leagueBannerSub = document.getElementById('league-banner-sub');
+const miniRosterRow = document.getElementById('mini-roster-row');
+const miniItemsRow = document.getElementById('mini-items-row');
 const dailyResetCountdown = document.getElementById('daily-reset-countdown');
 const bracketPath = document.getElementById('bracket-path');
 const shardBalanceInline = document.getElementById('shard-balance-inline');
@@ -2358,17 +2358,42 @@ function renderPlayerStatCard() {
   playerStatWins.textContent = wins;
   playerStatLosses.textContent = losses;
   playerStatWinrate.textContent = total > 0 ? `${Math.round((wins / total) * 100)}%` : '—';
+}
 
-  const tier = currentTier();
-  if (game.finaleWon) {
-    leagueBannerCount.textContent = '👑 Champion';
-    leagueBannerSub.textContent = 'multiverse conquered';
+function renderMiniSummary() {
+  if (!miniRosterRow) return;
+  miniRosterRow.innerHTML = '';
+  if (game.roster.length === 0) {
+    const empty = document.createElement('span');
+    empty.className = 'mini-roster-empty';
+    empty.textContent = 'No fighters yet';
+    miniRosterRow.appendChild(empty);
   } else {
-    const winsInLeague = Math.min(game.roundIndex, tier.bracket.length);
-    leagueBannerCount.textContent = `${winsInLeague} / ${tier.bracket.length}`;
-    const isLastLeague = game.tierIndex >= TIERS.length - 1;
-    leagueBannerSub.textContent = isLastLeague ? 'wins to become Champion' : `wins to ${TIERS[game.tierIndex + 1].name}`;
+    game.roster.forEach(c => {
+      const mini = document.createElement('div');
+      mini.className = 'mini-roster-avatar';
+      mini.style.setProperty('--rarity-color', c.color);
+      attachAvatarImage(mini, c.name, 'character', initials(c.name));
+      miniRosterRow.appendChild(mini);
+    });
   }
+
+  miniItemsRow.innerHTML = '';
+  Object.keys(ITEM_DEFS).forEach(key => {
+    const def = ITEM_DEFS[key];
+    const count = game.items[key] || 0;
+    const chip = document.createElement('div');
+    chip.className = 'mini-item-chip' + (count > 0 ? ' owned' : '');
+    chip.style.setProperty('--item-color', def.color);
+    chip.title = def.desc;
+    const icon = document.createElement('span');
+    icon.textContent = def.icon;
+    const countEl = document.createElement('span');
+    countEl.className = 'mini-item-count';
+    countEl.textContent = `×${count}`;
+    chip.append(icon, countEl);
+    miniItemsRow.appendChild(chip);
+  });
 }
 
 function updateDailyResetCountdown() {
@@ -2484,6 +2509,7 @@ function refreshUI() {
   document.body.classList.toggle('pre-draft', game.roster.length === 0 && !game.godMode);
   renderRosterSidebar();
   renderPlayerStatCard();
+  renderMiniSummary();
   renderItemsSidebar();
   renderDailyQuests();
   renderTrophyCase();
