@@ -1933,23 +1933,17 @@ function playRaritySound(rarity) {
 // roughly follow the strip's own ease-out — fast ticks at first, slowing
 // toward the landing, like a real prize wheel or slot machine.
 function playSpinTicks(durationMs) {
-  const totalSeconds = durationMs / 1000;
-  const tickCount = Math.round(18 + totalSeconds * 4);
-  const minGapMs = 70; // hard floor so a real audio clip never overlaps itself into mush
-
+  // A custom spin-tick.mp3 is treated as one single sound for the whole
+  // spin (e.g. a "whoosh" or a full ticking-run recording) — play it once,
+  // not repeated. Only the built-in synthesized fallback uses a real
+  // repeating click-click-click pattern, since those are tiny discrete blips.
   if (customSoundAvailable['spin-tick']) {
-    let lastDelay = -minGapMs;
-    for (let i = 1; i <= tickCount; i++) {
-      const x = i / tickCount;
-      const progress = Math.pow(x, 3); // ease-IN: dense/fast ticks early, spread out near the landing
-      let delayMs = progress * durationMs;
-      if (delayMs - lastDelay < minGapMs) delayMs = lastDelay + minGapMs;
-      lastDelay = delayMs;
-      setTimeout(() => playCustomSound('spin-tick', 0.5), delayMs);
-    }
+    playCustomSound('spin-tick', 0.6);
     return;
   }
 
+  const totalSeconds = durationMs / 1000;
+  const tickCount = Math.round(18 + totalSeconds * 4);
   const ctx = getAudioCtx();
   if (!ctx) return;
   for (let i = 1; i <= tickCount; i++) {
