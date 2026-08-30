@@ -1652,6 +1652,14 @@ function attachAvatarImage(container, name, kind, fallbackText) {
     detectMostlyTransparent(img, isTransparent => {
       if (isTransparent) container.classList.add('has-transparency');
     });
+    // Taller, more "portrait-shaped" source images lose proportionally more
+    // of their height when cropped to a square — bias the crop further
+    // toward the top for those, so the face doesn't get pushed out of frame.
+    // A perfectly square source still gets a gentle top bias (15%); a very
+    // tall portrait (e.g. 450×700) biases much harder (~50%+).
+    const ratio = img.naturalHeight / img.naturalWidth;
+    const bias = Math.max(15, Math.min(60, 15 + (ratio - 1) * 65));
+    img.style.objectPosition = `center ${bias.toFixed(0)}%`;
   };
   img.onerror = () => img.remove();
   img.src = imagePathFor(name, kind);
