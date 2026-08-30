@@ -1786,16 +1786,21 @@ function createItemEl(entry) {
 // Shrinks an element's font-size (instead of letting it wrap) until the text
 // fits on one line — keeps card layouts perfectly consistent no matter how
 // long a character's name is, instead of some cards being taller than others.
+// Shrinks an element's font-size (instead of letting it wrap) until the text
+// fits on one line — keeps card layouts perfectly consistent no matter how
+// long a character's name is, instead of some cards being taller than others.
+// Computed in one proportional step (not an iterative loop) — with 60 cards
+// per spin, repeatedly reading scrollWidth after every tiny size change adds
+// up to hundreds of forced layout reflows, which gets genuinely slow on
+// older hardware and was part of why sound/animation could lag behind.
 function fitTextToOneLine(el, maxSizeRem, minSizeRem) {
   if (!el) return;
-  let size = maxSizeRem;
-  el.style.fontSize = size + 'rem';
-  let guard = 0;
-  while (el.scrollWidth > el.clientWidth + 1 && size > minSizeRem && guard < 40) {
-    size -= 0.03;
-    el.style.fontSize = size + 'rem';
-    guard++;
-  }
+  el.style.fontSize = maxSizeRem + 'rem';
+  const scrollW = el.scrollWidth;
+  const clientW = el.clientWidth;
+  if (clientW === 0 || scrollW <= clientW + 1) return; // already fits, or not measurable yet
+  const ratio = clientW / scrollW;
+  el.style.fontSize = `${Math.max(minSizeRem, maxSizeRem * ratio * 0.96)}rem`;
 }
 
 function renderStrip(items) {
@@ -1853,6 +1858,20 @@ function playCustomSound(key, volume) {
   const instance = base.cloneNode(); // clone so overlapping plays don't cut each other off
   instance.volume = volume != null ? volume : 0.7;
   instance.play().catch(() => {});
+  return true;
+}
+
+// For sounds that only ever need to play once at a time (like the spin-tick,
+// now single-shot per spin) — reuse the already-decoded base element instead
+// of cloning. A fresh clone needs its own audio decode from scratch, which
+// on slower/older hardware can noticeably lag behind an already-visible
+// animation. Reusing the primed element avoids that redo entirely.
+function playCustomSoundDirect(key, volume) {
+  const base = customSoundElements[key];
+  if (!base) return false;
+  try { base.currentTime = 0; } catch (e) { /* not seekable yet — fine, play() still works */ }
+  base.volume = volume != null ? volume : 0.7;
+  base.play().catch(() => {});
   return true;
 }
 
@@ -1946,7 +1965,7 @@ function playSpinTicks(durationMs) {
   // not repeated. Only the built-in synthesized fallback uses a real
   // repeating click-click-click pattern, since those are tiny discrete blips.
   if (customSoundAvailable['spin-tick']) {
-    playCustomSound('spin-tick', 0.6);
+    playCustomSoundDirect('spin-tick', 0.6);
     return;
   }
 
