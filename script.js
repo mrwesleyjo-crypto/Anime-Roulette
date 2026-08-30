@@ -1785,18 +1785,7 @@ function fitTextToOneLine(el, maxSizeRem, minSizeRem) {
 function renderStrip(items) {
   track.innerHTML = '';
   const fragment = document.createDocumentFragment();
-  items.forEach((entry, i) => {
-    const el = createItemEl(entry);
-    // Subtle "barrel" tilt based on distance from the winner slot — an
-    // approximation of a curved 3D reel using flat CSS, cheap enough to
-    // set once at render time instead of recalculating every frame.
-    const dist = i - WINNER_INDEX;
-    const tilt = Math.max(-16, Math.min(16, dist * 3.5));
-    const scale = Math.max(0.9, 1 - Math.abs(dist) * 0.012);
-    el.style.setProperty('--tilt', `${tilt}deg`);
-    el.style.setProperty('--reel-scale', scale);
-    fragment.appendChild(el);
-  });
+  items.forEach(entry => fragment.appendChild(createItemEl(entry)));
   track.appendChild(fragment);
   track.querySelectorAll('.strip-item .name').forEach(el => fitTextToOneLine(el, 0.8, 0.5));
 }
