@@ -1838,6 +1838,7 @@ function renderStrip(items) {
   items.forEach(entry => fragment.appendChild(createItemEl(entry)));
   track.appendChild(fragment);
   track.querySelectorAll('.strip-item .name').forEach(el => fitTextToOneLine(el, 0.8, 0.5));
+  track.querySelectorAll('.strip-item .sub-tag').forEach(el => fitTextToOneLine(el, 0.66, 0.4));
 }
 
 function targetTranslateX() {
