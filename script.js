@@ -1927,11 +1927,16 @@ function playRaritySound(rarity) {
 function playSpinTicks(durationMs) {
   const totalSeconds = durationMs / 1000;
   const tickCount = Math.round(18 + totalSeconds * 4);
+  const minGapMs = 70; // hard floor so a real audio clip never overlaps itself into mush
 
   if (customSoundAvailable['spin-tick']) {
+    let lastDelay = -minGapMs;
     for (let i = 1; i <= tickCount; i++) {
-      const progress = 1 - Math.pow(1 - i / tickCount, 3);
-      const delayMs = progress * durationMs;
+      const x = i / tickCount;
+      const progress = Math.pow(x, 3); // ease-IN: dense/fast ticks early, spread out near the landing
+      let delayMs = progress * durationMs;
+      if (delayMs - lastDelay < minGapMs) delayMs = lastDelay + minGapMs;
+      lastDelay = delayMs;
       setTimeout(() => playCustomSound('spin-tick', 0.5), delayMs);
     }
     return;
@@ -1940,7 +1945,8 @@ function playSpinTicks(durationMs) {
   const ctx = getAudioCtx();
   if (!ctx) return;
   for (let i = 1; i <= tickCount; i++) {
-    const progress = 1 - Math.pow(1 - i / tickCount, 3); // ease-out cubic
+    const x = i / tickCount;
+    const progress = Math.pow(x, 3); // ease-IN, matching the custom-sound branch above
     const t = progress * totalSeconds;
     const freq = 150 + Math.random() * 30;
     playTone(freq, t, 0.035, 'square', 0.06);
