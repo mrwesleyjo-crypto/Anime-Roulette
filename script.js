@@ -1654,8 +1654,15 @@ const imageMetaCache = {};
 function analyzeImageMeta(img) {
   return new Promise(resolve => {
     detectMostlyTransparent(img, isTransparent => {
+      // Taller source images lose proportionally more height when cropped
+      // to a square, so this nudges the crop upward a bit — but gently.
+      // A strong upward bias assumes there's a lot of "empty" hair/space up
+      // top to skip, which is true for some art (long flowing hair) but not
+      // for others (a close portrait where the face already fills almost
+      // the whole frame) — over-correcting there just crops into the face
+      // or headwear instead. This modest curve is a safer middle ground.
       const ratio = img.naturalHeight / img.naturalWidth;
-      const bias = Math.max(15, Math.min(60, 15 + (ratio - 1) * 65));
+      const bias = Math.max(15, Math.min(40, 15 + (ratio - 1) * 30));
       resolve({ isTransparent, bias });
     });
   });
