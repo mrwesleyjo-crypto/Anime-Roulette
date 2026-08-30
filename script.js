@@ -1645,6 +1645,22 @@ function detectMostlyTransparent(img, callback) {
   }
 }
 
+// Caches the computed crop bias + transparency flag per image src, so once
+// an image has been analyzed once, every later card using it applies the
+// correct crop immediately — no visible "snap" from the default position
+// to the real one a few milliseconds after the image loads.
+const imageMetaCache = {};
+
+function analyzeImageMeta(img) {
+  return new Promise(resolve => {
+    detectMostlyTransparent(img, isTransparent => {
+      const ratio = img.naturalHeight / img.naturalWidth;
+      const bias = Math.max(15, Math.min(60, 15 + (ratio - 1) * 65));
+      resolve({ isTransparent, bias });
+    });
+  });
+}
+
 function attachAvatarImage(container, name, kind, fallbackText) {
   const fallback = document.createElement('span');
   fallback.className = 'avatar-fallback-text';
@@ -1655,22 +1671,28 @@ function attachAvatarImage(container, name, kind, fallbackText) {
   img.className = 'char-img';
   img.alt = name;
   img.loading = 'lazy';
-  img.onload = () => {
+  const src = imagePathFor(name, kind);
+
+  const applyMeta = meta => {
     container.classList.add('has-image');
-    detectMostlyTransparent(img, isTransparent => {
-      if (isTransparent) container.classList.add('has-transparency');
-    });
-    // Taller, more "portrait-shaped" source images lose proportionally more
-    // of their height when cropped to a square — bias the crop further
-    // toward the top for those, so the face doesn't get pushed out of frame.
-    // A perfectly square source still gets a gentle top bias (15%); a very
-    // tall portrait (e.g. 450×700) biases much harder (~50%+).
-    const ratio = img.naturalHeight / img.naturalWidth;
-    const bias = Math.max(15, Math.min(60, 15 + (ratio - 1) * 65));
-    img.style.objectPosition = `center ${bias.toFixed(0)}%`;
+    if (meta.isTransparent) container.classList.add('has-transparency');
+    img.style.objectPosition = `center ${meta.bias.toFixed(0)}%`;
   };
+
+  if (imageMetaCache[src]) {
+    // Already known — apply immediately once the image is actually in the
+    // DOM and loaded, no separate analysis pass needed.
+    img.onload = () => applyMeta(imageMetaCache[src]);
+  } else {
+    img.onload = () => {
+      analyzeImageMeta(img).then(meta => {
+        imageMetaCache[src] = meta;
+        applyMeta(meta);
+      });
+    };
+  }
   img.onerror = () => img.remove();
-  img.src = imagePathFor(name, kind);
+  img.src = src;
   container.appendChild(img);
 }
 
@@ -4214,12 +4236,20 @@ function preloadAllGameArt() {
   SPECIAL_FUSIONS.forEach(f => characterNames.add(f.name));
   characterNames.add(SECRET_PULL_CHARACTER.name);
   characterNames.add(SHARE_UNLOCK_CHARACTER.name);
-  characterNames.forEach(name => { const img = new Image(); img.src = imagePathFor(name, 'character'); });
+
+  const preloadAndAnalyze = (name, kind) => {
+    const src = imagePathFor(name, kind);
+    const img = new Image();
+    img.onload = () => { analyzeImageMeta(img).then(meta => { imageMetaCache[src] = meta; }); };
+    img.src = src;
+  };
+
+  characterNames.forEach(name => preloadAndAnalyze(name, 'character'));
 
   const villainNames = new Set();
   TIERS.forEach(tier => tier.bracket.forEach(v => villainNames.add(v.name)));
   villainNames.add(SECRET_OPPONENT.name);
-  villainNames.forEach(name => { const img = new Image(); img.src = imagePathFor(name, 'villain'); });
+  villainNames.forEach(name => preloadAndAnalyze(name, 'villain'));
 }
 preloadAllGameArt();
 
