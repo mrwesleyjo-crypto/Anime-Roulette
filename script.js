@@ -2102,9 +2102,11 @@ function runRoulette(pool, titleText, onComplete, options) {
   playSpinTicks(duration);
 
   let settled = false;
+  let onTransitionEnd;
   const finish = () => {
     if (settled) return;
     settled = true;
+    track.removeEventListener('transitionend', onTransitionEnd);
     const winnerEl = track.children[WINNER_INDEX];
 
     if (characterReveal && winnerEl && winner.rarity) {
@@ -2122,7 +2124,16 @@ function runRoulette(pool, titleText, onComplete, options) {
     }
   };
 
-  track.addEventListener('transitionend', finish, { once: true });
+  // IMPORTANT: transitionend bubbles up from child elements. Each of the ~60
+  // strip-item cards has its own short (0.3s) hover transition — without
+  // filtering by target/property, one of THOSE finishing early would fire
+  // this handler and reveal the winner long before the real multi-second
+  // track transform has actually finished scrolling.
+  onTransitionEnd = e => {
+    if (e.target !== track || e.propertyName !== 'transform') return;
+    finish();
+  };
+  track.addEventListener('transitionend', onTransitionEnd);
   setTimeout(finish, duration + 150);
 }
 
