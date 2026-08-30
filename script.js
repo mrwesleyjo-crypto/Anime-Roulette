@@ -20,19 +20,27 @@ const RARITY_RANK = RARITY_ORDER.reduce((acc, rarity, i) => { acc[rarity] = i; r
 // ---------------------------------------------------------------------------
 
 const POWER_TIERS = [
-  { max: 1950, label: 'Unranked', icon: '💤', color: '#7a7a8a' },
-  { max: 3575, label: 'E-Rank Talent', icon: '🌱', color: '#9aa5b1' },
-  { max: 4875, label: 'D-Rank Threat', icon: '⚡', color: '#3498db' },
-  { max: 6175, label: 'C-Rank Threat', icon: '🔥', color: '#5dade2' },
-  { max: 7800, label: 'B-Rank Threat', icon: '⭐', color: '#a855f7' },
-  { max: 10400, label: 'A-Rank Threat', icon: '👑', color: '#ffd24d' },
-  { max: 16250, label: 'S-Rank Threat', icon: '🌍', color: '#ff9f43' },
-  { max: 32500, label: 'SS-Rank Catastrophe', icon: '🌌', color: '#ff2d6b' },
+  { max: 1500, label: 'Unranked', icon: '💤', color: '#7a7a8a' },
+  { max: 2500, label: 'E-Rank Talent', icon: '🌱', color: '#9aa5b1' },
+  { max: 3900, label: 'D-Rank Threat', icon: '⚡', color: '#3498db' },
+  { max: 4600, label: 'C-Rank Threat', icon: '🔥', color: '#5dade2' },
+  { max: 5250, label: 'B-Rank Threat', icon: '⭐', color: '#a855f7' },
+  { max: 5950, label: 'A-Rank Threat', icon: '👑', color: '#ffd24d' },
+  { max: 6700, label: 'S-Rank Threat', icon: '🌍', color: '#ff9f43' },
+  { max: 9000, label: 'SS-Rank Catastrophe', icon: '🌌', color: '#ff2d6b' },
   { max: Infinity, label: 'SSS-Rank — Unclassifiable', icon: '♾️', color: '#00ffcc' }
 ];
 
 function getPowerTier(avgPower) {
   return POWER_TIERS.find(t => avgPower <= t.max) || POWER_TIERS[POWER_TIERS.length - 1];
+}
+
+function getPowerTierProgress(avgPower) {
+  const idx = POWER_TIERS.findIndex(t => avgPower <= t.max);
+  if (idx === -1 || idx === POWER_TIERS.length - 1) return 100; // top tier, always full
+  const prevMax = idx === 0 ? 0 : POWER_TIERS[idx - 1].max;
+  const curMax = POWER_TIERS[idx].max;
+  return clamp(((avgPower - prevMax) / (curMax - prevMax)) * 100, 0, 100);
 }
 
 // ---------------------------------------------------------------------------
@@ -2150,7 +2158,7 @@ function renderRosterSidebar() {
   const powerTier = getPowerTier(avgPower);
   powerTierLabel.textContent = `${powerTier.icon} ${powerTier.label}`;
   powerTierLabel.style.color = powerTier.color;
-  powerTierBarFill.style.width = `${clamp((avgPower / 300) * 100, avgPower > 0 ? 3 : 0, 100)}%`;
+  powerTierBarFill.style.width = `${avgPower > 0 ? getPowerTierProgress(avgPower) : 0}%`;
   powerTierBarFill.style.background = powerTier.color;
 
   const synergy = computeActiveSynergy();
@@ -2586,7 +2594,7 @@ function showBattleIntro(opponent) {
   battleYourPower.textContent = `Power ${totalRosterPower} total (${averageRosterPower()} avg)`;
 
   battleTeamStrip.innerHTML = '';
-  const miniSizeBySize = { 1: 84, 2: 68, 3: 56, 4: 48, 5: 40, 6: 34 };
+  const miniSizeBySize = { 1: 96, 2: 80, 3: 68, 4: 58, 5: 50, 6: 44 };
   const miniSize = miniSizeBySize[game.roster.length] || 30;
   battleTeamStrip.style.maxWidth = `${Math.min(3, game.roster.length) * (miniSize + 4) + 20}px`;
   game.roster.forEach(c => {

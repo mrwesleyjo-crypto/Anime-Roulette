@@ -517,7 +517,23 @@ h1 {
   .roster-card-image {
     font-size: 1.4rem;
   }
+  .enemy-side .battle-avatar {
+    width: 88px;
+    height: 88px;
+  }
 }
+
+@media (max-width: 480px) {
+  .enemy-side .battle-avatar {
+    width: 96px;
+    height: 96px;
+  }
+  .battle-mini-avatar {
+    max-width: 44px !important;
+    max-height: 44px !important;
+  }
+}
+
 
 /* ---------- Roster sidebar cards ---------- */
 
