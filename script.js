@@ -1465,6 +1465,7 @@ const dailyQuestList = document.getElementById('daily-quest-list');
 const trophyCase = document.getElementById('trophy-case');
 const bracketTitle = document.getElementById('bracket-title');
 const leagueProgress = document.getElementById('league-progress');
+const bracketCompact = document.getElementById('bracket-compact');
 const playerStatAvatar = document.getElementById('player-stat-avatar');
 const playerStatName = document.getElementById('player-stat-name');
 const playerStatLeague = document.getElementById('player-stat-league');
@@ -2464,6 +2465,24 @@ function renderBracket() {
       leagueProgress.innerHTML = isLastLeague
         ? `<b>${winsInLeague} / ${tier.bracket.length}</b> wins to become Champion`
         : `<b>${winsInLeague} / ${tier.bracket.length}</b> wins to ${TIERS[game.tierIndex + 1].name}`;
+    }
+  }
+
+  // Compact one-line "current matchup" summary for the mobile Game tab —
+  // the full multi-node bracket stays available behind the toggle below it.
+  if (bracketCompact) {
+    if (game.finaleWon) {
+      bracketCompact.innerHTML = `<div class="bracket-compact-info"><div class="bracket-compact-round">Tournament Complete</div><div class="bracket-compact-name">👑 Multiverse Champion</div></div>`;
+    } else {
+      const roundIdx = Math.min(game.roundIndex, tier.bracket.length - 1);
+      const upcoming = tier.bracket[roundIdx];
+      const roundLabel = roundIdx === tier.bracket.length - 1 ? 'Final' : ROUND_LABELS[roundIdx];
+      bracketCompact.innerHTML = `
+        <div class="bracket-compact-info">
+          <div class="bracket-compact-round">${roundLabel} · ${Math.min(game.roundIndex, tier.bracket.length)}/${tier.bracket.length}</div>
+          <div class="bracket-compact-name">${upcoming.name}</div>
+        </div>
+        <div class="bracket-compact-power">Power ${upcoming.power}</div>`;
     }
   }
 
@@ -4234,6 +4253,30 @@ function handleMainButtonClick() {
     case 'victory': resetGame(); break;
     case 'gameover': break;
   }
+}
+
+// ---------------------------------------------------------------------------
+// Mobile tab navigation — purely a visibility switch (which data-tab section
+// is shown); every tab reuses the exact same DOM/data already rendered by
+// the normal desktop code paths above, nothing is duplicated.
+// ---------------------------------------------------------------------------
+
+document.querySelectorAll('.mobile-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.tabBtn;
+    document.body.dataset.mobiletab = tab;
+    document.querySelectorAll('.mobile-tab').forEach(b => b.classList.toggle('active', b === btn));
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  });
+});
+
+const bracketToggleBtn = document.getElementById('bracket-toggle');
+if (bracketToggleBtn) {
+  bracketToggleBtn.addEventListener('click', () => {
+    const panel = bracketToggleBtn.closest('.bracket-panel');
+    const expanded = panel.classList.toggle('expanded');
+    bracketToggleBtn.textContent = expanded ? 'Hide Full Bracket ▴' : 'View Full Bracket ▾';
+  });
 }
 
 // ---------------------------------------------------------------------------

@@ -415,66 +415,6 @@ h1 {
 }
 
 @media (max-width: 760px) {
-  /* Always-visible compact roster bar pinned to the bottom of the screen —
-     the full roster/stats panels live further down the page and get
-     scrolled out of view while spinning, so this keeps your team visible
-     no matter where you've scrolled. */
-  .mobile-roster-bar {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 120;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    background: rgba(10, 6, 20, 0.96);
-    border-top: 1px solid var(--league-border, rgba(0,229,255,0.25));
-    box-shadow: 0 -6px 20px rgba(0,0,0,0.5);
-  }
-
-  .mobile-roster-bar-list {
-    display: flex;
-    gap: 6px;
-    overflow-x: auto;
-    flex: 1;
-    min-width: 0;
-  }
-
-  .mobile-roster-bar-avatar {
-    position: relative;
-    overflow: hidden;
-    flex-shrink: 0;
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    border: 2px solid var(--rarity-color, #00e5ff);
-  }
-
-  .mobile-roster-bar-power {
-    flex-shrink: 0;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 0.68rem;
-    font-weight: 700;
-    color: #ffd24d;
-    white-space: nowrap;
-    padding-left: 8px;
-    border-left: 1px solid rgba(255,255,255,0.15);
-  }
-
-  body {
-    padding-bottom: 62px;
-  }
-}
-
-@media (min-width: 761px) {
-  .mobile-roster-bar {
-    display: none;
-  }
-}
-
-@media (max-width: 760px) {
   /* backdrop-filter is a common cause of repaint/ghosting glitches on
      mobile GPUs, especially combined with live CSS transitions — drop it
      on small screens and fall back to the (already opaque-ish) solid tint. */
@@ -3002,5 +2942,173 @@ h1 {
   .roster-card .max-awakened-crown {
     top: -6px;
     right: -6px;
+  }
+}
+
+/* =====================================================================
+   Mobile tab navigation — turns the endless single-page scroll into a
+   focused game screen with 4 tabs. Strictly scoped to the mobile
+   breakpoint; every element keeps its normal desktop layout untouched.
+   ===================================================================== */
+
+@media (min-width: 761px) {
+  .mobile-tabbar {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  /* Hide every tab-tagged section by default, then reveal only the ones
+     matching the active tab. Untagged elements (page header, trophy case)
+     are unaffected and stay visible on every tab. */
+  [data-tab] {
+    display: none;
+  }
+  body[data-mobiletab="game"] [data-tab="game"],
+  body[data-mobiletab="roster"] [data-tab="roster"],
+  body[data-mobiletab="items"] [data-tab="items"],
+  body[data-mobiletab="quests"] [data-tab="quests"] {
+    display: block;
+  }
+
+  body {
+    padding-bottom: 74px; /* room for the fixed tab bar */
+  }
+
+  .mobile-tabbar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 130;
+    display: flex;
+    background: rgba(10, 6, 20, 0.97);
+    border-top: 1px solid var(--league-border, rgba(0,229,255,0.25));
+    box-shadow: 0 -6px 20px rgba(0,0,0,0.5);
+    padding: 4px 0;
+  }
+
+  .mobile-tab {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 6px 4px;
+    border-radius: 0;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: none;
+    color: #6c6c78;
+    min-height: 48px;
+  }
+
+  .mobile-tab:hover {
+    box-shadow: none;
+  }
+
+  .mobile-tab:active {
+    transform: scale(0.95);
+  }
+
+  .mobile-tab-icon {
+    font-size: 1.25rem;
+    line-height: 1;
+  }
+
+  .mobile-tab.active {
+    color: var(--league-text, #00e5ff);
+  }
+
+  .mobile-tab.active .mobile-tab-icon {
+    filter: drop-shadow(0 0 6px var(--league-glow, rgba(0,229,255,0.6)));
+  }
+
+  /* ---------- Compact bracket (Game tab) ---------- */
+
+  .bracket-path {
+    display: none; /* full bracket hidden by default, revealed by the toggle */
+  }
+
+  .bracket-panel.expanded .bracket-path {
+    display: flex;
+  }
+
+  .bracket-panel.expanded .bracket-compact {
+    display: none;
+  }
+
+  .bracket-compact {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .bracket-compact-info {
+    min-width: 0;
+  }
+
+  .bracket-compact-round {
+    font-size: 0.64rem;
+    font-weight: 700;
+    color: #a9a3c2;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .bracket-compact-name {
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .bracket-compact-power {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #ffd24d;
+    flex-shrink: 0;
+  }
+
+  .bracket-toggle {
+    display: block;
+    width: 100%;
+    background: none;
+    border: 1px solid rgba(255,255,255,0.15);
+    box-shadow: none;
+    color: #a9a3c2;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: none;
+    letter-spacing: 0;
+    padding: 7px;
+    border-radius: 6px;
+    margin-bottom: 2px;
+  }
+
+  .bracket-toggle:hover {
+    box-shadow: none;
+    background: rgba(255,255,255,0.05);
+  }
+}
+
+@media (min-width: 761px) {
+  .bracket-compact,
+  .bracket-toggle {
+    display: none; /* desktop always shows the full bracket, unchanged */
   }
 }

@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body data-mobiletab="game">
   <div class="starfield"></div>
   <div id="toast-container" class="toast-container"></div>
 
@@ -34,7 +34,7 @@
 
     <div class="layout layout-3col">
       <aside class="stats-col">
-        <div class="player-stat-card">
+        <div class="player-stat-card" data-tab="roster">
           <div class="player-stat-avatar" id="player-stat-avatar"></div>
           <div class="player-stat-name" id="player-stat-name">—</div>
           <div class="player-stat-league" id="player-stat-league">Bronze League</div>
@@ -45,52 +45,60 @@
           </div>
         </div>
 
-        <span class="roster-label">Your Roster</span>
-        <div class="roster-power-summary" id="roster-power-summary">Team Power: 0 total · 0 avg</div>
-        <div class="power-tier-row" id="power-tier-row">
-          <span class="power-tier-label" id="power-tier-label">🌱 Rookie Fighter</span>
-          <div class="power-tier-bar"><div class="power-tier-bar-fill" id="power-tier-bar-fill"></div></div>
+        <div data-tab="roster">
+          <span class="roster-label">Your Roster</span>
+          <div class="roster-power-summary" id="roster-power-summary">Team Power: 0 total · 0 avg</div>
+          <div class="power-tier-row" id="power-tier-row">
+            <span class="power-tier-label" id="power-tier-label">🌱 Rookie Fighter</span>
+            <div class="power-tier-bar"><div class="power-tier-bar-fill" id="power-tier-bar-fill"></div></div>
+          </div>
+          <div class="synergy-banner hidden" id="synergy-banner"></div>
+          <div class="roster-list" id="roster-list"></div>
         </div>
-        <div class="synergy-banner hidden" id="synergy-banner"></div>
-        <div class="roster-list" id="roster-list"></div>
 
-        <span class="roster-label items-label">Items</span>
-        <div class="items-list" id="items-list"></div>
+        <div data-tab="items">
+          <span class="roster-label items-label">Items</span>
+          <div class="items-list" id="items-list"></div>
+        </div>
       </aside>
 
       <div class="main-col">
-        <div class="bracket-panel">
+        <div class="bracket-panel" data-tab="game">
           <span class="bracket-title" id="bracket-title">Bronze League — Bracket</span>
           <div class="league-progress" id="league-progress"></div>
+          <div class="bracket-compact" id="bracket-compact"></div>
+          <button class="bracket-toggle" id="bracket-toggle" type="button">View Full Bracket ▾</button>
           <div class="bracket-path" id="bracket-path"></div>
         </div>
 
-        <h3 class="roulette-title" id="roulette-title">Ready to begin?</h3>
+        <div data-tab="game">
+          <h3 class="roulette-title" id="roulette-title">Ready to begin?</h3>
 
-        <div class="roulette-viewport">
-          <div class="pointer-top"></div>
-          <div class="center-line"></div>
-          <div class="fade fade-left"></div>
-          <div class="fade fade-right"></div>
-          <div class="strip-track" id="strip-track"></div>
+          <div class="roulette-viewport">
+            <div class="pointer-top"></div>
+            <div class="center-line"></div>
+            <div class="fade fade-left"></div>
+            <div class="fade fade-right"></div>
+            <div class="strip-track" id="strip-track"></div>
+          </div>
+
+          <button id="main-btn">Draft your first fighter!</button>
+
+          <div id="event-panel" class="event-panel hidden"></div>
         </div>
 
-        <button id="main-btn">Draft your first fighter!</button>
-
-        <div id="event-panel" class="event-panel hidden"></div>
-
-        <div class="log-panel">
+        <div class="log-panel" data-tab="quests">
           <span class="log-label">Tournament Log</span>
           <div id="log-list" class="log-list"><span class="log-empty">Your tournament log will fill up here once you start spinning.</span></div>
         </div>
 
-        <details class="leaderboard-panel">
+        <details class="leaderboard-panel" data-tab="quests">
           <summary class="log-label leaderboard-summary">Local Leaderboard</summary>
           <div id="leaderboard-list" class="leaderboard-list"></div>
         </details>
       </div>
 
-      <aside class="quests-col">
+      <aside class="quests-col" data-tab="quests">
         <div class="mini-summary-card">
           <span class="mini-summary-label">Your Roster</span>
           <div class="mini-roster-row" id="mini-roster-row"></div>
@@ -308,10 +316,12 @@
     </div>
   </div>
 
-  <div class="mobile-roster-bar" id="mobile-roster-bar">
-    <div class="mobile-roster-bar-list" id="mobile-roster-bar-list"></div>
-    <div class="mobile-roster-bar-power" id="mobile-roster-bar-power">—</div>
-  </div>
+  <nav class="mobile-tabbar" id="mobile-tabbar">
+    <button class="mobile-tab active" data-tab-btn="game" type="button"><span class="mobile-tab-icon">🏆</span><span>Game</span></button>
+    <button class="mobile-tab" data-tab-btn="roster" type="button"><span class="mobile-tab-icon">👤</span><span>Roster</span></button>
+    <button class="mobile-tab" data-tab-btn="items" type="button"><span class="mobile-tab-icon">🎒</span><span>Items</span></button>
+    <button class="mobile-tab" data-tab-btn="quests" type="button"><span class="mobile-tab-icon">📋</span><span>Quests</span></button>
+  </nav>
 
   <script src="script.js"></script>
 </body>
