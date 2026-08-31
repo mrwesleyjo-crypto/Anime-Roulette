@@ -563,29 +563,42 @@ h1 {
   }
 }
 
-/* VS-screen sizing on phones — a single, clearly-ordered rule (the previous
-   two overlapping breakpoints could apply in the wrong order on narrow
-   phones, leaving the villain avatar too big and crowding the "VS" text). */
-@media (max-width: 600px) {
+/* VS-screen sizing on mobile — matches the main 760px mobile breakpoint
+   used everywhere else, so it's consistent with however the site decides
+   "mobile" for every other component. Also shrinks the decorative dashed
+   ring around the villain, which added its own extra footprint beyond the
+   avatar circle itself and was part of why it still crowded the VS text. */
+@media (max-width: 760px) {
   .enemy-side .battle-avatar {
-    width: 82px;
-    height: 82px;
+    width: 68px;
+    height: 68px;
+    border-width: 2px;
+  }
+  .enemy-side .battle-avatar::before {
+    inset: -6px;
+  }
+  .enemy-side .battle-avatar .avatar-fallback-text {
+    font-size: 1.9rem;
   }
   .you-side .battle-avatar {
-    width: 50px;
-    height: 50px;
+    width: 44px;
+    height: 44px;
   }
   .battle-team-strip {
-    max-width: 130px !important;
+    max-width: 116px !important;
   }
   .battle-mini-avatar {
-    max-width: 40px !important;
-    max-height: 40px !important;
+    max-width: 36px !important;
+    max-height: 36px !important;
   }
   .battle-vs-text {
-    font-size: 1.6rem;
+    font-size: 1.4rem;
+  }
+  .battle-modal.has-vs-bg .battle-vs-row {
+    padding: 14px 8px !important;
   }
 }
+
 
 
 /* ---------- Roster sidebar cards ---------- */
