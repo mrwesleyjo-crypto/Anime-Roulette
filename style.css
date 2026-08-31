@@ -490,6 +490,71 @@ h1 {
   .quests-col {
     width: 100%;
   }
+
+  /* The actual game (bracket → roulette → fight button) is what people
+     come here to do — put it first, not buried under a trophy case, a
+     full stat card, and your whole roster. Stats and quests still exist,
+     just further down instead of gatekeeping the fun part. */
+  .main-col { order: 1; }
+  .stats-col { order: 2; }
+  .quests-col { order: 3; }
+
+  /* This mini roster+items card exists specifically for the desktop right
+     column — on mobile everything already stacks in one column, so it's
+     just a duplicate of the full roster/items already shown, plus the
+     always-visible bottom bar. Skip the redundant third copy. */
+  .mini-summary-card {
+    display: none;
+  }
+
+  /* Trophy case: six leagues in one row wastes a lot of vertical space
+     above the fold on a phone — shrink it so it reads as a quick strip. */
+  .trophy-case {
+    gap: 6px;
+    padding: 8px;
+    margin-bottom: 12px;
+  }
+  .trophy-slot .trophy-icon {
+    font-size: 1.3rem;
+  }
+  .trophy-slot .trophy-league {
+    font-size: 0.5rem;
+    max-width: 50px;
+  }
+
+  /* Player stat card: same info, laid out sideways instead of stacked so
+     it takes one compact row instead of a tall block. */
+  .player-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-align: left;
+    padding-bottom: 12px;
+  }
+  .player-stat-avatar {
+    margin: 0;
+    width: 44px;
+    height: 44px;
+    font-size: 1.05rem;
+    flex-shrink: 0;
+  }
+  .player-stat-name {
+    margin-bottom: 1px;
+  }
+  .player-stat-league {
+    margin-bottom: 0;
+  }
+  .player-stat-rows {
+    flex: 1;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  .player-stat-row {
+    flex-direction: column;
+    gap: 0;
+    font-size: 0.68rem;
+  }
+
   .page {
     padding: 18px 14px;
   }
@@ -2908,4 +2973,34 @@ h1 {
   font-size: 1.15rem;
   letter-spacing: 1.5px;
   background: linear-gradient(135deg, #ff2d6b, #ff2d6b 40%, #a855f7);
+}
+
+@media (max-width: 760px) {
+  /* Compact horizontal roster cards on mobile — a full-width vertical card
+     per fighter (image on top, text below) means scrolling past nearly a
+     full screen for every single roster member. Laying it out sideways
+     (small thumbnail + text beside it) fits a whole team of 6 in a much
+     shorter scroll. */
+  .roster-card {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+  }
+  .roster-card-image {
+    width: 64px;
+    height: 64px;
+    aspect-ratio: 1 / 1;
+    flex-shrink: 0;
+    border-radius: 8px;
+  }
+  .roster-card-body {
+    flex: 1;
+    min-width: 0;
+    padding: 0;
+  }
+  .roster-card .max-awakened-crown {
+    top: -6px;
+    right: -6px;
+  }
 }
