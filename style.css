@@ -561,20 +561,29 @@ h1 {
   .roster-card-image {
     font-size: 1.4rem;
   }
-  .enemy-side .battle-avatar {
-    width: 88px;
-    height: 88px;
-  }
 }
 
-@media (max-width: 480px) {
+/* VS-screen sizing on phones — a single, clearly-ordered rule (the previous
+   two overlapping breakpoints could apply in the wrong order on narrow
+   phones, leaving the villain avatar too big and crowding the "VS" text). */
+@media (max-width: 600px) {
   .enemy-side .battle-avatar {
-    width: 96px;
-    height: 96px;
+    width: 82px;
+    height: 82px;
+  }
+  .you-side .battle-avatar {
+    width: 50px;
+    height: 50px;
+  }
+  .battle-team-strip {
+    max-width: 130px !important;
   }
   .battle-mini-avatar {
-    max-width: 44px !important;
-    max-height: 44px !important;
+    max-width: 40px !important;
+    max-height: 40px !important;
+  }
+  .battle-vs-text {
+    font-size: 1.6rem;
   }
 }
 
@@ -2952,7 +2961,8 @@ h1 {
    ===================================================================== */
 
 @media (min-width: 761px) {
-  .mobile-tabbar {
+  .mobile-tabbar,
+  .mobile-roster-bar {
     display: none;
   }
 }
@@ -2972,7 +2982,54 @@ h1 {
   }
 
   body {
-    padding-bottom: 74px; /* room for the fixed tab bar */
+    padding-bottom: 130px; /* room for both the mini roster bar and the tab bar */
+  }
+
+  /* Always-visible compact roster strip, sitting just above the tab bar —
+     the tabs let you jump to the full Roster/Items screens, but this keeps
+     your team glanceable no matter which tab you're on or how far you've
+     scrolled within it. */
+  .mobile-roster-bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 58px;
+    z-index: 125;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: rgba(10, 6, 20, 0.96);
+    border-top: 1px solid var(--league-border, rgba(0,229,255,0.25));
+  }
+
+  .mobile-roster-bar-list {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .mobile-roster-bar-avatar {
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid var(--rarity-color, #00e5ff);
+  }
+
+  .mobile-roster-bar-power {
+    flex-shrink: 0;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.64rem;
+    font-weight: 700;
+    color: #ffd24d;
+    white-space: nowrap;
+    padding-left: 8px;
+    border-left: 1px solid rgba(255,255,255,0.15);
   }
 
   .mobile-tabbar {
