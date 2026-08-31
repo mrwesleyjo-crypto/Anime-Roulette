@@ -1466,6 +1466,11 @@ const trophyCase = document.getElementById('trophy-case');
 const bracketTitle = document.getElementById('bracket-title');
 const leagueProgress = document.getElementById('league-progress');
 const bracketCompact = document.getElementById('bracket-compact');
+const bracketFlow = document.getElementById('bracket-flow');
+const mlpLeagueName = document.getElementById('mlp-league-name');
+const mlpFraction = document.getElementById('mlp-fraction');
+const mlpBarFill = document.getElementById('mlp-bar-fill');
+const mlpNext = document.getElementById('mlp-next');
 const playerStatAvatar = document.getElementById('player-stat-avatar');
 const playerStatName = document.getElementById('player-stat-name');
 const playerStatLeague = document.getElementById('player-stat-league');
@@ -2483,6 +2488,42 @@ function renderBracket() {
           <div class="bracket-compact-name">${upcoming.name}</div>
         </div>
         <div class="bracket-compact-power">Power ${upcoming.power}</div>`;
+    }
+  }
+
+  // Small horizontal tournament-flow strip (mobile) — WIN → NEXT ROUND →
+  // SEMI FINAL → CHAMPION, current step highlighted, reusing the same
+  // ROUND_LABELS/roundIndex data as everything else on this screen.
+  if (bracketFlow) {
+    bracketFlow.innerHTML = '';
+    const flowLabels = ['Round 1', 'Round 2', 'Semifinal', 'Champion'];
+    flowLabels.forEach((label, i) => {
+      const step = document.createElement('span');
+      step.className = 'bracket-flow-step';
+      if (i < game.roundIndex || game.finaleWon) step.classList.add('done');
+      else if (i === game.roundIndex) step.classList.add('current');
+      step.textContent = label;
+      bracketFlow.appendChild(step);
+    });
+  }
+
+  // Compact league progress bar (mobile) — replaces the full trophy case
+  // with just what matters right now: current league, progress, next goal.
+  if (mlpLeagueName) {
+    mlpLeagueName.textContent = game.finaleWon ? 'Multiverse Champion' : tier.name;
+    if (game.finaleWon) {
+      mlpFraction.textContent = '';
+      mlpBarFill.style.width = '100%';
+      mlpNext.textContent = '👑 You conquered every league!';
+    } else {
+      const winsInLeague = Math.min(game.roundIndex, tier.bracket.length);
+      mlpFraction.textContent = `${winsInLeague} / ${tier.bracket.length} wins`;
+      mlpBarFill.style.width = `${(winsInLeague / tier.bracket.length) * 100}%`;
+      const remaining = tier.bracket.length - winsInLeague;
+      const isLastLeague = game.tierIndex >= TIERS.length - 1;
+      mlpNext.textContent = isLastLeague
+        ? `Win ${remaining} more ${remaining === 1 ? 'battle' : 'battles'} to become Champion`
+        : `Win ${remaining} more ${remaining === 1 ? 'battle' : 'battles'} to reach ${TIERS[game.tierIndex + 1].name}`;
     }
   }
 
@@ -4271,13 +4312,38 @@ document.querySelectorAll('.mobile-tab').forEach(btn => {
 });
 
 const bracketToggleBtn = document.getElementById('bracket-toggle');
+const bracketModalBackdrop = document.getElementById('bracket-modal-backdrop');
+const bracketModalClose = document.getElementById('bracket-modal-close');
 if (bracketToggleBtn) {
+  const closeBracketModal = () => {
+    bracketToggleBtn.closest('.bracket-panel').classList.remove('expanded');
+    bracketToggleBtn.textContent = 'View Full Bracket ▾';
+  };
   bracketToggleBtn.addEventListener('click', () => {
     const panel = bracketToggleBtn.closest('.bracket-panel');
     const expanded = panel.classList.toggle('expanded');
     bracketToggleBtn.textContent = expanded ? 'Hide Full Bracket ▴' : 'View Full Bracket ▾';
   });
+  if (bracketModalBackdrop) bracketModalBackdrop.addEventListener('click', closeBracketModal);
+  if (bracketModalClose) bracketModalClose.addEventListener('click', closeBracketModal);
 }
+
+// Mobile-only entry points for features that live in the desktop header —
+// same underlying modals/handlers, just reachable from within the tabs.
+const mobileOpenCollectionBtn = document.getElementById('mobile-open-collection-btn');
+if (mobileOpenCollectionBtn) mobileOpenCollectionBtn.addEventListener('click', () => { renderCollectionIndex(); collectionOverlay.classList.remove('hidden'); });
+
+const mobileOpenStatsBtn = document.getElementById('mobile-open-stats-btn');
+if (mobileOpenStatsBtn) mobileOpenStatsBtn.addEventListener('click', () => { renderStatsModal(); statsOverlay.classList.remove('hidden'); });
+
+const mobileOpenShopBtn = document.getElementById('mobile-open-shop-btn');
+if (mobileOpenShopBtn) mobileOpenShopBtn.addEventListener('click', () => { renderShop(); shopOverlay.classList.remove('hidden'); });
+
+const mobileOpenHowtoBtn = document.getElementById('mobile-open-howto-btn');
+if (mobileOpenHowtoBtn) mobileOpenHowtoBtn.addEventListener('click', showHowto);
+
+const mobileChangeNameBtn = document.getElementById('mobile-change-name-btn');
+if (mobileChangeNameBtn) mobileChangeNameBtn.addEventListener('click', () => openNameOverlay(game.playerName));
 
 // ---------------------------------------------------------------------------
 // Init

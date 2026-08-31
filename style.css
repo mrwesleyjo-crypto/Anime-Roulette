@@ -3182,3 +3182,208 @@ h1 {
     display: none; /* desktop always shows the full bracket, unchanged */
   }
 }
+
+/* =====================================================================
+   Mobile Game-screen refinement — compact header, compact league
+   progress, and a proper tournament-flow bracket experience. Strictly
+   scoped to mobile; desktop keeps its original header/trophy-case/bracket.
+   ===================================================================== */
+
+@media (min-width: 761px) {
+  .mobile-league-progress,
+  .bracket-title-mobile,
+  .bracket-flow,
+  .next-move-label,
+  .mobile-tab-menu-row,
+  .bracket-modal-backdrop,
+  .bracket-modal-close {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  [data-desktop-only] {
+    display: none !important;
+  }
+
+  /* ---------- Compact header ---------- */
+  .player-bar {
+    margin-bottom: 2px;
+  }
+  h1 {
+    font-size: 1rem;
+  }
+  .player-id {
+    font-size: 0.72rem;
+    gap: 3px;
+  }
+
+  /* ---------- Compact league progress (replaces the trophy case) ---------- */
+  .mobile-league-progress {
+    padding: 10px 12px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+    background: rgba(10, 6, 20, 0.6);
+    border: 1px solid var(--league-border, rgba(0,229,255,0.18));
+  }
+  .mlp-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  .mlp-league-name {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--league-text, #00e5ff);
+  }
+  .mlp-fraction {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #ffd24d;
+  }
+  .mlp-bar {
+    height: 8px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.08);
+    overflow: hidden;
+    margin-bottom: 6px;
+  }
+  .mlp-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #00e5ff, #ffd24d);
+    transition: width 0.5s ease;
+  }
+  .mlp-next {
+    font-size: 0.68rem;
+    color: #a9a3c2;
+    font-weight: 600;
+  }
+
+  /* ---------- Small entry-point buttons for features that used to live
+     in the header (Collection, Stats, Shop, How to Play, Change Name) ---------- */
+  .mobile-tab-menu-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .mobile-tab-menu-btn {
+    flex: 1;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.15);
+    box-shadow: none;
+    color: #e8e5f0;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-transform: none;
+    letter-spacing: 0;
+    padding: 10px 6px;
+    border-radius: 8px;
+  }
+  .mobile-tab-menu-btn:hover {
+    box-shadow: none;
+    background: rgba(255,255,255,0.09);
+  }
+
+  /* ---------- Bracket: tournament-flow visual + compact matchup ---------- */
+  .bracket-title-mobile {
+    display: block;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.78rem;
+    color: #ffd24d;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+
+  .bracket-flow {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 10px;
+  }
+  .bracket-flow-step {
+    flex: 1;
+    text-align: center;
+    font-size: 0.56rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    color: #4a4560;
+    padding-bottom: 6px;
+    border-bottom: 3px solid #2a2540;
+    text-transform: uppercase;
+  }
+  .bracket-flow-step.done {
+    color: #2ecc71;
+    border-bottom-color: #2ecc71;
+  }
+  .bracket-flow-step.current {
+    color: #ffd24d;
+    border-bottom-color: #ffd24d;
+    text-shadow: 0 0 8px rgba(255,210,77,0.6);
+  }
+
+  /* ---------- Spin section ---------- */
+  .next-move-label {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #a9a3c2;
+    text-align: center;
+    margin-bottom: 2px;
+  }
+  .roulette-title {
+    text-align: center;
+    margin-top: 0;
+  }
+
+  /* ---------- Full bracket as a near-fullscreen modal instead of a
+     plain inline reveal — same #bracket-path element/data, just given a
+     fixed, centered presentation while expanded. ---------- */
+  .bracket-modal-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 199;
+  }
+  .bracket-modal-close {
+    display: none;
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 201;
+    padding: 8px 16px;
+    font-size: 0.78rem;
+  }
+  .bracket-panel.expanded .bracket-modal-backdrop,
+  .bracket-panel.expanded .bracket-modal-close {
+    display: block;
+  }
+  .bracket-panel.expanded .bracket-path {
+    display: flex;
+    position: fixed;
+    top: 8%;
+    left: 5%;
+    right: 5%;
+    bottom: 8%;
+    z-index: 200;
+    flex-direction: column;
+    overflow-y: auto;
+    background: rgba(20, 12, 33, 0.98);
+    border: 1px solid var(--league-border, rgba(0,229,255,0.3));
+    border-radius: 14px;
+    padding: 50px 16px 20px;
+    box-shadow: 0 0 60px rgba(0,0,0,0.7);
+  }
+  .bracket-panel.expanded .bracket-node {
+    width: 100%;
+  }
+  .bracket-panel.expanded .bracket-arrow {
+    transform: rotate(90deg);
+    margin: 2px 0;
+  }
+}

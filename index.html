@@ -20,20 +20,34 @@
       <h1>Multiverse Anime Tournament</h1>
       <div class="player-id">
         Playing as <b id="player-name-display">—</b> <span id="title-display" class="title-badge"></span>
-        <button class="link-btn" id="change-name-btn">Change name</button>
-        <button class="link-btn" id="open-howto-btn">❓ How to Play</button>
-        <button class="link-btn" id="open-collection-btn">📖 Collection</button>
-        <button class="link-btn" id="open-stats-btn">📊 Stats</button>
-        <button class="link-btn" id="open-shop-btn">🛒 Shop (<span id="shard-balance-inline">0</span> 🔷)</button>
+        <button class="link-btn" id="change-name-btn" data-desktop-only="true">Change name</button>
+        <button class="link-btn" id="open-howto-btn" data-desktop-only="true">❓ How to Play</button>
+        <button class="link-btn" id="open-collection-btn" data-desktop-only="true">📖 Collection</button>
+        <button class="link-btn" id="open-stats-btn" data-desktop-only="true">📊 Stats</button>
+        <button class="link-btn" id="open-shop-btn" data-desktop-only="true">🛒 Shop (<span id="shard-balance-inline">0</span> 🔷)</button>
       </div>
     </div>
 
-    <p class="subtitle-short">🎯 Draft fighters, clear 6 leagues, become Champion. Single elimination — see <b id="howto-inline-link">How to Play</b> for details.</p>
+    <p class="subtitle-short" data-desktop-only="true">🎯 Draft fighters, clear 6 leagues, become Champion. Single elimination — see <b id="howto-inline-link">How to Play</b> for details.</p>
 
-    <div class="trophy-case" id="trophy-case"></div>
+    <div class="trophy-case" id="trophy-case" data-desktop-only="true"></div>
+
+    <div class="mobile-league-progress" data-tab="game">
+      <div class="mlp-header">
+        <span class="mlp-league-name" id="mlp-league-name">Bronze League</span>
+        <span class="mlp-fraction" id="mlp-fraction">0 / 4 wins</span>
+      </div>
+      <div class="mlp-bar"><div class="mlp-bar-fill" id="mlp-bar-fill"></div></div>
+      <div class="mlp-next" id="mlp-next">Win 4 battles to reach Silver League</div>
+    </div>
 
     <div class="layout layout-3col">
       <aside class="stats-col">
+        <div class="mobile-tab-menu-row" data-tab="roster">
+          <button class="mobile-tab-menu-btn" id="mobile-open-collection-btn" type="button">📖 Collection Index</button>
+          <button class="mobile-tab-menu-btn" id="mobile-open-stats-btn" type="button">📊 Stats</button>
+        </div>
+
         <div class="player-stat-card" data-tab="roster">
           <div class="player-stat-avatar" id="player-stat-avatar"></div>
           <div class="player-stat-name" id="player-stat-name">—</div>
@@ -57,6 +71,9 @@
         </div>
 
         <div data-tab="items">
+          <div class="mobile-tab-menu-row">
+            <button class="mobile-tab-menu-btn" id="mobile-open-shop-btn" type="button">🛒 Shop</button>
+          </div>
           <span class="roster-label items-label">Items</span>
           <div class="items-list" id="items-list"></div>
         </div>
@@ -64,14 +81,20 @@
 
       <div class="main-col">
         <div class="bracket-panel" data-tab="game">
-          <span class="bracket-title" id="bracket-title">Bronze League — Bracket</span>
-          <div class="league-progress" id="league-progress"></div>
+          <span class="bracket-title" id="bracket-title" data-desktop-only="true">Bronze League — Bracket</span>
+          <div class="league-progress" id="league-progress" data-desktop-only="true"></div>
+
+          <span class="bracket-title-mobile">Current Tournament</span>
+          <div class="bracket-flow" id="bracket-flow"></div>
           <div class="bracket-compact" id="bracket-compact"></div>
           <button class="bracket-toggle" id="bracket-toggle" type="button">View Full Bracket ▾</button>
+          <div class="bracket-modal-backdrop" id="bracket-modal-backdrop"></div>
+          <button class="bracket-modal-close" id="bracket-modal-close" type="button">✕ Close</button>
           <div class="bracket-path" id="bracket-path"></div>
         </div>
 
         <div data-tab="game">
+          <span class="next-move-label" id="next-move-label">Your Next Move</span>
           <h3 class="roulette-title" id="roulette-title">Ready to begin?</h3>
 
           <div class="roulette-viewport">
@@ -99,6 +122,10 @@
       </div>
 
       <aside class="quests-col" data-tab="quests">
+        <div class="mobile-tab-menu-row">
+          <button class="mobile-tab-menu-btn" id="mobile-open-howto-btn" type="button">❓ How to Play</button>
+          <button class="mobile-tab-menu-btn" id="mobile-change-name-btn" type="button">✏️ Change Name</button>
+        </div>
         <div class="mini-summary-card">
           <span class="mini-summary-label">Your Roster</span>
           <div class="mini-roster-row" id="mini-roster-row"></div>
@@ -322,10 +349,10 @@
   </div>
 
   <nav class="mobile-tabbar" id="mobile-tabbar">
-    <button class="mobile-tab active" data-tab-btn="game" type="button"><span class="mobile-tab-icon">🏆</span><span>Game</span></button>
-    <button class="mobile-tab" data-tab-btn="roster" type="button"><span class="mobile-tab-icon">👤</span><span>Roster</span></button>
+    <button class="mobile-tab active" data-tab-btn="game" type="button"><span class="mobile-tab-icon">🏆</span><span>Play</span></button>
+    <button class="mobile-tab" data-tab-btn="roster" type="button"><span class="mobile-tab-icon">👥</span><span>Collection</span></button>
     <button class="mobile-tab" data-tab-btn="items" type="button"><span class="mobile-tab-icon">🎒</span><span>Items</span></button>
-    <button class="mobile-tab" data-tab-btn="quests" type="button"><span class="mobile-tab-icon">📋</span><span>Quests</span></button>
+    <button class="mobile-tab" data-tab-btn="quests" type="button"><span class="mobile-tab-icon">☰</span><span>More</span></button>
   </nav>
 
   <script src="script.js"></script>
